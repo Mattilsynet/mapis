@@ -1,4 +1,4 @@
-# mappis
+# mapis
 
 Contains protobuf(protocol buffers) files and generated go types used within the plattform team
 
