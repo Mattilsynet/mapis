@@ -1,0 +1,14 @@
+syntax = "proto3";
+package kind.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/kind/v1;kindv1";
+
+enum Kind {
+  UnknownKind = 0;
+  IdportenClient = 1;
+  MaskinportenClient = 2;
+  Event = 3;
+  AppRegistrationClient = 4;
+  NatsAccount = 5;
+  DigdirScope = 6;
+}

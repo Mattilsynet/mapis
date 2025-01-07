@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package event.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/event/v1;eventv1";
+
+import "meta/v1/meta.proto";
+import "google/protobuf/any.proto";
+
+// Root message for the API
+message Event {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  EventSpec spec = 3;
+}
+
+// Generic event specification. Useful for event based state transfer.
+message EventSpec {
+  // The protobuf package name goes here.
+  string kind = 1;
+
+  // Enum for the action type
+  enum Operation {
+    OPERATION_UNSPECIFIED = 0; // Default value, used when no action is specified.
+    OPERATION_CREATE = 1;
+    OPERATION_READ = 2;
+    OPERATION_UPDATE = 3;
+    OPERATION_DELETE = 4;
+  }
+
+  // What operation caused this event (CRUD)
+  Operation operation = 2; // ENUM
+
+  // The raw event kind object
+  google.protobuf.Any kind_object = 3;
+
+  // Correlation ID from action that caused this event to exist.
+  string correlation_id = 10;
+}
+

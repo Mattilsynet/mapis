@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package query.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/query/v1;query";
+
+message Query {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 10;
+  QuerySpec spec = 20;
+  QueryStatus status = 30;
+}
+// map-cli get ManagedEnvironment
+// lists all...
+
+// map-cli get ManagedEnvironment map-ops map-ops-dev
+// lists only map-ops and map-ops-dev
+message QuerySpec {
+  string action = 1;
+  meta.v1.TypeMeta type = 10; // Kind = ManagedEnvironment, f.ex
+  repeated meta.v1.ObjectMeta type_metadata =
+      20; // name of the managedenvironment in question, can be a list
+  QueryFilter query_filter = 30;
+  string session = 40;
+}
+
+message QueryStatus {
+  status.v1.Status status = 1;
+  repeated bytes type_payload = 20;
+  string id = 30;
+}
+
+message QueryFilter {
+  string name = 1;
+  bool status_is_ready = 10;
+}

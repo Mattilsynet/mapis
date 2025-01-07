@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package command.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/command/v1;command";
+
+message Command {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 10;
+  CommandSpec spec = 20;
+  CommandStatus status = 30;
+}
+
+message CommandSpec {
+  string Operation = 1 [ (buf.validate.field).string = {
+    in : [ "CREATE", "UPDATE", "DELETE", "create", "update", "delete" ]
+  } ];
+  meta.v1.TypeMeta type = 10;
+  bytes type_payload = 20;
+  string session_id = 30;
+}
+
+message CommandStatus {
+  string id = 1;
+  string query_subject = 10;
+  status.v1.Status status = 20;
+}

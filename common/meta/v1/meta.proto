@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package meta.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/meta/v1;metav1";
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+message TypeMeta {
+  string kind = 1;
+  string api_version = 2;
+}
+
+message ObjectMeta {
+  // we make a rule such that name of the object must be set to something instead of nothing
+  string name = 1[(buf.validate.field).string = {
+    min_len: 1,
+  }];
+  map<string, string> labels = 2;
+  map<string, string> annotations = 3;
+  // we make a rule such that the resource version must be set to something instead of nothing
+  string resource_version = 4[(buf.validate.field).string = {
+    min_len: 1,
+  }];
+  google.protobuf.Timestamp created_timestamp = 5;
+  string uid = 6;
+}
+

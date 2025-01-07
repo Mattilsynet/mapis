@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package condition.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/condition/v1;conditionv1";
+
+import "google/protobuf/timestamp.proto";
+
+message Condition {
+  bool status = 1;
+  string message = 5;
+  string reason = 10;
+  string type = 15;
+  google.protobuf.Timestamp lastTransitionTime = 20;
+}
+

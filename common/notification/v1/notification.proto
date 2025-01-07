@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package notification.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/notification/v1;notificationv1";
+
+import "meta/v1/meta.proto";
+import "google/protobuf/struct.proto";
+
+// Notification is a generic event that can be used to notify other systems of changes in the system.
+message Notification {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  NotificationSpec spec = 3;
+}
+
+// Generic notification event specification.
+message NotificationSpec {
+
+  // Enum for the action type
+  enum Operation {
+    OPERATION_UNSPECIFIED = 0; // Default value, used when no action is specified.
+    OPERATION_CREATE = 1;
+    OPERATION_READ = 2;
+    OPERATION_UPDATE = 3;
+    OPERATION_DELETE = 4;
+  }
+
+  // The action that triggered this notification
+  Operation operation = 1;
+
+  // A structured string to identify the resource. Example: /resource/v1/IdPortenClient/1234.
+  string self_link = 2;
+  // The specific resource id the notification is tied to. May be part of the self_link.
+  string resource_id = 3;
+  // The specific resource type the notification is tied to. May be part of the self_link.
+  string resource_type = 4;
+  // The resource version of the resource the notification is tied to. Not part of the self_link.
+  string resource_version = 5;
+  // Struct for free-form for optional state transfer. Beware, you may leak sensitive info here.
+  google.protobuf.Struct resource_data = 6;
+
+
+  // Correlation ID from action that caused this event to exist.
+  string correlation_id = 10;
+}
+

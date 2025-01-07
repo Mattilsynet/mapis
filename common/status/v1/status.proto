@@ -1,0 +1,12 @@
+syntax = "proto3";
+import "condition/v1/condition.proto";
+
+package status.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/status/v1;statusv1";
+
+message Status {
+  repeated condition.v1.Condition conditions = 1;
+  string message = 2;
+}
+
