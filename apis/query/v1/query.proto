@@ -36,5 +36,6 @@ message QueryStatus {
 
 message QueryFilter {
   string name = 1;
-  bool status_is_ready = 10;
+  StatusFilter statusFilter = 10;
 }
+message StatusFilter { bool status_is_ready = 1; }
