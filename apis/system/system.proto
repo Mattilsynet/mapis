@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package system.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/system/v1;system";
+/*INFO: 
+System is to organize our github repos as to say: This system is composed of component A, B and C to fasilitate one or more use-case(s). i.e., these components makes sense in this grouping.
+e.g., managed-environment, system, application, component, usergroups, users might be composed together to a system which can be called "administration/plattform"
+e.g., map-query-api and map-command-api to a system called "CQRS" or similar 
+*/
+//INFO: name is within metadata.name
+message System {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 10;
+  SystemSpec spec = 20;
+  SystemStatus status = 30;
+}
+message SystemSpec {
+  string description = 1;
+  string managed_environment_ref = 10; //this could be the key to a concrete ME behind component ME, or perhaps a metadata label
+  repeated SystemApplicationIndex system_application_indexes = 20;
+  
+}
+//INFO: This could also be called system application mapping 
+message SystemApplicationIndex {
+  string name = 1;
+  string repo_url = 10;
+
+}
+message SystemStatus {
+}
