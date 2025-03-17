@@ -1,0 +1,15 @@
+syntax = "proto3";
+package mapspace.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/mattilsynet/mapis/gen/mapspace/v1;mapspace";
+message Mapspace {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 10;
+  MapspaceSpec spec = 20;
+}
+message MapspaceSpec { MapspaceStatus mapspace_status = 20; }
+message MapspaceStatus { map<string, string> statusMap = 1; }

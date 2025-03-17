@@ -62,7 +62,7 @@ func (m *ManagedGcpEnvironmentSpec) CloneVT() *ManagedGcpEnvironmentSpec {
 	r.ParentFolderId = m.ParentFolderId
 	r.DnsZoneName = m.DnsZoneName
 	r.TeamArRepoId = m.TeamArRepoId
-	r.NamespaceRef = m.NamespaceRef
+	r.MapspaceRef = m.MapspaceRef
 	r.BudgetAmount = m.BudgetAmount
 	r.Email = m.Email
 	if len(m.unknownFields) > 0 {
@@ -153,7 +153,7 @@ func (this *ManagedGcpEnvironmentSpec) EqualVT(that *ManagedGcpEnvironmentSpec) 
 	if this.TeamArRepoId != that.TeamArRepoId {
 		return false
 	}
-	if this.NamespaceRef != that.NamespaceRef {
+	if this.MapspaceRef != that.MapspaceRef {
 		return false
 	}
 	if this.BudgetAmount != that.BudgetAmount {
@@ -349,10 +349,10 @@ func (m *ManagedGcpEnvironmentSpec) MarshalToSizedBufferVT(dAtA []byte) (int, er
 		i--
 		dAtA[i] = 0x92
 	}
-	if len(m.NamespaceRef) > 0 {
-		i -= len(m.NamespaceRef)
-		copy(dAtA[i:], m.NamespaceRef)
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.NamespaceRef)))
+	if len(m.MapspaceRef) > 0 {
+		i -= len(m.MapspaceRef)
+		copy(dAtA[i:], m.MapspaceRef)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.MapspaceRef)))
 		i--
 		dAtA[i] = 0x2
 		i--
@@ -594,10 +594,10 @@ func (m *ManagedGcpEnvironmentSpec) MarshalToSizedBufferVTStrict(dAtA []byte) (i
 		i--
 		dAtA[i] = 0x92
 	}
-	if len(m.NamespaceRef) > 0 {
-		i -= len(m.NamespaceRef)
-		copy(dAtA[i:], m.NamespaceRef)
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.NamespaceRef)))
+	if len(m.MapspaceRef) > 0 {
+		i -= len(m.MapspaceRef)
+		copy(dAtA[i:], m.MapspaceRef)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.MapspaceRef)))
 		i--
 		dAtA[i] = 0x2
 		i--
@@ -750,7 +750,7 @@ func (m *ManagedGcpEnvironmentSpec) SizeVT() (n int) {
 	if l > 0 {
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
-	l = len(m.NamespaceRef)
+	l = len(m.MapspaceRef)
 	if l > 0 {
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
@@ -1154,7 +1154,7 @@ func (m *ManagedGcpEnvironmentSpec) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 40:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NamespaceRef", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MapspaceRef", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1182,7 +1182,7 @@ func (m *ManagedGcpEnvironmentSpec) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.NamespaceRef = string(dAtA[iNdEx:postIndex])
+			m.MapspaceRef = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 50:
 			if wireType != 2 {
@@ -1834,7 +1834,7 @@ func (m *ManagedGcpEnvironmentSpec) UnmarshalVTUnsafe(dAtA []byte) error {
 			iNdEx = postIndex
 		case 40:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NamespaceRef", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MapspaceRef", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1866,7 +1866,7 @@ func (m *ManagedGcpEnvironmentSpec) UnmarshalVTUnsafe(dAtA []byte) error {
 			if intStringLen > 0 {
 				stringValue = unsafe.String(&dAtA[iNdEx], intStringLen)
 			}
-			m.NamespaceRef = stringValue
+			m.MapspaceRef = stringValue
 			iNdEx = postIndex
 		case 50:
 			if wireType != 2 {

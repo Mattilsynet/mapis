@@ -22,8 +22,8 @@ message ManagedGcpEnvironmentSpec {
   string parent_folder_id = 10;
   string dns_zone_name = 20;
   string team_ar_repo_id = 30;
-  // eg., "123213213", which is the overall namespace name, i.e., map-ops-dev
-  string namespace_ref = 40;
+  // eg., "123213213", which is the overall mapspace name, i.e., map-ops-dev
+  string mapspace_ref = 40;
   string budget_amount = 50;
   // eg. for slack,
   // "some-team-aaaa94320493204932049320@somecompany-hq.slack.com" where budget
