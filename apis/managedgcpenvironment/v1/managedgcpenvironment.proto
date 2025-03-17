@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package managedgcpenvironment.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/mattilsynet/mapis/gen/managedgcpenvironment/v1;managedgcpenvironment";
+
+message ManagedGcpEnvironment {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 10;
+  ManagedGcpEnvironmentSpec spec = 20;
+  ManagedGcpEnvironmentStatus status = 30;
+}
+
+message ManagedGcpEnvironmentSpec {
+  // e.g., gcp.plattform@mattilsynet.no
+  string group = 1;
+  // eg., "1182832818, the namespace folder which could be map-ops-dev/dev"
+  string parent_folder_id = 10;
+  string dns_zone_name = 20;
+  string team_ar_repo_id = 30;
+  // eg., "123213213", which is the overall namespace name, i.e., map-ops-dev
+  string namespace_ref = 40;
+  string budget_amount = 50;
+  // eg. for slack,
+  // "some-team-aaaa94320493204932049320@somecompany-hq.slack.com" where budget
+  // alerts would arrive at f.ex
+  string email = 60;
+}
+message ManagedGcpEnvironmentStatus { map<string, string> statusMap = 1; }
