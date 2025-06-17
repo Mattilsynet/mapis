@@ -20,6 +20,8 @@ message ManagedGcpEnvironmentSpec {
   string group = 1;
   // eg., "1182832818, the namespace folder which could be map-ops-dev/dev"
   string parent_folder_id = 10;
+  // eg., "dev", "prod"
+  string env = 11;
   string dns_zone_name = 20;
   string team_ar_repo_id = 30;
   // eg., "123213213", which is the overall mapspace name, i.e., map-ops-dev
