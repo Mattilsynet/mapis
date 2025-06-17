@@ -60,6 +60,7 @@ func (m *ManagedGcpEnvironmentSpec) CloneVT() *ManagedGcpEnvironmentSpec {
 	r := new(ManagedGcpEnvironmentSpec)
 	r.Group = m.Group
 	r.ParentFolderId = m.ParentFolderId
+	r.Env = m.Env
 	r.DnsZoneName = m.DnsZoneName
 	r.TeamArRepoId = m.TeamArRepoId
 	r.MapspaceRef = m.MapspaceRef
@@ -145,6 +146,9 @@ func (this *ManagedGcpEnvironmentSpec) EqualVT(that *ManagedGcpEnvironmentSpec) 
 		return false
 	}
 	if this.ParentFolderId != that.ParentFolderId {
+		return false
+	}
+	if this.Env != that.Env {
 		return false
 	}
 	if this.DnsZoneName != that.DnsZoneName {
@@ -375,6 +379,13 @@ func (m *ManagedGcpEnvironmentSpec) MarshalToSizedBufferVT(dAtA []byte) (int, er
 		dAtA[i] = 0x1
 		i--
 		dAtA[i] = 0xa2
+	}
+	if len(m.Env) > 0 {
+		i -= len(m.Env)
+		copy(dAtA[i:], m.Env)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Env)))
+		i--
+		dAtA[i] = 0x5a
 	}
 	if len(m.ParentFolderId) > 0 {
 		i -= len(m.ParentFolderId)
@@ -621,6 +632,13 @@ func (m *ManagedGcpEnvironmentSpec) MarshalToSizedBufferVTStrict(dAtA []byte) (i
 		i--
 		dAtA[i] = 0xa2
 	}
+	if len(m.Env) > 0 {
+		i -= len(m.Env)
+		copy(dAtA[i:], m.Env)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Env)))
+		i--
+		dAtA[i] = 0x5a
+	}
 	if len(m.ParentFolderId) > 0 {
 		i -= len(m.ParentFolderId)
 		copy(dAtA[i:], m.ParentFolderId)
@@ -739,6 +757,10 @@ func (m *ManagedGcpEnvironmentSpec) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	l = len(m.ParentFolderId)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Env)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
@@ -1087,6 +1109,38 @@ func (m *ManagedGcpEnvironmentSpec) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.ParentFolderId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Env = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 20:
 			if wireType != 2 {
@@ -1759,6 +1813,42 @@ func (m *ManagedGcpEnvironmentSpec) UnmarshalVTUnsafe(dAtA []byte) error {
 				stringValue = unsafe.String(&dAtA[iNdEx], intStringLen)
 			}
 			m.ParentFolderId = stringValue
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var stringValue string
+			if intStringLen > 0 {
+				stringValue = unsafe.String(&dAtA[iNdEx], intStringLen)
+			}
+			m.Env = stringValue
 			iNdEx = postIndex
 		case 20:
 			if wireType != 2 {
