@@ -17,11 +17,16 @@ message ManagedGcpEnvironment {
 
 message ManagedGcpEnvironmentSpec {
   // e.g., gcp.plattform@mattilsynet.no
-  string group = 1;
+  string group = 1[(buf.validate.field).cel = {
+    id: "valid_email"
+    message: "email must be a valid email"
+    expression: "this.isEmail()"
+  }];
+//[(buf.validate.field).string.email = true];
   // eg., "1182832818, the namespace folder which could be map-ops-dev/dev"
   string parent_folder_id = 10;
   // eg., "dev", "prod"
-  string env = 11;
+  string env = 11[(buf.validate.field).string.in = "dev", (buf.validate.field).string.in = "prod"];
   string dns_zone_name = 20;
   string team_ar_repo_id = 30;
   // eg., "123213213", which is the overall mapspace name, i.e., map-ops-dev
@@ -30,6 +35,11 @@ message ManagedGcpEnvironmentSpec {
   // eg. for slack,
   // "some-team-aaaa94320493204932049320@somecompany-hq.slack.com" where budget
   // alerts would arrive at f.ex
-  string email = 60;
+  string email = 60[(buf.validate.field).cel = {
+    id: "valid_email"
+    message: "email must be a valid email"
+    expression: "this.isEmail()"
+  }];
+
 }
 message ManagedGcpEnvironmentStatus { map<string, string> statusMap = 1; }
