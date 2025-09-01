@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package organization.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/organization/v1;organization";
+
+//INFO: https://github.com/zitadel/zitadel/blob/8574d6fbabe1ed115ac430fecfa6f873044a76f0/proto/zitadel/org/v2/org.proto#L14 for ideas
+message Organization {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  OrganizationSpec spec = 20;
+  OrganizationStatus status = 30;
+}
+
+message OrganizationSpec {
+  meta.v1.TypeMeta type = 1;
+  string resource_id = 20;
+  string organization_name = 30;
+  string organization_domain_name = 40;
+}
+
+message OrganizationStatus {
+  status.v1.Status status = 20;
+}
