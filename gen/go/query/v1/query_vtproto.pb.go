@@ -29,6 +29,7 @@ func (m *Query) CloneVT() *Query {
 	r := new(Query)
 	r.Spec = m.Spec.CloneVT()
 	r.Status = m.Status.CloneVT()
+	r.ReplySubject = m.ReplySubject
 	if rhs := m.Type; rhs != nil {
 		if vtpb, ok := interface{}(rhs).(interface{ CloneVT() *v1.TypeMeta }); ok {
 			r.Type = vtpb.CloneVT()
@@ -62,6 +63,7 @@ func (m *QuerySpec) CloneVT() *QuerySpec {
 	r.Action = m.Action
 	r.QueryFilter = m.QueryFilter.CloneVT()
 	r.Session = m.Session
+	r.ResponseFormat = m.ResponseFormat
 	if rhs := m.Type; rhs != nil {
 		if vtpb, ok := interface{}(rhs).(interface{ CloneVT() *v1.TypeMeta }); ok {
 			r.Type = vtpb.CloneVT()
@@ -185,6 +187,9 @@ func (this *Query) EqualVT(that *Query) bool {
 	if !this.Status.EqualVT(that.Status) {
 		return false
 	}
+	if this.ReplySubject != that.ReplySubject {
+		return false
+	}
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
@@ -236,6 +241,9 @@ func (this *QuerySpec) EqualVT(that *QuerySpec) bool {
 		return false
 	}
 	if this.Session != that.Session {
+		return false
+	}
+	if this.ResponseFormat != that.ResponseFormat {
 		return false
 	}
 	return string(this.unknownFields) == string(that.unknownFields)
@@ -354,6 +362,15 @@ func (m *Query) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ReplySubject) > 0 {
+		i -= len(m.ReplySubject)
+		copy(dAtA[i:], m.ReplySubject)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ReplySubject)))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xc2
+	}
 	if m.Status != nil {
 		size, err := m.Status.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
@@ -454,6 +471,13 @@ func (m *QuerySpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ResponseFormat != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ResponseFormat))
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0x90
 	}
 	if len(m.Session) > 0 {
 		i -= len(m.Session)
@@ -732,6 +756,15 @@ func (m *Query) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ReplySubject) > 0 {
+		i -= len(m.ReplySubject)
+		copy(dAtA[i:], m.ReplySubject)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ReplySubject)))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xc2
+	}
 	if m.Status != nil {
 		size, err := m.Status.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -832,6 +865,13 @@ func (m *QuerySpec) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ResponseFormat != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ResponseFormat))
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0x90
 	}
 	if len(m.Session) > 0 {
 		i -= len(m.Session)
@@ -1114,6 +1154,10 @@ func (m *Query) SizeVT() (n int) {
 		l = m.Status.SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	l = len(m.ReplySubject)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -1157,6 +1201,9 @@ func (m *QuerySpec) SizeVT() (n int) {
 	l = len(m.Session)
 	if l > 0 {
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ResponseFormat != 0 {
+		n += 2 + protohelpers.SizeOfVarint(uint64(m.ResponseFormat))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -1412,6 +1459,38 @@ func (m *Query) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 40:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ReplySubject", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ReplySubject = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := protohelpers.Skip(dAtA[iNdEx:])
@@ -1649,6 +1728,25 @@ func (m *QuerySpec) UnmarshalVT(dAtA []byte) error {
 			}
 			m.Session = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 50:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResponseFormat", wireType)
+			}
+			m.ResponseFormat = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ResponseFormat |= ResponseFormat(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := protohelpers.Skip(dAtA[iNdEx:])
@@ -2209,6 +2307,42 @@ func (m *Query) UnmarshalVTUnsafe(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 40:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ReplySubject", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var stringValue string
+			if intStringLen > 0 {
+				stringValue = unsafe.String(&dAtA[iNdEx], intStringLen)
+			}
+			m.ReplySubject = stringValue
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := protohelpers.Skip(dAtA[iNdEx:])
@@ -2454,6 +2588,25 @@ func (m *QuerySpec) UnmarshalVTUnsafe(dAtA []byte) error {
 			}
 			m.Session = stringValue
 			iNdEx = postIndex
+		case 50:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResponseFormat", wireType)
+			}
+			m.ResponseFormat = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ResponseFormat |= ResponseFormat(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := protohelpers.Skip(dAtA[iNdEx:])

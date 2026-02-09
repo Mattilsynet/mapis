@@ -26,3 +26,7 @@ message OrganizationSpec {
 message OrganizationStatus {
   status.v1.Status status = 20;
 }
+
+message OrganizationList {
+  repeated Organization items = 1;
+}

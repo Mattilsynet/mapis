@@ -13,6 +13,7 @@ message Query {
   meta.v1.ObjectMeta metadata = 10;
   QuerySpec spec = 20;
   QueryStatus status = 30;
+  string reply_subject = 40;
 }
 // map-cli get ManagedEnvironment
 // lists all...
@@ -26,6 +27,13 @@ message QuerySpec {
       20; // name of the managedenvironment in question, can be a list
   QueryFilter query_filter = 30;
   string session = 40;
+  ResponseFormat response_format = 50;
+}
+
+enum ResponseFormat {
+  RESPONSE_FORMAT_UNSPECIFIED = 0;
+  RESPONSE_FORMAT_PROTO = 1;
+  RESPONSE_FORMAT_HTML = 2;
 }
 
 message QueryStatus {
