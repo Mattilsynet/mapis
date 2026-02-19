@@ -16,7 +16,7 @@ message ManagedGcpEnvironment {
 }
 
 message ManagedGcpEnvironmentSpec {
-  // e.g., gcp.plattform@mattilsynet.no
+  // e.g., gcp.platform@mattilsynet.no
   string group = 1[(buf.validate.field).cel = {
     id: "valid_email"
     message: "email must be a valid email"

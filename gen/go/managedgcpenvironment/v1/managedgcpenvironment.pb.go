@@ -93,7 +93,7 @@ func (x *ManagedGcpEnvironment) GetStatus() *ManagedGcpEnvironmentStatus {
 
 type ManagedGcpEnvironmentSpec struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// e.g., gcp.plattform@mattilsynet.no
+	// e.g., gcp.platform@mattilsynet.no
 	Group string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
 	// [(buf.validate.field).string.email = true];
 	// eg., "1182832818, the namespace folder which could be map-ops-dev/dev"

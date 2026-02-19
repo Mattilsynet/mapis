@@ -9,7 +9,7 @@ import "status/v1/status.proto";
 option go_package = "github.com/Mattilsynet/mapis/gen/system/v1;system";
 /*INFO: 
 System is to organize our github repos as to say: This system is composed of component A, B and C to fasilitate one or more use-case(s). i.e., these components makes sense in this grouping.
-e.g., managed-environment, system, application, component, usergroups, users might be composed together to a system which can be called "administration/plattform"
+e.g., managed-environment, system, application, component, usergroups, users might be composed together to a system which can be called "administration/platform"
 e.g., map-query-api and map-command-api to a system called "CQRS" or similar 
 */
 //INFO: name is within metadata.name
