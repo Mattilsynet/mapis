@@ -1,0 +1,70 @@
+syntax = "proto3";
+package iam.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+
+// Policy - grants access to a resource by binding roles to members
+// A policy applies to any resource (not owned by a specific resource)
+// Policies are aggregated per resource during sync
+// metadata.name = user-provided unique identifier
+message Policy {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  PolicySpec spec = 20;
+  PolicyStatus status = 30;
+}
+
+message PolicySpec {
+  // resource_id - the target resource this policy grants access to
+  // Format: orgs/{org}/projects/{project}/resources/{resource}
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+
+  // bindings - list of role bindings for this policy
+  // Multiple bindings for the same role are merged (members combined)
+  repeated Binding bindings = 10;
+
+  // description - human-readable description of this policy
+  string description = 20;
+}
+
+message Binding {
+  // role - the role name being granted
+  string role = 1 [(buf.validate.field).string.min_len = 1];
+
+  // members - who gets this role (users, groups, serviceaccounts)
+  // Format: users/{email}, groups/{name}, serviceaccounts/{id}
+  repeated string members = 2 [(buf.validate.field).string.min_len = 1];
+
+  // conditions - CEL expressions that must evaluate to true
+  // Multiple conditions are AND'd together
+  repeated Condition conditions = 3;
+}
+
+message Condition {
+  // id - optional reusable condition identifier
+  string id = 1;
+
+  // expression - CEL expression for access control
+  string expression = 2 [(buf.validate.field).string.min_len = 1];
+
+  // description - human-readable description
+  string description = 3;
+
+  // ttl - how long to cache evaluation results
+  google.protobuf.Duration ttl = 4;
+}
+
+message PolicyStatus {
+  status.v1.Status status = 20;
+  // external_id - ZITADEL project ID (populated during sync)
+  string external_id = 21;
+}
+
+message PolicyList {
+  repeated Policy items = 1;
+}

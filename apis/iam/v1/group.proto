@@ -1,0 +1,42 @@
+syntax = "proto3";
+package iam.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+
+// Group - platform-only collection of users (NOT synced to ZITADEL)
+// Groups are expanded during policy sync to ZITADEL
+// metadata.name = group name
+message Group {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;  // name = group_name
+  GroupSpec spec = 20;
+  GroupStatus status = 30;
+}
+
+message GroupSpec {
+  // name - group name (matches metadata.name)
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // description - human-readable description
+  string description = 2;
+
+  // members - users and service accounts in this group
+  // Format: users/{email}, serviceaccounts/{id}
+  // NOTE: Groups CANNOT contain other groups
+  repeated string members = 10 [(buf.validate.field).string.min_len = 1];
+
+  // external_id - external reference (if needed)
+  string external_id = 20;
+}
+
+message GroupStatus {
+  status.v1.Status status = 20;
+}
+
+message GroupList {
+  repeated Group items = 1;
+}

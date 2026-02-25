@@ -1,0 +1,53 @@
+syntax = "proto3";
+package iam.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+
+// User - represents a person accessing the platform
+// metadata.name = user's email address
+message User {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;  // name = email
+  UserSpec spec = 20;
+  UserStatus status = 30;
+}
+
+message UserSpec {
+  // email - primary identifier, matches metadata.name
+  string email = 1 [(buf.validate.field).string.email = true];
+
+  // display_name - user's display name
+  string display_name = 2 [(buf.validate.field).string.min_len = 1];
+
+  // given_name - first name
+  string given_name = 3;
+
+  // family_name - last name
+  string family_name = 4;
+
+  // phone - optional phone number (E.164 format)
+  string phone = 5 [(buf.validate.field).string = {
+    pattern: "^\\+?[1-9]\\d{1,14}$"
+  }];
+
+  // disabled - if true, user cannot authenticate
+  bool disabled = 10;
+
+  // external_id - ZITADEL user ID (populated during sync)
+  string external_id = 20;
+}
+
+message UserStatus {
+  status.v1.Status status = 20;
+  // last_login - when user last authenticated
+  google.protobuf.Timestamp last_login = 21;
+}
+
+message UserList {
+  repeated User items = 1;
+}
