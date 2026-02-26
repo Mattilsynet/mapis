@@ -101,9 +101,10 @@ type GroupSpec struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// description - human-readable description
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// members - users and service accounts in this group
-	// Format: users/{email}, serviceaccounts/{id}
+	// members - user email addresses only (service accounts cannot be members)
+	// Format: plain email address (e.g., "user@example.com")
 	// NOTE: Groups CANNOT contain other groups
+	// NOTE: Service accounts are NOT allowed in groups
 	Members []string `protobuf:"bytes,10,rep,name=members,proto3" json:"members,omitempty"`
 	// external_id - external reference (if needed)
 	ExternalId    string `protobuf:"bytes,20,opt,name=external_id,json=externalId,proto3" json:"external_id,omitempty"`
@@ -266,12 +267,12 @@ const file_iam_v1_group_proto_rawDesc = "" +
 	"\x04type\x18\x01 \x01(\v2\x11.meta.v1.TypeMetaR\x04type\x12/\n" +
 	"\bmetadata\x18\x02 \x01(\v2\x13.meta.v1.ObjectMetaR\bmetadata\x12%\n" +
 	"\x04spec\x18\x14 \x01(\v2\x11.iam.v1.GroupSpecR\x04spec\x12+\n" +
-	"\x06status\x18\x1e \x01(\v2\x13.iam.v1.GroupStatusR\x06status\"\x8e\x01\n" +
+	"\x06status\x18\x1e \x01(\v2\x13.iam.v1.GroupStatusR\x06status\"\x90\x01\n" +
 	"\tGroupSpec\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04name\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\x12!\n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12#\n" +
 	"\amembers\x18\n" +
-	" \x03(\tB\a\xbaH\x04r\x02\x10\x01R\amembers\x12\x1f\n" +
+	" \x03(\tB\t\xbaH\x06r\x04\x10\x01`\x01R\amembers\x12\x1f\n" +
 	"\vexternal_id\x18\x14 \x01(\tR\n" +
 	"externalId\"8\n" +
 	"\vGroupStatus\x12)\n" +

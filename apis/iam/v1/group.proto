@@ -24,10 +24,14 @@ message GroupSpec {
   // description - human-readable description
   string description = 2;
 
-  // members - users and service accounts in this group
-  // Format: users/{email}, serviceaccounts/{id}
+  // members - user email addresses only (service accounts cannot be members)
+  // Format: plain email address (e.g., "user@example.com")
   // NOTE: Groups CANNOT contain other groups
-  repeated string members = 10 [(buf.validate.field).string.min_len = 1];
+  // NOTE: Service accounts are NOT allowed in groups
+  repeated string members = 10 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.email = true
+  ];
 
   // external_id - external reference (if needed)
   string external_id = 20;
