@@ -24,7 +24,7 @@ message RoleSpec {
   // description - human-readable description
   string description = 2;
 
-  // permissions - list of permission strings
+  // permissions - list of permission names (references to iam.permission.{name})
   // Format: resource:action (e.g., "projects:read", "secrets:write")
   repeated string permissions = 10 [(buf.validate.field).string.min_len = 1];
 

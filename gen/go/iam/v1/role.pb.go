@@ -101,7 +101,7 @@ type RoleSpec struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// description - human-readable description
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// permissions - list of permission strings
+	// permissions - list of permission names (references to iam.permission.{name})
 	// Format: resource:action (e.g., "projects:read", "secrets:write")
 	Permissions []string `protobuf:"bytes,10,rep,name=permissions,proto3" json:"permissions,omitempty"`
 	// external_id - ZITADEL role ID (populated during sync)
