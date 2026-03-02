@@ -5,12 +5,12 @@ import "buf/validate/validate.proto";
 import "meta/v1/meta.proto";
 import "status/v1/status.proto";
 import "google/protobuf/duration.proto";
+import "iam/v1/condition.proto";
 
 option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
 
-// Policy - grants access to a resource by binding roles to members
-// A policy applies to any resource (not owned by a specific resource)
-// Policies are aggregated per resource during sync
+// Policy - metadata container for role bindings and permissions
+// Policies aggregate role bindings and are synced to external providers
 // metadata.name = user-provided unique identifier
 message Policy {
   meta.v1.TypeMeta type = 1;
@@ -24,15 +24,15 @@ message PolicySpec {
   // Format: orgs/{org}/projects/{project}/resources/{resource}
   string resource_id = 1 [(buf.validate.field).string.min_len = 1];
 
-  // bindings - list of role bindings for this policy
+  // policy_bindings - list of role bindings for this policy
   // Multiple bindings for the same role are merged (members combined)
-  repeated Binding bindings = 10;
+  repeated PolicyBinding policy_bindings = 10;
 
   // description - human-readable description of this policy
   string description = 20;
 }
 
-message Binding {
+message PolicyBinding {
   // role - the role name being granted
   string role = 1 [(buf.validate.field).string.min_len = 1];
 
@@ -42,21 +42,7 @@ message Binding {
 
   // conditions - CEL expressions that must evaluate to true
   // Multiple conditions are AND'd together
-  repeated Condition conditions = 3;
-}
-
-message Condition {
-  // id - optional reusable condition identifier
-  string id = 1;
-
-  // expression - CEL expression for access control
-  string expression = 2 [(buf.validate.field).string.min_len = 1];
-
-  // description - human-readable description
-  string description = 3;
-
-  // ttl - how long to cache evaluation results
-  google.protobuf.Duration ttl = 4;
+  repeated Condition conditions = 20;
 }
 
 message PolicyStatus {
@@ -68,3 +54,5 @@ message PolicyStatus {
 message PolicyList {
   repeated Policy items = 1;
 }
+
+

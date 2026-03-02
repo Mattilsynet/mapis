@@ -1,0 +1,44 @@
+syntax = "proto3";
+package iam.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+import "google/protobuf/duration.proto";
+import "iam/v1/condition.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+
+// RoleBinding - grants a role to users/groups for a specific resource
+// metadata.name = user-provided unique identifier
+message RoleBinding {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  RoleBindingSpec spec = 20;
+  RoleBindingStatus status = 30;
+}
+
+message RoleBindingSpec {
+  // resource_id - the target resource this role grants access to
+  // Format: orgs/{org}/projects/{project}/resources/{resource}
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+
+  // role - the role name being bound
+  string role = 2 [(buf.validate.field).string.min_len = 1];
+
+  // members - who gets this role
+  // Format: users/{email}, groups/{name}, serviceaccounts/{id}
+  repeated string members = 10 [(buf.validate.field).string.min_len = 1];
+
+  // conditions - CEL expressions that must evaluate to true
+  repeated Condition conditions = 20;
+}
+
+message RoleBindingStatus {
+  status.v1.Status status = 20;
+  string external_id = 21;
+}
+
+message RoleBindingList {
+  repeated RoleBinding items = 1;
+}

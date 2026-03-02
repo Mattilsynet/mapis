@@ -12,7 +12,7 @@ import (
 	v11 "github.com/Mattilsynet/mapis/gen/go/status/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	_ "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -25,9 +25,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Policy - grants access to a resource by binding roles to members
-// A policy applies to any resource (not owned by a specific resource)
-// Policies are aggregated per resource during sync
+// Policy - metadata container for role bindings and permissions
+// Policies aggregate role bindings and are synced to external providers
 // metadata.name = user-provided unique identifier
 type Policy struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -102,9 +101,9 @@ type PolicySpec struct {
 	// resource_id - the target resource this policy grants access to
 	// Format: orgs/{org}/projects/{project}/resources/{resource}
 	ResourceId string `protobuf:"bytes,1,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
-	// bindings - list of role bindings for this policy
+	// policy_bindings - list of role bindings for this policy
 	// Multiple bindings for the same role are merged (members combined)
-	Bindings []*Binding `protobuf:"bytes,10,rep,name=bindings,proto3" json:"bindings,omitempty"`
+	PolicyBindings []*PolicyBinding `protobuf:"bytes,10,rep,name=policy_bindings,json=policyBindings,proto3" json:"policy_bindings,omitempty"`
 	// description - human-readable description of this policy
 	Description   string `protobuf:"bytes,20,opt,name=description,proto3" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -148,9 +147,9 @@ func (x *PolicySpec) GetResourceId() string {
 	return ""
 }
 
-func (x *PolicySpec) GetBindings() []*Binding {
+func (x *PolicySpec) GetPolicyBindings() []*PolicyBinding {
 	if x != nil {
-		return x.Bindings
+		return x.PolicyBindings
 	}
 	return nil
 }
@@ -162,7 +161,7 @@ func (x *PolicySpec) GetDescription() string {
 	return ""
 }
 
-type Binding struct {
+type PolicyBinding struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// role - the role name being granted
 	Role string `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
@@ -171,25 +170,25 @@ type Binding struct {
 	Members []string `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
 	// conditions - CEL expressions that must evaluate to true
 	// Multiple conditions are AND'd together
-	Conditions    []*Condition `protobuf:"bytes,3,rep,name=conditions,proto3" json:"conditions,omitempty"`
+	Conditions    []*Condition `protobuf:"bytes,20,rep,name=conditions,proto3" json:"conditions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Binding) Reset() {
-	*x = Binding{}
+func (x *PolicyBinding) Reset() {
+	*x = PolicyBinding{}
 	mi := &file_iam_v1_policy_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Binding) String() string {
+func (x *PolicyBinding) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Binding) ProtoMessage() {}
+func (*PolicyBinding) ProtoMessage() {}
 
-func (x *Binding) ProtoReflect() protoreflect.Message {
+func (x *PolicyBinding) ProtoReflect() protoreflect.Message {
 	mi := &file_iam_v1_policy_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -201,100 +200,28 @@ func (x *Binding) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Binding.ProtoReflect.Descriptor instead.
-func (*Binding) Descriptor() ([]byte, []int) {
+// Deprecated: Use PolicyBinding.ProtoReflect.Descriptor instead.
+func (*PolicyBinding) Descriptor() ([]byte, []int) {
 	return file_iam_v1_policy_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *Binding) GetRole() string {
+func (x *PolicyBinding) GetRole() string {
 	if x != nil {
 		return x.Role
 	}
 	return ""
 }
 
-func (x *Binding) GetMembers() []string {
+func (x *PolicyBinding) GetMembers() []string {
 	if x != nil {
 		return x.Members
 	}
 	return nil
 }
 
-func (x *Binding) GetConditions() []*Condition {
+func (x *PolicyBinding) GetConditions() []*Condition {
 	if x != nil {
 		return x.Conditions
-	}
-	return nil
-}
-
-type Condition struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// id - optional reusable condition identifier
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// expression - CEL expression for access control
-	Expression string `protobuf:"bytes,2,opt,name=expression,proto3" json:"expression,omitempty"`
-	// description - human-readable description
-	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	// ttl - how long to cache evaluation results
-	Ttl           *durationpb.Duration `protobuf:"bytes,4,opt,name=ttl,proto3" json:"ttl,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Condition) Reset() {
-	*x = Condition{}
-	mi := &file_iam_v1_policy_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Condition) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Condition) ProtoMessage() {}
-
-func (x *Condition) ProtoReflect() protoreflect.Message {
-	mi := &file_iam_v1_policy_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Condition.ProtoReflect.Descriptor instead.
-func (*Condition) Descriptor() ([]byte, []int) {
-	return file_iam_v1_policy_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *Condition) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *Condition) GetExpression() string {
-	if x != nil {
-		return x.Expression
-	}
-	return ""
-}
-
-func (x *Condition) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *Condition) GetTtl() *durationpb.Duration {
-	if x != nil {
-		return x.Ttl
 	}
 	return nil
 }
@@ -310,7 +237,7 @@ type PolicyStatus struct {
 
 func (x *PolicyStatus) Reset() {
 	*x = PolicyStatus{}
-	mi := &file_iam_v1_policy_proto_msgTypes[4]
+	mi := &file_iam_v1_policy_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -322,7 +249,7 @@ func (x *PolicyStatus) String() string {
 func (*PolicyStatus) ProtoMessage() {}
 
 func (x *PolicyStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_iam_v1_policy_proto_msgTypes[4]
+	mi := &file_iam_v1_policy_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -335,7 +262,7 @@ func (x *PolicyStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicyStatus.ProtoReflect.Descriptor instead.
 func (*PolicyStatus) Descriptor() ([]byte, []int) {
-	return file_iam_v1_policy_proto_rawDescGZIP(), []int{4}
+	return file_iam_v1_policy_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *PolicyStatus) GetStatus() *v11.Status {
@@ -361,7 +288,7 @@ type PolicyList struct {
 
 func (x *PolicyList) Reset() {
 	*x = PolicyList{}
-	mi := &file_iam_v1_policy_proto_msgTypes[5]
+	mi := &file_iam_v1_policy_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -373,7 +300,7 @@ func (x *PolicyList) String() string {
 func (*PolicyList) ProtoMessage() {}
 
 func (x *PolicyList) ProtoReflect() protoreflect.Message {
-	mi := &file_iam_v1_policy_proto_msgTypes[5]
+	mi := &file_iam_v1_policy_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -386,7 +313,7 @@ func (x *PolicyList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicyList.ProtoReflect.Descriptor instead.
 func (*PolicyList) Descriptor() ([]byte, []int) {
-	return file_iam_v1_policy_proto_rawDescGZIP(), []int{5}
+	return file_iam_v1_policy_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *PolicyList) GetItems() []*Policy {
@@ -400,32 +327,25 @@ var File_iam_v1_policy_proto protoreflect.FileDescriptor
 
 const file_iam_v1_policy_proto_rawDesc = "" +
 	"\n" +
-	"\x13iam/v1/policy.proto\x12\x06iam.v1\x1a\x1bbuf/validate/validate.proto\x1a\x12meta/v1/meta.proto\x1a\x16status/v1/status.proto\x1a\x1egoogle/protobuf/duration.proto\"\xb6\x01\n" +
+	"\x13iam/v1/policy.proto\x12\x06iam.v1\x1a\x1bbuf/validate/validate.proto\x1a\x12meta/v1/meta.proto\x1a\x16status/v1/status.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x16iam/v1/condition.proto\"\xb6\x01\n" +
 	"\x06Policy\x12%\n" +
 	"\x04type\x18\x01 \x01(\v2\x11.meta.v1.TypeMetaR\x04type\x12/\n" +
 	"\bmetadata\x18\x02 \x01(\v2\x13.meta.v1.ObjectMetaR\bmetadata\x12&\n" +
 	"\x04spec\x18\x14 \x01(\v2\x12.iam.v1.PolicySpecR\x04spec\x12,\n" +
-	"\x06status\x18\x1e \x01(\v2\x14.iam.v1.PolicyStatusR\x06status\"\x85\x01\n" +
+	"\x06status\x18\x1e \x01(\v2\x14.iam.v1.PolicyStatusR\x06status\"\x98\x01\n" +
 	"\n" +
 	"PolicySpec\x12(\n" +
 	"\vresource_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\n" +
-	"resourceId\x12+\n" +
-	"\bbindings\x18\n" +
-	" \x03(\v2\x0f.iam.v1.BindingR\bbindings\x12 \n" +
-	"\vdescription\x18\x14 \x01(\tR\vdescription\"|\n" +
-	"\aBinding\x12\x1b\n" +
+	"resourceId\x12>\n" +
+	"\x0fpolicy_bindings\x18\n" +
+	" \x03(\v2\x15.iam.v1.PolicyBindingR\x0epolicyBindings\x12 \n" +
+	"\vdescription\x18\x14 \x01(\tR\vdescription\"\x82\x01\n" +
+	"\rPolicyBinding\x12\x1b\n" +
 	"\x04role\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04role\x12!\n" +
 	"\amembers\x18\x02 \x03(\tB\a\xbaH\x04r\x02\x10\x01R\amembers\x121\n" +
 	"\n" +
-	"conditions\x18\x03 \x03(\v2\x11.iam.v1.ConditionR\n" +
-	"conditions\"\x93\x01\n" +
-	"\tCondition\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12'\n" +
-	"\n" +
-	"expression\x18\x02 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\n" +
-	"expression\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\x12+\n" +
-	"\x03ttl\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\x03ttl\"Z\n" +
+	"conditions\x18\x14 \x03(\v2\x11.iam.v1.ConditionR\n" +
+	"conditions\"Z\n" +
 	"\fPolicyStatus\x12)\n" +
 	"\x06status\x18\x14 \x01(\v2\x11.status.v1.StatusR\x06status\x12\x1f\n" +
 	"\vexternal_id\x18\x15 \x01(\tR\n" +
@@ -446,34 +366,32 @@ func file_iam_v1_policy_proto_rawDescGZIP() []byte {
 	return file_iam_v1_policy_proto_rawDescData
 }
 
-var file_iam_v1_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_iam_v1_policy_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_iam_v1_policy_proto_goTypes = []any{
-	(*Policy)(nil),              // 0: iam.v1.Policy
-	(*PolicySpec)(nil),          // 1: iam.v1.PolicySpec
-	(*Binding)(nil),             // 2: iam.v1.Binding
-	(*Condition)(nil),           // 3: iam.v1.Condition
-	(*PolicyStatus)(nil),        // 4: iam.v1.PolicyStatus
-	(*PolicyList)(nil),          // 5: iam.v1.PolicyList
-	(*v1.TypeMeta)(nil),         // 6: meta.v1.TypeMeta
-	(*v1.ObjectMeta)(nil),       // 7: meta.v1.ObjectMeta
-	(*durationpb.Duration)(nil), // 8: google.protobuf.Duration
-	(*v11.Status)(nil),          // 9: status.v1.Status
+	(*Policy)(nil),        // 0: iam.v1.Policy
+	(*PolicySpec)(nil),    // 1: iam.v1.PolicySpec
+	(*PolicyBinding)(nil), // 2: iam.v1.PolicyBinding
+	(*PolicyStatus)(nil),  // 3: iam.v1.PolicyStatus
+	(*PolicyList)(nil),    // 4: iam.v1.PolicyList
+	(*v1.TypeMeta)(nil),   // 5: meta.v1.TypeMeta
+	(*v1.ObjectMeta)(nil), // 6: meta.v1.ObjectMeta
+	(*Condition)(nil),     // 7: iam.v1.Condition
+	(*v11.Status)(nil),    // 8: status.v1.Status
 }
 var file_iam_v1_policy_proto_depIdxs = []int32{
-	6, // 0: iam.v1.Policy.type:type_name -> meta.v1.TypeMeta
-	7, // 1: iam.v1.Policy.metadata:type_name -> meta.v1.ObjectMeta
+	5, // 0: iam.v1.Policy.type:type_name -> meta.v1.TypeMeta
+	6, // 1: iam.v1.Policy.metadata:type_name -> meta.v1.ObjectMeta
 	1, // 2: iam.v1.Policy.spec:type_name -> iam.v1.PolicySpec
-	4, // 3: iam.v1.Policy.status:type_name -> iam.v1.PolicyStatus
-	2, // 4: iam.v1.PolicySpec.bindings:type_name -> iam.v1.Binding
-	3, // 5: iam.v1.Binding.conditions:type_name -> iam.v1.Condition
-	8, // 6: iam.v1.Condition.ttl:type_name -> google.protobuf.Duration
-	9, // 7: iam.v1.PolicyStatus.status:type_name -> status.v1.Status
-	0, // 8: iam.v1.PolicyList.items:type_name -> iam.v1.Policy
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	3, // 3: iam.v1.Policy.status:type_name -> iam.v1.PolicyStatus
+	2, // 4: iam.v1.PolicySpec.policy_bindings:type_name -> iam.v1.PolicyBinding
+	7, // 5: iam.v1.PolicyBinding.conditions:type_name -> iam.v1.Condition
+	8, // 6: iam.v1.PolicyStatus.status:type_name -> status.v1.Status
+	0, // 7: iam.v1.PolicyList.items:type_name -> iam.v1.Policy
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_iam_v1_policy_proto_init() }
@@ -481,13 +399,14 @@ func file_iam_v1_policy_proto_init() {
 	if File_iam_v1_policy_proto != nil {
 		return
 	}
+	file_iam_v1_condition_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_iam_v1_policy_proto_rawDesc), len(file_iam_v1_policy_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

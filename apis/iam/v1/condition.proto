@@ -1,0 +1,22 @@
+syntax = "proto3";
+package iam.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+
+// Condition - CEL expression for access control
+message Condition {
+  // id - optional reusable condition identifier
+  string id = 1;
+
+  // expression - CEL expression for access control
+  string expression = 2 [(buf.validate.field).string.min_len = 1];
+
+  // description - human-readable description
+  string description = 3;
+
+  // ttl - how long to cache evaluation results
+  google.protobuf.Duration ttl = 4;
+}
