@@ -1,0 +1,44 @@
+syntax = "proto3";
+package iam.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+
+// Permission - defines a single permission (resource:action pair)
+// Permissions are reusable across roles
+// metadata.name = permission name (e.g., "projects:read")
+message Permission {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;  // name = permission_name
+  PermissionSpec spec = 20;
+  PermissionStatus status = 30;
+}
+
+message PermissionSpec {
+  // name - permission name (matches metadata.name)
+  // Format: resource:action (e.g., "projects:read", "secrets:write")
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+  
+  // description - human-readable description
+  string description = 2;
+  
+  // resource_type - the resource this permission applies to
+  string resource_type = 3 [(buf.validate.field).string.min_len = 1];
+  
+  // action - the action that can be performed
+  string action = 4 [(buf.validate.field).string.min_len = 1];
+  
+  // is_builtin - if true, this is a system-provided permission
+  bool is_builtin = 30;
+}
+
+message PermissionStatus {
+  status.v1.Status status = 20;
+}
+
+message PermissionList {
+  repeated Permission items = 1;
+}

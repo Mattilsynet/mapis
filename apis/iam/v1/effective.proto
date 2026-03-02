@@ -1,0 +1,67 @@
+syntax = "proto3";
+package iam.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+
+// UserPermission - computed permissions for a user derived from RoleBindings
+// metadata.name = user_email
+message UserPermission {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  UserPermissionSpec spec = 20;
+  UserPermissionStatus status = 30;
+}
+
+message UserPermissionSpec {
+  // user_email - the user's email address
+  string user_email = 1 [(buf.validate.field).string.email = true];
+  
+  // permissions - list of role assignments granted to this user
+  repeated RoleAssignment permissions = 10;
+}
+
+message RoleAssignment {
+  // resource_id - the target resource this role grants access to
+  // Format: orgs/{org}/projects/{project}/resources/{resource}
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+  
+  // role - the role name being granted
+  string role = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message UserPermissionStatus {
+  status.v1.Status status = 20;
+}
+
+message UserPermissionList {
+  repeated UserPermission items = 1;
+}
+
+// ServiceAccountPermission - computed permissions for a service account
+// metadata.name = sa_id
+message ServiceAccountPermission {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  ServiceAccountPermissionSpec spec = 20;
+  ServiceAccountPermissionStatus status = 30;
+}
+
+message ServiceAccountPermissionSpec {
+  // sa_id - the service account ID
+  string sa_id = 1 [(buf.validate.field).string.min_len = 1];
+  
+  // permissions - list of role assignments granted to this service account
+  repeated RoleAssignment permissions = 10;
+}
+
+message ServiceAccountPermissionStatus {
+  status.v1.Status status = 20;
+}
+
+message ServiceAccountPermissionList {
+  repeated ServiceAccountPermission items = 1;
+}
