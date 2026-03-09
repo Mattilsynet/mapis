@@ -291,32 +291,32 @@ func (x *UserPermissionList) GetItems() []*UserPermission {
 	return nil
 }
 
-// ServiceAccountPermission - computed permissions for a service account
-// metadata.name = sa_id
-type ServiceAccountPermission struct {
-	state         protoimpl.MessageState          `protogen:"open.v1"`
-	Type          *v1.TypeMeta                    `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	Metadata      *v1.ObjectMeta                  `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	Spec          *ServiceAccountPermissionSpec   `protobuf:"bytes,20,opt,name=spec,proto3" json:"spec,omitempty"`
-	Status        *ServiceAccountPermissionStatus `protobuf:"bytes,30,opt,name=status,proto3" json:"status,omitempty"`
+// ServiceUserPermission - computed permissions for a service user
+// metadata.name = service_user_name
+type ServiceUserPermission struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Type          *v1.TypeMeta                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Metadata      *v1.ObjectMeta               `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Spec          *ServiceUserPermissionSpec   `protobuf:"bytes,20,opt,name=spec,proto3" json:"spec,omitempty"`
+	Status        *ServiceUserPermissionStatus `protobuf:"bytes,30,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ServiceAccountPermission) Reset() {
-	*x = ServiceAccountPermission{}
+func (x *ServiceUserPermission) Reset() {
+	*x = ServiceUserPermission{}
 	mi := &file_iam_v1_effective_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ServiceAccountPermission) String() string {
+func (x *ServiceUserPermission) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ServiceAccountPermission) ProtoMessage() {}
+func (*ServiceUserPermission) ProtoMessage() {}
 
-func (x *ServiceAccountPermission) ProtoReflect() protoreflect.Message {
+func (x *ServiceUserPermission) ProtoReflect() protoreflect.Message {
 	mi := &file_iam_v1_effective_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -328,63 +328,64 @@ func (x *ServiceAccountPermission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ServiceAccountPermission.ProtoReflect.Descriptor instead.
-func (*ServiceAccountPermission) Descriptor() ([]byte, []int) {
+// Deprecated: Use ServiceUserPermission.ProtoReflect.Descriptor instead.
+func (*ServiceUserPermission) Descriptor() ([]byte, []int) {
 	return file_iam_v1_effective_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *ServiceAccountPermission) GetType() *v1.TypeMeta {
+func (x *ServiceUserPermission) GetType() *v1.TypeMeta {
 	if x != nil {
 		return x.Type
 	}
 	return nil
 }
 
-func (x *ServiceAccountPermission) GetMetadata() *v1.ObjectMeta {
+func (x *ServiceUserPermission) GetMetadata() *v1.ObjectMeta {
 	if x != nil {
 		return x.Metadata
 	}
 	return nil
 }
 
-func (x *ServiceAccountPermission) GetSpec() *ServiceAccountPermissionSpec {
+func (x *ServiceUserPermission) GetSpec() *ServiceUserPermissionSpec {
 	if x != nil {
 		return x.Spec
 	}
 	return nil
 }
 
-func (x *ServiceAccountPermission) GetStatus() *ServiceAccountPermissionStatus {
+func (x *ServiceUserPermission) GetStatus() *ServiceUserPermissionStatus {
 	if x != nil {
 		return x.Status
 	}
 	return nil
 }
 
-type ServiceAccountPermissionSpec struct {
+type ServiceUserPermissionSpec struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// sa_id - the service account ID
-	SaId string `protobuf:"bytes,1,opt,name=sa_id,json=saId,proto3" json:"sa_id,omitempty"`
-	// permissions - list of role assignments granted to this service account
+	// service_user_name - the service user principal name
+	// Format: serviceuser@{org}.{domain} (e.g., serviceuser@acme.example.com)
+	ServiceUserName string `protobuf:"bytes,1,opt,name=service_user_name,json=serviceUserName,proto3" json:"service_user_name,omitempty"`
+	// permissions - list of role assignments granted to this service user
 	Permissions   []*RoleAssignment `protobuf:"bytes,10,rep,name=permissions,proto3" json:"permissions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ServiceAccountPermissionSpec) Reset() {
-	*x = ServiceAccountPermissionSpec{}
+func (x *ServiceUserPermissionSpec) Reset() {
+	*x = ServiceUserPermissionSpec{}
 	mi := &file_iam_v1_effective_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ServiceAccountPermissionSpec) String() string {
+func (x *ServiceUserPermissionSpec) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ServiceAccountPermissionSpec) ProtoMessage() {}
+func (*ServiceUserPermissionSpec) ProtoMessage() {}
 
-func (x *ServiceAccountPermissionSpec) ProtoReflect() protoreflect.Message {
+func (x *ServiceUserPermissionSpec) ProtoReflect() protoreflect.Message {
 	mi := &file_iam_v1_effective_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -396,46 +397,46 @@ func (x *ServiceAccountPermissionSpec) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ServiceAccountPermissionSpec.ProtoReflect.Descriptor instead.
-func (*ServiceAccountPermissionSpec) Descriptor() ([]byte, []int) {
+// Deprecated: Use ServiceUserPermissionSpec.ProtoReflect.Descriptor instead.
+func (*ServiceUserPermissionSpec) Descriptor() ([]byte, []int) {
 	return file_iam_v1_effective_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *ServiceAccountPermissionSpec) GetSaId() string {
+func (x *ServiceUserPermissionSpec) GetServiceUserName() string {
 	if x != nil {
-		return x.SaId
+		return x.ServiceUserName
 	}
 	return ""
 }
 
-func (x *ServiceAccountPermissionSpec) GetPermissions() []*RoleAssignment {
+func (x *ServiceUserPermissionSpec) GetPermissions() []*RoleAssignment {
 	if x != nil {
 		return x.Permissions
 	}
 	return nil
 }
 
-type ServiceAccountPermissionStatus struct {
+type ServiceUserPermissionStatus struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Status        *v11.Status            `protobuf:"bytes,20,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ServiceAccountPermissionStatus) Reset() {
-	*x = ServiceAccountPermissionStatus{}
+func (x *ServiceUserPermissionStatus) Reset() {
+	*x = ServiceUserPermissionStatus{}
 	mi := &file_iam_v1_effective_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ServiceAccountPermissionStatus) String() string {
+func (x *ServiceUserPermissionStatus) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ServiceAccountPermissionStatus) ProtoMessage() {}
+func (*ServiceUserPermissionStatus) ProtoMessage() {}
 
-func (x *ServiceAccountPermissionStatus) ProtoReflect() protoreflect.Message {
+func (x *ServiceUserPermissionStatus) ProtoReflect() protoreflect.Message {
 	mi := &file_iam_v1_effective_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -447,39 +448,39 @@ func (x *ServiceAccountPermissionStatus) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ServiceAccountPermissionStatus.ProtoReflect.Descriptor instead.
-func (*ServiceAccountPermissionStatus) Descriptor() ([]byte, []int) {
+// Deprecated: Use ServiceUserPermissionStatus.ProtoReflect.Descriptor instead.
+func (*ServiceUserPermissionStatus) Descriptor() ([]byte, []int) {
 	return file_iam_v1_effective_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *ServiceAccountPermissionStatus) GetStatus() *v11.Status {
+func (x *ServiceUserPermissionStatus) GetStatus() *v11.Status {
 	if x != nil {
 		return x.Status
 	}
 	return nil
 }
 
-type ServiceAccountPermissionList struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Items         []*ServiceAccountPermission `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+type ServiceUserPermissionList struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Items         []*ServiceUserPermission `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ServiceAccountPermissionList) Reset() {
-	*x = ServiceAccountPermissionList{}
+func (x *ServiceUserPermissionList) Reset() {
+	*x = ServiceUserPermissionList{}
 	mi := &file_iam_v1_effective_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ServiceAccountPermissionList) String() string {
+func (x *ServiceUserPermissionList) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ServiceAccountPermissionList) ProtoMessage() {}
+func (*ServiceUserPermissionList) ProtoMessage() {}
 
-func (x *ServiceAccountPermissionList) ProtoReflect() protoreflect.Message {
+func (x *ServiceUserPermissionList) ProtoReflect() protoreflect.Message {
 	mi := &file_iam_v1_effective_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -491,12 +492,12 @@ func (x *ServiceAccountPermissionList) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ServiceAccountPermissionList.ProtoReflect.Descriptor instead.
-func (*ServiceAccountPermissionList) Descriptor() ([]byte, []int) {
+// Deprecated: Use ServiceUserPermissionList.ProtoReflect.Descriptor instead.
+func (*ServiceUserPermissionList) Descriptor() ([]byte, []int) {
 	return file_iam_v1_effective_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *ServiceAccountPermissionList) GetItems() []*ServiceAccountPermission {
+func (x *ServiceUserPermissionList) GetItems() []*ServiceUserPermission {
 	if x != nil {
 		return x.Items
 	}
@@ -525,20 +526,20 @@ const file_iam_v1_effective_proto_rawDesc = "" +
 	"\x14UserPermissionStatus\x12)\n" +
 	"\x06status\x18\x14 \x01(\v2\x11.status.v1.StatusR\x06status\"B\n" +
 	"\x12UserPermissionList\x12,\n" +
-	"\x05items\x18\x01 \x03(\v2\x16.iam.v1.UserPermissionR\x05items\"\xec\x01\n" +
-	"\x18ServiceAccountPermission\x12%\n" +
+	"\x05items\x18\x01 \x03(\v2\x16.iam.v1.UserPermissionR\x05items\"\xe3\x01\n" +
+	"\x15ServiceUserPermission\x12%\n" +
 	"\x04type\x18\x01 \x01(\v2\x11.meta.v1.TypeMetaR\x04type\x12/\n" +
-	"\bmetadata\x18\x02 \x01(\v2\x13.meta.v1.ObjectMetaR\bmetadata\x128\n" +
-	"\x04spec\x18\x14 \x01(\v2$.iam.v1.ServiceAccountPermissionSpecR\x04spec\x12>\n" +
-	"\x06status\x18\x1e \x01(\v2&.iam.v1.ServiceAccountPermissionStatusR\x06status\"v\n" +
-	"\x1cServiceAccountPermissionSpec\x12\x1c\n" +
-	"\x05sa_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04saId\x128\n" +
+	"\bmetadata\x18\x02 \x01(\v2\x13.meta.v1.ObjectMetaR\bmetadata\x125\n" +
+	"\x04spec\x18\x14 \x01(\v2!.iam.v1.ServiceUserPermissionSpecR\x04spec\x12;\n" +
+	"\x06status\x18\x1e \x01(\v2#.iam.v1.ServiceUserPermissionStatusR\x06status\"\x8a\x01\n" +
+	"\x19ServiceUserPermissionSpec\x123\n" +
+	"\x11service_user_name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x0fserviceUserName\x128\n" +
 	"\vpermissions\x18\n" +
-	" \x03(\v2\x16.iam.v1.RoleAssignmentR\vpermissions\"K\n" +
-	"\x1eServiceAccountPermissionStatus\x12)\n" +
-	"\x06status\x18\x14 \x01(\v2\x11.status.v1.StatusR\x06status\"V\n" +
-	"\x1cServiceAccountPermissionList\x126\n" +
-	"\x05items\x18\x01 \x03(\v2 .iam.v1.ServiceAccountPermissionR\x05itemsB/Z-github.com/Mattilsynet/mapis/gen/iam/v1;iamv1b\x06proto3"
+	" \x03(\v2\x16.iam.v1.RoleAssignmentR\vpermissions\"H\n" +
+	"\x1bServiceUserPermissionStatus\x12)\n" +
+	"\x06status\x18\x14 \x01(\v2\x11.status.v1.StatusR\x06status\"P\n" +
+	"\x19ServiceUserPermissionList\x123\n" +
+	"\x05items\x18\x01 \x03(\v2\x1d.iam.v1.ServiceUserPermissionR\x05itemsB/Z-github.com/Mattilsynet/mapis/gen/iam/v1;iamv1b\x06proto3"
 
 var (
 	file_iam_v1_effective_proto_rawDescOnce sync.Once
@@ -554,18 +555,18 @@ func file_iam_v1_effective_proto_rawDescGZIP() []byte {
 
 var file_iam_v1_effective_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_iam_v1_effective_proto_goTypes = []any{
-	(*UserPermission)(nil),                 // 0: iam.v1.UserPermission
-	(*UserPermissionSpec)(nil),             // 1: iam.v1.UserPermissionSpec
-	(*RoleAssignment)(nil),                 // 2: iam.v1.RoleAssignment
-	(*UserPermissionStatus)(nil),           // 3: iam.v1.UserPermissionStatus
-	(*UserPermissionList)(nil),             // 4: iam.v1.UserPermissionList
-	(*ServiceAccountPermission)(nil),       // 5: iam.v1.ServiceAccountPermission
-	(*ServiceAccountPermissionSpec)(nil),   // 6: iam.v1.ServiceAccountPermissionSpec
-	(*ServiceAccountPermissionStatus)(nil), // 7: iam.v1.ServiceAccountPermissionStatus
-	(*ServiceAccountPermissionList)(nil),   // 8: iam.v1.ServiceAccountPermissionList
-	(*v1.TypeMeta)(nil),                    // 9: meta.v1.TypeMeta
-	(*v1.ObjectMeta)(nil),                  // 10: meta.v1.ObjectMeta
-	(*v11.Status)(nil),                     // 11: status.v1.Status
+	(*UserPermission)(nil),              // 0: iam.v1.UserPermission
+	(*UserPermissionSpec)(nil),          // 1: iam.v1.UserPermissionSpec
+	(*RoleAssignment)(nil),              // 2: iam.v1.RoleAssignment
+	(*UserPermissionStatus)(nil),        // 3: iam.v1.UserPermissionStatus
+	(*UserPermissionList)(nil),          // 4: iam.v1.UserPermissionList
+	(*ServiceUserPermission)(nil),       // 5: iam.v1.ServiceUserPermission
+	(*ServiceUserPermissionSpec)(nil),   // 6: iam.v1.ServiceUserPermissionSpec
+	(*ServiceUserPermissionStatus)(nil), // 7: iam.v1.ServiceUserPermissionStatus
+	(*ServiceUserPermissionList)(nil),   // 8: iam.v1.ServiceUserPermissionList
+	(*v1.TypeMeta)(nil),                 // 9: meta.v1.TypeMeta
+	(*v1.ObjectMeta)(nil),               // 10: meta.v1.ObjectMeta
+	(*v11.Status)(nil),                  // 11: status.v1.Status
 }
 var file_iam_v1_effective_proto_depIdxs = []int32{
 	9,  // 0: iam.v1.UserPermission.type:type_name -> meta.v1.TypeMeta
@@ -575,13 +576,13 @@ var file_iam_v1_effective_proto_depIdxs = []int32{
 	2,  // 4: iam.v1.UserPermissionSpec.permissions:type_name -> iam.v1.RoleAssignment
 	11, // 5: iam.v1.UserPermissionStatus.status:type_name -> status.v1.Status
 	0,  // 6: iam.v1.UserPermissionList.items:type_name -> iam.v1.UserPermission
-	9,  // 7: iam.v1.ServiceAccountPermission.type:type_name -> meta.v1.TypeMeta
-	10, // 8: iam.v1.ServiceAccountPermission.metadata:type_name -> meta.v1.ObjectMeta
-	6,  // 9: iam.v1.ServiceAccountPermission.spec:type_name -> iam.v1.ServiceAccountPermissionSpec
-	7,  // 10: iam.v1.ServiceAccountPermission.status:type_name -> iam.v1.ServiceAccountPermissionStatus
-	2,  // 11: iam.v1.ServiceAccountPermissionSpec.permissions:type_name -> iam.v1.RoleAssignment
-	11, // 12: iam.v1.ServiceAccountPermissionStatus.status:type_name -> status.v1.Status
-	5,  // 13: iam.v1.ServiceAccountPermissionList.items:type_name -> iam.v1.ServiceAccountPermission
+	9,  // 7: iam.v1.ServiceUserPermission.type:type_name -> meta.v1.TypeMeta
+	10, // 8: iam.v1.ServiceUserPermission.metadata:type_name -> meta.v1.ObjectMeta
+	6,  // 9: iam.v1.ServiceUserPermission.spec:type_name -> iam.v1.ServiceUserPermissionSpec
+	7,  // 10: iam.v1.ServiceUserPermission.status:type_name -> iam.v1.ServiceUserPermissionStatus
+	2,  // 11: iam.v1.ServiceUserPermissionSpec.permissions:type_name -> iam.v1.RoleAssignment
+	11, // 12: iam.v1.ServiceUserPermissionStatus.status:type_name -> status.v1.Status
+	5,  // 13: iam.v1.ServiceUserPermissionList.items:type_name -> iam.v1.ServiceUserPermission
 	14, // [14:14] is the sub-list for method output_type
 	14, // [14:14] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name

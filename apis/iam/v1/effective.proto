@@ -41,27 +41,28 @@ message UserPermissionList {
   repeated UserPermission items = 1;
 }
 
-// ServiceAccountPermission - computed permissions for a service account
-// metadata.name = sa_id
-message ServiceAccountPermission {
+// ServiceUserPermission - computed permissions for a service user
+// metadata.name = service_user_name
+message ServiceUserPermission {
   meta.v1.TypeMeta type = 1;
   meta.v1.ObjectMeta metadata = 2;
-  ServiceAccountPermissionSpec spec = 20;
-  ServiceAccountPermissionStatus status = 30;
+  ServiceUserPermissionSpec spec = 20;
+  ServiceUserPermissionStatus status = 30;
 }
 
-message ServiceAccountPermissionSpec {
-  // sa_id - the service account ID
-  string sa_id = 1 [(buf.validate.field).string.min_len = 1];
+message ServiceUserPermissionSpec {
+  // service_user_name - the service user principal name
+  // Format: serviceuser@{org}.{domain} (e.g., serviceuser@acme.example.com)
+  string service_user_name = 1 [(buf.validate.field).string.min_len = 1];
   
-  // permissions - list of role assignments granted to this service account
+  // permissions - list of role assignments granted to this service user
   repeated RoleAssignment permissions = 10;
 }
 
-message ServiceAccountPermissionStatus {
+message ServiceUserPermissionStatus {
   status.v1.Status status = 20;
 }
 
-message ServiceAccountPermissionList {
-  repeated ServiceAccountPermission items = 1;
+message ServiceUserPermissionList {
+  repeated ServiceUserPermission items = 1;
 }

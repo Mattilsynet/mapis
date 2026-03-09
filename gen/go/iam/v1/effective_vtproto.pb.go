@@ -142,11 +142,11 @@ func (m *UserPermissionList) CloneMessageVT() proto.Message {
 	return m.CloneVT()
 }
 
-func (m *ServiceAccountPermission) CloneVT() *ServiceAccountPermission {
+func (m *ServiceUserPermission) CloneVT() *ServiceUserPermission {
 	if m == nil {
-		return (*ServiceAccountPermission)(nil)
+		return (*ServiceUserPermission)(nil)
 	}
-	r := new(ServiceAccountPermission)
+	r := new(ServiceUserPermission)
 	r.Spec = m.Spec.CloneVT()
 	r.Status = m.Status.CloneVT()
 	if rhs := m.Type; rhs != nil {
@@ -170,16 +170,16 @@ func (m *ServiceAccountPermission) CloneVT() *ServiceAccountPermission {
 	return r
 }
 
-func (m *ServiceAccountPermission) CloneMessageVT() proto.Message {
+func (m *ServiceUserPermission) CloneMessageVT() proto.Message {
 	return m.CloneVT()
 }
 
-func (m *ServiceAccountPermissionSpec) CloneVT() *ServiceAccountPermissionSpec {
+func (m *ServiceUserPermissionSpec) CloneVT() *ServiceUserPermissionSpec {
 	if m == nil {
-		return (*ServiceAccountPermissionSpec)(nil)
+		return (*ServiceUserPermissionSpec)(nil)
 	}
-	r := new(ServiceAccountPermissionSpec)
-	r.SaId = m.SaId
+	r := new(ServiceUserPermissionSpec)
+	r.ServiceUserName = m.ServiceUserName
 	if rhs := m.Permissions; rhs != nil {
 		tmpContainer := make([]*RoleAssignment, len(rhs))
 		for k, v := range rhs {
@@ -194,15 +194,15 @@ func (m *ServiceAccountPermissionSpec) CloneVT() *ServiceAccountPermissionSpec {
 	return r
 }
 
-func (m *ServiceAccountPermissionSpec) CloneMessageVT() proto.Message {
+func (m *ServiceUserPermissionSpec) CloneMessageVT() proto.Message {
 	return m.CloneVT()
 }
 
-func (m *ServiceAccountPermissionStatus) CloneVT() *ServiceAccountPermissionStatus {
+func (m *ServiceUserPermissionStatus) CloneVT() *ServiceUserPermissionStatus {
 	if m == nil {
-		return (*ServiceAccountPermissionStatus)(nil)
+		return (*ServiceUserPermissionStatus)(nil)
 	}
-	r := new(ServiceAccountPermissionStatus)
+	r := new(ServiceUserPermissionStatus)
 	if rhs := m.Status; rhs != nil {
 		if vtpb, ok := interface{}(rhs).(interface{ CloneVT() *v11.Status }); ok {
 			r.Status = vtpb.CloneVT()
@@ -217,17 +217,17 @@ func (m *ServiceAccountPermissionStatus) CloneVT() *ServiceAccountPermissionStat
 	return r
 }
 
-func (m *ServiceAccountPermissionStatus) CloneMessageVT() proto.Message {
+func (m *ServiceUserPermissionStatus) CloneMessageVT() proto.Message {
 	return m.CloneVT()
 }
 
-func (m *ServiceAccountPermissionList) CloneVT() *ServiceAccountPermissionList {
+func (m *ServiceUserPermissionList) CloneVT() *ServiceUserPermissionList {
 	if m == nil {
-		return (*ServiceAccountPermissionList)(nil)
+		return (*ServiceUserPermissionList)(nil)
 	}
-	r := new(ServiceAccountPermissionList)
+	r := new(ServiceUserPermissionList)
 	if rhs := m.Items; rhs != nil {
-		tmpContainer := make([]*ServiceAccountPermission, len(rhs))
+		tmpContainer := make([]*ServiceUserPermission, len(rhs))
 		for k, v := range rhs {
 			tmpContainer[k] = v.CloneVT()
 		}
@@ -240,7 +240,7 @@ func (m *ServiceAccountPermissionList) CloneVT() *ServiceAccountPermissionList {
 	return r
 }
 
-func (m *ServiceAccountPermissionList) CloneMessageVT() proto.Message {
+func (m *ServiceUserPermissionList) CloneMessageVT() proto.Message {
 	return m.CloneVT()
 }
 
@@ -394,7 +394,7 @@ func (this *UserPermissionList) EqualMessageVT(thatMsg proto.Message) bool {
 	}
 	return this.EqualVT(that)
 }
-func (this *ServiceAccountPermission) EqualVT(that *ServiceAccountPermission) bool {
+func (this *ServiceUserPermission) EqualVT(that *ServiceUserPermission) bool {
 	if this == that {
 		return true
 	} else if this == nil || that == nil {
@@ -423,20 +423,20 @@ func (this *ServiceAccountPermission) EqualVT(that *ServiceAccountPermission) bo
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
-func (this *ServiceAccountPermission) EqualMessageVT(thatMsg proto.Message) bool {
-	that, ok := thatMsg.(*ServiceAccountPermission)
+func (this *ServiceUserPermission) EqualMessageVT(thatMsg proto.Message) bool {
+	that, ok := thatMsg.(*ServiceUserPermission)
 	if !ok {
 		return false
 	}
 	return this.EqualVT(that)
 }
-func (this *ServiceAccountPermissionSpec) EqualVT(that *ServiceAccountPermissionSpec) bool {
+func (this *ServiceUserPermissionSpec) EqualVT(that *ServiceUserPermissionSpec) bool {
 	if this == that {
 		return true
 	} else if this == nil || that == nil {
 		return false
 	}
-	if this.SaId != that.SaId {
+	if this.ServiceUserName != that.ServiceUserName {
 		return false
 	}
 	if len(this.Permissions) != len(that.Permissions) {
@@ -459,14 +459,14 @@ func (this *ServiceAccountPermissionSpec) EqualVT(that *ServiceAccountPermission
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
-func (this *ServiceAccountPermissionSpec) EqualMessageVT(thatMsg proto.Message) bool {
-	that, ok := thatMsg.(*ServiceAccountPermissionSpec)
+func (this *ServiceUserPermissionSpec) EqualMessageVT(thatMsg proto.Message) bool {
+	that, ok := thatMsg.(*ServiceUserPermissionSpec)
 	if !ok {
 		return false
 	}
 	return this.EqualVT(that)
 }
-func (this *ServiceAccountPermissionStatus) EqualVT(that *ServiceAccountPermissionStatus) bool {
+func (this *ServiceUserPermissionStatus) EqualVT(that *ServiceUserPermissionStatus) bool {
 	if this == that {
 		return true
 	} else if this == nil || that == nil {
@@ -482,14 +482,14 @@ func (this *ServiceAccountPermissionStatus) EqualVT(that *ServiceAccountPermissi
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
-func (this *ServiceAccountPermissionStatus) EqualMessageVT(thatMsg proto.Message) bool {
-	that, ok := thatMsg.(*ServiceAccountPermissionStatus)
+func (this *ServiceUserPermissionStatus) EqualMessageVT(thatMsg proto.Message) bool {
+	that, ok := thatMsg.(*ServiceUserPermissionStatus)
 	if !ok {
 		return false
 	}
 	return this.EqualVT(that)
 }
-func (this *ServiceAccountPermissionList) EqualVT(that *ServiceAccountPermissionList) bool {
+func (this *ServiceUserPermissionList) EqualVT(that *ServiceUserPermissionList) bool {
 	if this == that {
 		return true
 	} else if this == nil || that == nil {
@@ -502,10 +502,10 @@ func (this *ServiceAccountPermissionList) EqualVT(that *ServiceAccountPermission
 		vy := that.Items[i]
 		if p, q := vx, vy; p != q {
 			if p == nil {
-				p = &ServiceAccountPermission{}
+				p = &ServiceUserPermission{}
 			}
 			if q == nil {
-				q = &ServiceAccountPermission{}
+				q = &ServiceUserPermission{}
 			}
 			if !p.EqualVT(q) {
 				return false
@@ -515,8 +515,8 @@ func (this *ServiceAccountPermissionList) EqualVT(that *ServiceAccountPermission
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
-func (this *ServiceAccountPermissionList) EqualMessageVT(thatMsg proto.Message) bool {
-	that, ok := thatMsg.(*ServiceAccountPermissionList)
+func (this *ServiceUserPermissionList) EqualMessageVT(thatMsg proto.Message) bool {
+	that, ok := thatMsg.(*ServiceUserPermissionList)
 	if !ok {
 		return false
 	}
@@ -824,7 +824,7 @@ func (m *UserPermissionList) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *ServiceAccountPermission) MarshalVT() (dAtA []byte, err error) {
+func (m *ServiceUserPermission) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -837,12 +837,12 @@ func (m *ServiceAccountPermission) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ServiceAccountPermission) MarshalToVT(dAtA []byte) (int, error) {
+func (m *ServiceUserPermission) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *ServiceAccountPermission) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *ServiceUserPermission) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -925,7 +925,7 @@ func (m *ServiceAccountPermission) MarshalToSizedBufferVT(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *ServiceAccountPermissionSpec) MarshalVT() (dAtA []byte, err error) {
+func (m *ServiceUserPermissionSpec) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -938,12 +938,12 @@ func (m *ServiceAccountPermissionSpec) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ServiceAccountPermissionSpec) MarshalToVT(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionSpec) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *ServiceAccountPermissionSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -967,17 +967,17 @@ func (m *ServiceAccountPermissionSpec) MarshalToSizedBufferVT(dAtA []byte) (int,
 			dAtA[i] = 0x52
 		}
 	}
-	if len(m.SaId) > 0 {
-		i -= len(m.SaId)
-		copy(dAtA[i:], m.SaId)
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.SaId)))
+	if len(m.ServiceUserName) > 0 {
+		i -= len(m.ServiceUserName)
+		copy(dAtA[i:], m.ServiceUserName)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ServiceUserName)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *ServiceAccountPermissionStatus) MarshalVT() (dAtA []byte, err error) {
+func (m *ServiceUserPermissionStatus) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -990,12 +990,12 @@ func (m *ServiceAccountPermissionStatus) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ServiceAccountPermissionStatus) MarshalToVT(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionStatus) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *ServiceAccountPermissionStatus) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionStatus) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -1034,7 +1034,7 @@ func (m *ServiceAccountPermissionStatus) MarshalToSizedBufferVT(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
-func (m *ServiceAccountPermissionList) MarshalVT() (dAtA []byte, err error) {
+func (m *ServiceUserPermissionList) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -1047,12 +1047,12 @@ func (m *ServiceAccountPermissionList) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ServiceAccountPermissionList) MarshalToVT(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionList) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *ServiceAccountPermissionList) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionList) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -1381,7 +1381,7 @@ func (m *UserPermissionList) MarshalToSizedBufferVTStrict(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *ServiceAccountPermission) MarshalVTStrict() (dAtA []byte, err error) {
+func (m *ServiceUserPermission) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -1394,12 +1394,12 @@ func (m *ServiceAccountPermission) MarshalVTStrict() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ServiceAccountPermission) MarshalToVTStrict(dAtA []byte) (int, error) {
+func (m *ServiceUserPermission) MarshalToVTStrict(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
 }
 
-func (m *ServiceAccountPermission) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+func (m *ServiceUserPermission) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -1482,7 +1482,7 @@ func (m *ServiceAccountPermission) MarshalToSizedBufferVTStrict(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
-func (m *ServiceAccountPermissionSpec) MarshalVTStrict() (dAtA []byte, err error) {
+func (m *ServiceUserPermissionSpec) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -1495,12 +1495,12 @@ func (m *ServiceAccountPermissionSpec) MarshalVTStrict() (dAtA []byte, err error
 	return dAtA[:n], nil
 }
 
-func (m *ServiceAccountPermissionSpec) MarshalToVTStrict(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionSpec) MarshalToVTStrict(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
 }
 
-func (m *ServiceAccountPermissionSpec) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionSpec) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -1524,17 +1524,17 @@ func (m *ServiceAccountPermissionSpec) MarshalToSizedBufferVTStrict(dAtA []byte)
 			dAtA[i] = 0x52
 		}
 	}
-	if len(m.SaId) > 0 {
-		i -= len(m.SaId)
-		copy(dAtA[i:], m.SaId)
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.SaId)))
+	if len(m.ServiceUserName) > 0 {
+		i -= len(m.ServiceUserName)
+		copy(dAtA[i:], m.ServiceUserName)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ServiceUserName)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *ServiceAccountPermissionStatus) MarshalVTStrict() (dAtA []byte, err error) {
+func (m *ServiceUserPermissionStatus) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -1547,12 +1547,12 @@ func (m *ServiceAccountPermissionStatus) MarshalVTStrict() (dAtA []byte, err err
 	return dAtA[:n], nil
 }
 
-func (m *ServiceAccountPermissionStatus) MarshalToVTStrict(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionStatus) MarshalToVTStrict(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
 }
 
-func (m *ServiceAccountPermissionStatus) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionStatus) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -1591,7 +1591,7 @@ func (m *ServiceAccountPermissionStatus) MarshalToSizedBufferVTStrict(dAtA []byt
 	return len(dAtA) - i, nil
 }
 
-func (m *ServiceAccountPermissionList) MarshalVTStrict() (dAtA []byte, err error) {
+func (m *ServiceUserPermissionList) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -1604,12 +1604,12 @@ func (m *ServiceAccountPermissionList) MarshalVTStrict() (dAtA []byte, err error
 	return dAtA[:n], nil
 }
 
-func (m *ServiceAccountPermissionList) MarshalToVTStrict(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionList) MarshalToVTStrict(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
 }
 
-func (m *ServiceAccountPermissionList) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+func (m *ServiceUserPermissionList) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -1748,7 +1748,7 @@ func (m *UserPermissionList) SizeVT() (n int) {
 	return n
 }
 
-func (m *ServiceAccountPermission) SizeVT() (n int) {
+func (m *ServiceUserPermission) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1786,13 +1786,13 @@ func (m *ServiceAccountPermission) SizeVT() (n int) {
 	return n
 }
 
-func (m *ServiceAccountPermissionSpec) SizeVT() (n int) {
+func (m *ServiceUserPermissionSpec) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.SaId)
+	l = len(m.ServiceUserName)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
@@ -1806,7 +1806,7 @@ func (m *ServiceAccountPermissionSpec) SizeVT() (n int) {
 	return n
 }
 
-func (m *ServiceAccountPermissionStatus) SizeVT() (n int) {
+func (m *ServiceUserPermissionStatus) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1826,7 +1826,7 @@ func (m *ServiceAccountPermissionStatus) SizeVT() (n int) {
 	return n
 }
 
-func (m *ServiceAccountPermissionList) SizeVT() (n int) {
+func (m *ServiceUserPermissionList) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2465,7 +2465,7 @@ func (m *UserPermissionList) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ServiceAccountPermission) UnmarshalVT(dAtA []byte) error {
+func (m *ServiceUserPermission) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2488,10 +2488,10 @@ func (m *ServiceAccountPermission) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ServiceAccountPermission: wiretype end group for non-group")
+			return fmt.Errorf("proto: ServiceUserPermission: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ServiceAccountPermission: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ServiceUserPermission: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2612,7 +2612,7 @@ func (m *ServiceAccountPermission) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Spec == nil {
-				m.Spec = &ServiceAccountPermissionSpec{}
+				m.Spec = &ServiceUserPermissionSpec{}
 			}
 			if err := m.Spec.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -2648,7 +2648,7 @@ func (m *ServiceAccountPermission) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Status == nil {
-				m.Status = &ServiceAccountPermissionStatus{}
+				m.Status = &ServiceUserPermissionStatus{}
 			}
 			if err := m.Status.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -2676,7 +2676,7 @@ func (m *ServiceAccountPermission) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ServiceAccountPermissionSpec) UnmarshalVT(dAtA []byte) error {
+func (m *ServiceUserPermissionSpec) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2699,15 +2699,15 @@ func (m *ServiceAccountPermissionSpec) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ServiceAccountPermissionSpec: wiretype end group for non-group")
+			return fmt.Errorf("proto: ServiceUserPermissionSpec: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ServiceAccountPermissionSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ServiceUserPermissionSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SaId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceUserName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2735,7 +2735,7 @@ func (m *ServiceAccountPermissionSpec) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SaId = string(dAtA[iNdEx:postIndex])
+			m.ServiceUserName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 10:
 			if wireType != 2 {
@@ -2793,7 +2793,7 @@ func (m *ServiceAccountPermissionSpec) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ServiceAccountPermissionStatus) UnmarshalVT(dAtA []byte) error {
+func (m *ServiceUserPermissionStatus) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2816,10 +2816,10 @@ func (m *ServiceAccountPermissionStatus) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ServiceAccountPermissionStatus: wiretype end group for non-group")
+			return fmt.Errorf("proto: ServiceUserPermissionStatus: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ServiceAccountPermissionStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ServiceUserPermissionStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 20:
@@ -2888,7 +2888,7 @@ func (m *ServiceAccountPermissionStatus) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ServiceAccountPermissionList) UnmarshalVT(dAtA []byte) error {
+func (m *ServiceUserPermissionList) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2911,10 +2911,10 @@ func (m *ServiceAccountPermissionList) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ServiceAccountPermissionList: wiretype end group for non-group")
+			return fmt.Errorf("proto: ServiceUserPermissionList: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ServiceAccountPermissionList: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ServiceUserPermissionList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2946,7 +2946,7 @@ func (m *ServiceAccountPermissionList) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Items = append(m.Items, &ServiceAccountPermission{})
+			m.Items = append(m.Items, &ServiceUserPermission{})
 			if err := m.Items[len(m.Items)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -3608,7 +3608,7 @@ func (m *UserPermissionList) UnmarshalVTUnsafe(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ServiceAccountPermission) UnmarshalVTUnsafe(dAtA []byte) error {
+func (m *ServiceUserPermission) UnmarshalVTUnsafe(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3631,10 +3631,10 @@ func (m *ServiceAccountPermission) UnmarshalVTUnsafe(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ServiceAccountPermission: wiretype end group for non-group")
+			return fmt.Errorf("proto: ServiceUserPermission: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ServiceAccountPermission: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ServiceUserPermission: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3755,7 +3755,7 @@ func (m *ServiceAccountPermission) UnmarshalVTUnsafe(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Spec == nil {
-				m.Spec = &ServiceAccountPermissionSpec{}
+				m.Spec = &ServiceUserPermissionSpec{}
 			}
 			if err := m.Spec.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -3791,7 +3791,7 @@ func (m *ServiceAccountPermission) UnmarshalVTUnsafe(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Status == nil {
-				m.Status = &ServiceAccountPermissionStatus{}
+				m.Status = &ServiceUserPermissionStatus{}
 			}
 			if err := m.Status.UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -3819,7 +3819,7 @@ func (m *ServiceAccountPermission) UnmarshalVTUnsafe(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ServiceAccountPermissionSpec) UnmarshalVTUnsafe(dAtA []byte) error {
+func (m *ServiceUserPermissionSpec) UnmarshalVTUnsafe(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3842,15 +3842,15 @@ func (m *ServiceAccountPermissionSpec) UnmarshalVTUnsafe(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ServiceAccountPermissionSpec: wiretype end group for non-group")
+			return fmt.Errorf("proto: ServiceUserPermissionSpec: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ServiceAccountPermissionSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ServiceUserPermissionSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SaId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceUserName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3882,7 +3882,7 @@ func (m *ServiceAccountPermissionSpec) UnmarshalVTUnsafe(dAtA []byte) error {
 			if intStringLen > 0 {
 				stringValue = unsafe.String(&dAtA[iNdEx], intStringLen)
 			}
-			m.SaId = stringValue
+			m.ServiceUserName = stringValue
 			iNdEx = postIndex
 		case 10:
 			if wireType != 2 {
@@ -3940,7 +3940,7 @@ func (m *ServiceAccountPermissionSpec) UnmarshalVTUnsafe(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ServiceAccountPermissionStatus) UnmarshalVTUnsafe(dAtA []byte) error {
+func (m *ServiceUserPermissionStatus) UnmarshalVTUnsafe(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3963,10 +3963,10 @@ func (m *ServiceAccountPermissionStatus) UnmarshalVTUnsafe(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ServiceAccountPermissionStatus: wiretype end group for non-group")
+			return fmt.Errorf("proto: ServiceUserPermissionStatus: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ServiceAccountPermissionStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ServiceUserPermissionStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 20:
@@ -4035,7 +4035,7 @@ func (m *ServiceAccountPermissionStatus) UnmarshalVTUnsafe(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ServiceAccountPermissionList) UnmarshalVTUnsafe(dAtA []byte) error {
+func (m *ServiceUserPermissionList) UnmarshalVTUnsafe(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4058,10 +4058,10 @@ func (m *ServiceAccountPermissionList) UnmarshalVTUnsafe(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ServiceAccountPermissionList: wiretype end group for non-group")
+			return fmt.Errorf("proto: ServiceUserPermissionList: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ServiceAccountPermissionList: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ServiceUserPermissionList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -4093,7 +4093,7 @@ func (m *ServiceAccountPermissionList) UnmarshalVTUnsafe(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Items = append(m.Items, &ServiceAccountPermission{})
+			m.Items = append(m.Items, &ServiceUserPermission{})
 			if err := m.Items[len(m.Items)-1].UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
