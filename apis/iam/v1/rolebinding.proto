@@ -27,7 +27,8 @@ message RoleBindingSpec {
   string role = 2 [(buf.validate.field).string.min_len = 1];
 
   // members - who gets this role
-  // Format: users/{email}, groups/{name}, serviceaccounts/{id}
+  // Format: user/{email}, group/{name}, serviceuser/{principal_name}
+  // Example: "serviceuser/serviceuser@acme.example.com"
   repeated string members = 10 [(buf.validate.field).string.min_len = 1];
 
   // conditions - CEL expressions that must evaluate to true

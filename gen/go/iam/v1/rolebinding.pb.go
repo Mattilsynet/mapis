@@ -103,7 +103,8 @@ type RoleBindingSpec struct {
 	// role - the role name being bound
 	Role string `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`
 	// members - who gets this role
-	// Format: users/{email}, groups/{name}, serviceaccounts/{id}
+	// Format: user/{email}, group/{name}, serviceuser/{principal_name}
+	// Example: "serviceuser/serviceuser@acme.example.com"
 	Members []string `protobuf:"bytes,10,rep,name=members,proto3" json:"members,omitempty"`
 	// conditions - CEL expressions that must evaluate to true
 	Conditions    []*Condition `protobuf:"bytes,20,rep,name=conditions,proto3" json:"conditions,omitempty"`

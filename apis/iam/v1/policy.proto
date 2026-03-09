@@ -4,14 +4,13 @@ package iam.v1;
 import "buf/validate/validate.proto";
 import "meta/v1/meta.proto";
 import "status/v1/status.proto";
-import "google/protobuf/duration.proto";
-import "iam/v1/condition.proto";
 
 option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
 
-// Policy - metadata container for role bindings and permissions
-// Policies aggregate role bindings and are synced to external providers
-// metadata.name = user-provided unique identifier
+// Policy - defines required roles for a specific resource
+// Each resource (org, project, resource) has its own Policy
+// Policies are aggregated up the hierarchy to form the effective policy
+// metadata.name = "{resource_id}/policies/default"
 message Policy {
   meta.v1.TypeMeta type = 1;
   meta.v1.ObjectMeta metadata = 2;
@@ -20,35 +19,20 @@ message Policy {
 }
 
 message PolicySpec {
-  // resource_id - the target resource this policy grants access to
-  // Format: orgs/{org}/projects/{project}/resources/{resource}
+  // resource_id - the resource this policy applies to
+  // Format: orgs/{org} OR orgs/{org}/projects/{project} OR orgs/{org}/projects/{project}/resources/{resource}
   string resource_id = 1 [(buf.validate.field).string.min_len = 1];
 
-  // policy_bindings - list of role bindings for this policy
-  // Multiple bindings for the same role are merged (members combined)
-  repeated PolicyBinding policy_bindings = 10;
+  // required_roles - list of roles required to access this resource
+  // These roles are inherited by child resources in the hierarchy
+  repeated string required_roles = 10 [(buf.validate.field).repeated.min_items = 1];
 
   // description - human-readable description of this policy
   string description = 20;
 }
 
-message PolicyBinding {
-  // role - the role name being granted
-  string role = 1 [(buf.validate.field).string.min_len = 1];
-
-  // members - who gets this role (users, groups, serviceaccounts)
-  // Format: users/{email}, groups/{name}, serviceaccounts/{id}
-  repeated string members = 2 [(buf.validate.field).string.min_len = 1];
-
-  // conditions - CEL expressions that must evaluate to true
-  // Multiple conditions are AND'd together
-  repeated Condition conditions = 20;
-}
-
 message PolicyStatus {
   status.v1.Status status = 20;
-  // external_id - ZITADEL project ID (populated during sync)
-  string external_id = 21;
 }
 
 message PolicyList {

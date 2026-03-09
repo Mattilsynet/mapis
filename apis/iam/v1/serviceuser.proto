@@ -1,0 +1,50 @@
+syntax = "proto3";
+package iam.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+
+// ServiceUser - a machine identity for API access
+// metadata.name = service user principal name (global unique)
+// Format: "serviceuser@{org}.{domain}" (e.g., "serviceuser@acme.example.com")
+message ServiceUser {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  ServiceUserSpec spec = 20;
+  ServiceUserStatus status = 30;
+}
+
+message ServiceUserSpec {
+  // name - service user principal name (global unique)
+  // Format: "serviceuser@{org}.{domain}" (e.g., "serviceuser@acme.example.com")
+  // Org must be lowercase DNS label (max 63 chars), domain can be any valid format
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+  
+  // description - human-readable description
+  string description = 2;
+  
+  // display_name - optional friendly name for UI display
+  // If not provided, defaults to the principal name
+  string display_name = 3;
+  
+  // is_active - if false, the service user is disabled
+  bool is_active = 4;
+}
+
+message ServiceUserStatus {
+  status.v1.Status status = 20;
+  
+  // zitadel_id - ZITADEL service user ID (populated during sync)
+  string zitadel_id = 21;
+  
+  // last_active - last time this service user was used
+  google.protobuf.Timestamp last_active = 22;
+}
+
+message ServiceUserList {
+  repeated ServiceUser items = 1;
+}
