@@ -9,8 +9,10 @@ import (
 	v1 "github.com/Mattilsynet/mapis/gen/go/meta/v1"
 	v11 "github.com/Mattilsynet/mapis/gen/go/status/v1"
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	timestamppb1 "github.com/planetscale/vtprotobuf/types/known/timestamppb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	unsafe "unsafe"
 )
@@ -101,6 +103,7 @@ func (m *UserPermissionStatus) CloneVT() *UserPermissionStatus {
 		return (*UserPermissionStatus)(nil)
 	}
 	r := new(UserPermissionStatus)
+	r.ComputedTimestamp = (*timestamppb.Timestamp)((*timestamppb1.Timestamp)(m.ComputedTimestamp).CloneVT())
 	if rhs := m.Status; rhs != nil {
 		if vtpb, ok := interface{}(rhs).(interface{ CloneVT() *v11.Status }); ok {
 			r.Status = vtpb.CloneVT()
@@ -203,6 +206,7 @@ func (m *ServiceUserPermissionStatus) CloneVT() *ServiceUserPermissionStatus {
 		return (*ServiceUserPermissionStatus)(nil)
 	}
 	r := new(ServiceUserPermissionStatus)
+	r.ComputedTimestamp = (*timestamppb.Timestamp)((*timestamppb1.Timestamp)(m.ComputedTimestamp).CloneVT())
 	if rhs := m.Status; rhs != nil {
 		if vtpb, ok := interface{}(rhs).(interface{ CloneVT() *v11.Status }); ok {
 			r.Status = vtpb.CloneVT()
@@ -351,6 +355,9 @@ func (this *UserPermissionStatus) EqualVT(that *UserPermissionStatus) bool {
 	} else if !proto.Equal(this.Status, that.Status) {
 		return false
 	}
+	if !(*timestamppb1.Timestamp)(this.ComputedTimestamp).EqualVT((*timestamppb1.Timestamp)(that.ComputedTimestamp)) {
+		return false
+	}
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
@@ -477,6 +484,9 @@ func (this *ServiceUserPermissionStatus) EqualVT(that *ServiceUserPermissionStat
 			return false
 		}
 	} else if !proto.Equal(this.Status, that.Status) {
+		return false
+	}
+	if !(*timestamppb1.Timestamp)(this.ComputedTimestamp).EqualVT((*timestamppb1.Timestamp)(that.ComputedTimestamp)) {
 		return false
 	}
 	return string(this.unknownFields) == string(that.unknownFields)
@@ -752,6 +762,18 @@ func (m *UserPermissionStatus) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ComputedTimestamp != nil {
+		size, err := (*timestamppb1.Timestamp)(m.ComputedTimestamp).MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xfa
+	}
 	if m.Status != nil {
 		if vtmsg, ok := interface{}(m.Status).(interface {
 			MarshalToSizedBufferVT([]byte) (int, error)
@@ -1006,6 +1028,18 @@ func (m *ServiceUserPermissionStatus) MarshalToSizedBufferVT(dAtA []byte) (int, 
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ComputedTimestamp != nil {
+		size, err := (*timestamppb1.Timestamp)(m.ComputedTimestamp).MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xfa
 	}
 	if m.Status != nil {
 		if vtmsg, ok := interface{}(m.Status).(interface {
@@ -1309,6 +1343,18 @@ func (m *UserPermissionStatus) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ComputedTimestamp != nil {
+		size, err := (*timestamppb1.Timestamp)(m.ComputedTimestamp).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xfa
+	}
 	if m.Status != nil {
 		if vtmsg, ok := interface{}(m.Status).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -1564,6 +1610,18 @@ func (m *ServiceUserPermissionStatus) MarshalToSizedBufferVTStrict(dAtA []byte) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ComputedTimestamp != nil {
+		size, err := (*timestamppb1.Timestamp)(m.ComputedTimestamp).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xfa
+	}
 	if m.Status != nil {
 		if vtmsg, ok := interface{}(m.Status).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -1728,6 +1786,10 @@ func (m *UserPermissionStatus) SizeVT() (n int) {
 		}
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	if m.ComputedTimestamp != nil {
+		l = (*timestamppb1.Timestamp)(m.ComputedTimestamp).SizeVT()
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -1820,6 +1882,10 @@ func (m *ServiceUserPermissionStatus) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.Status)
 		}
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ComputedTimestamp != nil {
+		l = (*timestamppb1.Timestamp)(m.ComputedTimestamp).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
@@ -2358,6 +2424,42 @@ func (m *UserPermissionStatus) UnmarshalVT(dAtA []byte) error {
 				}
 			}
 			iNdEx = postIndex
+		case 31:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ComputedTimestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ComputedTimestamp == nil {
+				m.ComputedTimestamp = &timestamppb.Timestamp{}
+			}
+			if err := (*timestamppb1.Timestamp)(m.ComputedTimestamp).UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := protohelpers.Skip(dAtA[iNdEx:])
@@ -2864,6 +2966,42 @@ func (m *ServiceUserPermissionStatus) UnmarshalVT(dAtA []byte) error {
 				if err := proto.Unmarshal(dAtA[iNdEx:postIndex], m.Status); err != nil {
 					return err
 				}
+			}
+			iNdEx = postIndex
+		case 31:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ComputedTimestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ComputedTimestamp == nil {
+				m.ComputedTimestamp = &timestamppb.Timestamp{}
+			}
+			if err := (*timestamppb1.Timestamp)(m.ComputedTimestamp).UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
 			iNdEx = postIndex
 		default:
@@ -3501,6 +3639,42 @@ func (m *UserPermissionStatus) UnmarshalVTUnsafe(dAtA []byte) error {
 				}
 			}
 			iNdEx = postIndex
+		case 31:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ComputedTimestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ComputedTimestamp == nil {
+				m.ComputedTimestamp = &timestamppb.Timestamp{}
+			}
+			if err := (*timestamppb1.Timestamp)(m.ComputedTimestamp).UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := protohelpers.Skip(dAtA[iNdEx:])
@@ -4011,6 +4185,42 @@ func (m *ServiceUserPermissionStatus) UnmarshalVTUnsafe(dAtA []byte) error {
 				if err := proto.Unmarshal(dAtA[iNdEx:postIndex], m.Status); err != nil {
 					return err
 				}
+			}
+			iNdEx = postIndex
+		case 31:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ComputedTimestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ComputedTimestamp == nil {
+				m.ComputedTimestamp = &timestamppb.Timestamp{}
+			}
+			if err := (*timestamppb1.Timestamp)(m.ComputedTimestamp).UnmarshalVTUnsafe(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
 			iNdEx = postIndex
 		default:

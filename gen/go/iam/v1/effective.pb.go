@@ -12,6 +12,7 @@ import (
 	v11 "github.com/Mattilsynet/mapis/gen/go/status/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -204,10 +205,11 @@ func (x *RoleAssignment) GetRole() string {
 }
 
 type UserPermissionStatus struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        *v11.Status            `protobuf:"bytes,20,opt,name=status,proto3" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Status            *v11.Status            `protobuf:"bytes,20,opt,name=status,proto3" json:"status,omitempty"`
+	ComputedTimestamp *timestamppb.Timestamp `protobuf:"bytes,31,opt,name=computed_timestamp,json=computedTimestamp,proto3" json:"computed_timestamp,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *UserPermissionStatus) Reset() {
@@ -243,6 +245,13 @@ func (*UserPermissionStatus) Descriptor() ([]byte, []int) {
 func (x *UserPermissionStatus) GetStatus() *v11.Status {
 	if x != nil {
 		return x.Status
+	}
+	return nil
+}
+
+func (x *UserPermissionStatus) GetComputedTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ComputedTimestamp
 	}
 	return nil
 }
@@ -417,10 +426,11 @@ func (x *ServiceUserPermissionSpec) GetPermissions() []*RoleAssignment {
 }
 
 type ServiceUserPermissionStatus struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        *v11.Status            `protobuf:"bytes,20,opt,name=status,proto3" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Status            *v11.Status            `protobuf:"bytes,20,opt,name=status,proto3" json:"status,omitempty"`
+	ComputedTimestamp *timestamppb.Timestamp `protobuf:"bytes,31,opt,name=computed_timestamp,json=computedTimestamp,proto3" json:"computed_timestamp,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *ServiceUserPermissionStatus) Reset() {
@@ -456,6 +466,13 @@ func (*ServiceUserPermissionStatus) Descriptor() ([]byte, []int) {
 func (x *ServiceUserPermissionStatus) GetStatus() *v11.Status {
 	if x != nil {
 		return x.Status
+	}
+	return nil
+}
+
+func (x *ServiceUserPermissionStatus) GetComputedTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ComputedTimestamp
 	}
 	return nil
 }
@@ -508,7 +525,7 @@ var File_iam_v1_effective_proto protoreflect.FileDescriptor
 
 const file_iam_v1_effective_proto_rawDesc = "" +
 	"\n" +
-	"\x16iam/v1/effective.proto\x12\x06iam.v1\x1a\x1bbuf/validate/validate.proto\x1a\x12meta/v1/meta.proto\x1a\x16status/v1/status.proto\"\xce\x01\n" +
+	"\x16iam/v1/effective.proto\x12\x06iam.v1\x1a\x1bbuf/validate/validate.proto\x1a\x12meta/v1/meta.proto\x1a\x16status/v1/status.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xce\x01\n" +
 	"\x0eUserPermission\x12%\n" +
 	"\x04type\x18\x01 \x01(\v2\x11.meta.v1.TypeMetaR\x04type\x12/\n" +
 	"\bmetadata\x18\x02 \x01(\v2\x13.meta.v1.ObjectMetaR\bmetadata\x12.\n" +
@@ -522,9 +539,10 @@ const file_iam_v1_effective_proto_rawDesc = "" +
 	"\x0eRoleAssignment\x12(\n" +
 	"\vresource_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\n" +
 	"resourceId\x12\x1b\n" +
-	"\x04role\x18\x02 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04role\"A\n" +
+	"\x04role\x18\x02 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04role\"\x8c\x01\n" +
 	"\x14UserPermissionStatus\x12)\n" +
-	"\x06status\x18\x14 \x01(\v2\x11.status.v1.StatusR\x06status\"B\n" +
+	"\x06status\x18\x14 \x01(\v2\x11.status.v1.StatusR\x06status\x12I\n" +
+	"\x12computed_timestamp\x18\x1f \x01(\v2\x1a.google.protobuf.TimestampR\x11computedTimestamp\"B\n" +
 	"\x12UserPermissionList\x12,\n" +
 	"\x05items\x18\x01 \x03(\v2\x16.iam.v1.UserPermissionR\x05items\"\xe3\x01\n" +
 	"\x15ServiceUserPermission\x12%\n" +
@@ -535,9 +553,10 @@ const file_iam_v1_effective_proto_rawDesc = "" +
 	"\x19ServiceUserPermissionSpec\x123\n" +
 	"\x11service_user_name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x0fserviceUserName\x128\n" +
 	"\vpermissions\x18\n" +
-	" \x03(\v2\x16.iam.v1.RoleAssignmentR\vpermissions\"H\n" +
+	" \x03(\v2\x16.iam.v1.RoleAssignmentR\vpermissions\"\x93\x01\n" +
 	"\x1bServiceUserPermissionStatus\x12)\n" +
-	"\x06status\x18\x14 \x01(\v2\x11.status.v1.StatusR\x06status\"P\n" +
+	"\x06status\x18\x14 \x01(\v2\x11.status.v1.StatusR\x06status\x12I\n" +
+	"\x12computed_timestamp\x18\x1f \x01(\v2\x1a.google.protobuf.TimestampR\x11computedTimestamp\"P\n" +
 	"\x19ServiceUserPermissionList\x123\n" +
 	"\x05items\x18\x01 \x03(\v2\x1d.iam.v1.ServiceUserPermissionR\x05itemsB/Z-github.com/Mattilsynet/mapis/gen/iam/v1;iamv1b\x06proto3"
 
@@ -567,6 +586,7 @@ var file_iam_v1_effective_proto_goTypes = []any{
 	(*v1.TypeMeta)(nil),                 // 9: meta.v1.TypeMeta
 	(*v1.ObjectMeta)(nil),               // 10: meta.v1.ObjectMeta
 	(*v11.Status)(nil),                  // 11: status.v1.Status
+	(*timestamppb.Timestamp)(nil),       // 12: google.protobuf.Timestamp
 }
 var file_iam_v1_effective_proto_depIdxs = []int32{
 	9,  // 0: iam.v1.UserPermission.type:type_name -> meta.v1.TypeMeta
@@ -575,19 +595,21 @@ var file_iam_v1_effective_proto_depIdxs = []int32{
 	3,  // 3: iam.v1.UserPermission.status:type_name -> iam.v1.UserPermissionStatus
 	2,  // 4: iam.v1.UserPermissionSpec.permissions:type_name -> iam.v1.RoleAssignment
 	11, // 5: iam.v1.UserPermissionStatus.status:type_name -> status.v1.Status
-	0,  // 6: iam.v1.UserPermissionList.items:type_name -> iam.v1.UserPermission
-	9,  // 7: iam.v1.ServiceUserPermission.type:type_name -> meta.v1.TypeMeta
-	10, // 8: iam.v1.ServiceUserPermission.metadata:type_name -> meta.v1.ObjectMeta
-	6,  // 9: iam.v1.ServiceUserPermission.spec:type_name -> iam.v1.ServiceUserPermissionSpec
-	7,  // 10: iam.v1.ServiceUserPermission.status:type_name -> iam.v1.ServiceUserPermissionStatus
-	2,  // 11: iam.v1.ServiceUserPermissionSpec.permissions:type_name -> iam.v1.RoleAssignment
-	11, // 12: iam.v1.ServiceUserPermissionStatus.status:type_name -> status.v1.Status
-	5,  // 13: iam.v1.ServiceUserPermissionList.items:type_name -> iam.v1.ServiceUserPermission
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	12, // 6: iam.v1.UserPermissionStatus.computed_timestamp:type_name -> google.protobuf.Timestamp
+	0,  // 7: iam.v1.UserPermissionList.items:type_name -> iam.v1.UserPermission
+	9,  // 8: iam.v1.ServiceUserPermission.type:type_name -> meta.v1.TypeMeta
+	10, // 9: iam.v1.ServiceUserPermission.metadata:type_name -> meta.v1.ObjectMeta
+	6,  // 10: iam.v1.ServiceUserPermission.spec:type_name -> iam.v1.ServiceUserPermissionSpec
+	7,  // 11: iam.v1.ServiceUserPermission.status:type_name -> iam.v1.ServiceUserPermissionStatus
+	2,  // 12: iam.v1.ServiceUserPermissionSpec.permissions:type_name -> iam.v1.RoleAssignment
+	11, // 13: iam.v1.ServiceUserPermissionStatus.status:type_name -> status.v1.Status
+	12, // 14: iam.v1.ServiceUserPermissionStatus.computed_timestamp:type_name -> google.protobuf.Timestamp
+	5,  // 15: iam.v1.ServiceUserPermissionList.items:type_name -> iam.v1.ServiceUserPermission
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_iam_v1_effective_proto_init() }
