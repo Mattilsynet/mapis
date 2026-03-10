@@ -25,5 +25,18 @@ message ObjectMeta {
   }];
   google.protobuf.Timestamp created_timestamp = 5;
   string uid = 6;
+  
+  // Fully Qualified Resource Name (FQRN)
+  // Complete, unambiguous identifier for the resource in the system
+  // Format: {kind}/{path} where path follows resource-specific hierarchy
+  // Examples:
+  //   - "users/alice@acme.com"
+  //   - "orgs/acme"
+  //   - "orgs/acme/projects/frontend"
+  //   - "roles/frontend-reader"
+  //   - "users/alice@acme.com/rolebindings/reader"
+  string fqrn = 7[(buf.validate.field).string = {
+    min_len: 1,
+  }];
 }
 

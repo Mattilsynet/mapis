@@ -49,6 +49,7 @@ func (m *ObjectMeta) CloneVT() *ObjectMeta {
 	r.ResourceVersion = m.ResourceVersion
 	r.CreatedTimestamp = (*timestamppb.Timestamp)((*timestamppb1.Timestamp)(m.CreatedTimestamp).CloneVT())
 	r.Uid = m.Uid
+	r.Fqrn = m.Fqrn
 	if rhs := m.Labels; rhs != nil {
 		tmpContainer := make(map[string]string, len(rhs))
 		for k, v := range rhs {
@@ -138,6 +139,9 @@ func (this *ObjectMeta) EqualVT(that *ObjectMeta) bool {
 	if this.Uid != that.Uid {
 		return false
 	}
+	if this.Fqrn != that.Fqrn {
+		return false
+	}
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
@@ -224,6 +228,13 @@ func (m *ObjectMeta) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.Fqrn) > 0 {
+		i -= len(m.Fqrn)
+		copy(dAtA[i:], m.Fqrn)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Fqrn)))
+		i--
+		dAtA[i] = 0x3a
 	}
 	if len(m.Uid) > 0 {
 		i -= len(m.Uid)
@@ -374,6 +385,13 @@ func (m *ObjectMeta) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.Fqrn) > 0 {
+		i -= len(m.Fqrn)
+		copy(dAtA[i:], m.Fqrn)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Fqrn)))
+		i--
+		dAtA[i] = 0x3a
+	}
 	if len(m.Uid) > 0 {
 		i -= len(m.Uid)
 		copy(dAtA[i:], m.Uid)
@@ -499,6 +517,10 @@ func (m *ObjectMeta) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	l = len(m.Uid)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Fqrn)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
@@ -1035,6 +1057,38 @@ func (m *ObjectMeta) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Uid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Fqrn", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Fqrn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1623,6 +1677,42 @@ func (m *ObjectMeta) UnmarshalVTUnsafe(dAtA []byte) error {
 				stringValue = unsafe.String(&dAtA[iNdEx], intStringLen)
 			}
 			m.Uid = stringValue
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Fqrn", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protohelpers.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var stringValue string
+			if intStringLen > 0 {
+				stringValue = unsafe.String(&dAtA[iNdEx], intStringLen)
+			}
+			m.Fqrn = stringValue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

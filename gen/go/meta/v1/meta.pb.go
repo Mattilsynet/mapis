@@ -85,8 +85,18 @@ type ObjectMeta struct {
 	ResourceVersion  string                 `protobuf:"bytes,4,opt,name=resource_version,json=resourceVersion,proto3" json:"resource_version,omitempty"`
 	CreatedTimestamp *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_timestamp,json=createdTimestamp,proto3" json:"created_timestamp,omitempty"`
 	Uid              string                 `protobuf:"bytes,6,opt,name=uid,proto3" json:"uid,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Fully Qualified Resource Name (FQRN)
+	// Complete, unambiguous identifier for the resource in the system
+	// Format: {kind}/{path} where path follows resource-specific hierarchy
+	// Examples:
+	//   - "users/alice@acme.com"
+	//   - "orgs/acme"
+	//   - "orgs/acme/projects/frontend"
+	//   - "roles/frontend-reader"
+	//   - "users/alice@acme.com/rolebindings/reader"
+	Fqrn          string `protobuf:"bytes,7,opt,name=fqrn,proto3" json:"fqrn,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ObjectMeta) Reset() {
@@ -161,6 +171,13 @@ func (x *ObjectMeta) GetUid() string {
 	return ""
 }
 
+func (x *ObjectMeta) GetFqrn() string {
+	if x != nil {
+		return x.Fqrn
+	}
+	return ""
+}
+
 var File_meta_v1_meta_proto protoreflect.FileDescriptor
 
 const file_meta_v1_meta_proto_rawDesc = "" +
@@ -169,7 +186,7 @@ const file_meta_v1_meta_proto_rawDesc = "" +
 	"\bTypeMeta\x12\x12\n" +
 	"\x04kind\x18\x01 \x01(\tR\x04kind\x12\x1f\n" +
 	"\vapi_version\x18\x02 \x01(\tR\n" +
-	"apiVersion\"\xb4\x03\n" +
+	"apiVersion\"\xd1\x03\n" +
 	"\n" +
 	"ObjectMeta\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04name\x127\n" +
@@ -177,7 +194,8 @@ const file_meta_v1_meta_proto_rawDesc = "" +
 	"\vannotations\x18\x03 \x03(\v2$.meta.v1.ObjectMeta.AnnotationsEntryR\vannotations\x122\n" +
 	"\x10resource_version\x18\x04 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x0fresourceVersion\x12G\n" +
 	"\x11created_timestamp\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\x10createdTimestamp\x12\x10\n" +
-	"\x03uid\x18\x06 \x01(\tR\x03uid\x1a9\n" +
+	"\x03uid\x18\x06 \x01(\tR\x03uid\x12\x1b\n" +
+	"\x04fqrn\x18\a \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04fqrn\x1a9\n" +
 	"\vLabelsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a>\n" +
