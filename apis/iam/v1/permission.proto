@@ -7,9 +7,9 @@ import "status/v1/status.proto";
 
 option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
 
-// Permission - defines a single permission (resource:action pair)
+// Permission - defines a single permission
 // Permissions are reusable across roles
-// metadata.name = permission name (e.g., "projects:read")
+// metadata.name = DNS-safe resource identifier for the permission resource
 message Permission {
   meta.v1.TypeMeta type = 1;
   meta.v1.ObjectMeta metadata = 2;  // name = permission_name
@@ -18,9 +18,13 @@ message Permission {
 }
 
 message PermissionSpec {
-  // name - permission name (matches metadata.name)
-  // Format: resource:action (e.g., "projects:read", "secrets:write")
-  string name = 1 [(buf.validate.field).string.min_len = 1];
+  // name - canonical semantic permission name (independent of metadata.name)
+  // Canonical format: service.plural_resource.verb
+  // Example: "iam.users.create"
+  string name = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    pattern: "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+  }];
   
   // description - human-readable description
   string description = 2;

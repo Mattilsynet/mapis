@@ -24,9 +24,9 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Permission - defines a single permission (resource:action pair)
+// Permission - defines a single permission
 // Permissions are reusable across roles
-// metadata.name = permission name (e.g., "projects:read")
+// metadata.name = DNS-safe resource identifier for the permission resource
 type Permission struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          *v1.TypeMeta           `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
@@ -97,8 +97,9 @@ func (x *Permission) GetStatus() *PermissionStatus {
 
 type PermissionSpec struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// name - permission name (matches metadata.name)
-	// Format: resource:action (e.g., "projects:read", "secrets:write")
+	// name - canonical semantic permission name (independent of metadata.name)
+	// Canonical format: service.plural_resource.verb
+	// Example: "iam.users.create"
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// description - human-readable description
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
@@ -275,9 +276,9 @@ const file_iam_v1_permission_proto_rawDesc = "" +
 	"\x04type\x18\x01 \x01(\v2\x11.meta.v1.TypeMetaR\x04type\x12/\n" +
 	"\bmetadata\x18\x02 \x01(\v2\x13.meta.v1.ObjectMetaR\bmetadata\x12*\n" +
 	"\x04spec\x18\x14 \x01(\v2\x16.iam.v1.PermissionSpecR\x04spec\x120\n" +
-	"\x06status\x18\x1e \x01(\v2\x18.iam.v1.PermissionStatusR\x06status\"\xbd\x01\n" +
-	"\x0ePermissionSpec\x12\x1b\n" +
-	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04name\x12 \n" +
+	"\x06status\x18\x1e \x01(\v2\x18.iam.v1.PermissionStatusR\x06status\"\xf2\x01\n" +
+	"\x0ePermissionSpec\x12P\n" +
+	"\x04name\x18\x01 \x01(\tB<\xbaH9r7\x10\x0123^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$R\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12,\n" +
 	"\rresource_type\x18\x03 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\fresourceType\x12\x1f\n" +
 	"\x06action\x18\x04 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x06action\x12\x1d\n" +
