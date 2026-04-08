@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package controlplane.v1;
+
+import "buf/validate/validate.proto";
+import "iam/v1/permission.proto";
+import "iam/v1/role.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/controlplane/v1;controlplanev1";
+
+// ServiceDescriptor is the declarative source for platform service metadata
+// and built-in IAM declarations for a service.
+//
+// Reconciliation ownership:
+// - ServiceDescriptor reconciler projects declarations into IAM dataplane.
+// - Method-to-permission mapping remains in service/runtime code.
+message ServiceDescriptor {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  ServiceDescriptorSpec spec = 20;
+  ServiceDescriptorStatus status = 30;
+}
+
+message ServiceDescriptorSpec {
+  // service_name is the canonical service namespace.
+  string service_name = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    pattern: "^[a-z][a-z0-9-]*$"
+  }];
+
+  string display_name = 2;
+  string description = 3;
+
+  repeated ResourceKindDescriptor resource_kinds = 10;
+
+  // declared_permissions embeds IAM permission declarations for this service.
+  //
+  // Input contract:
+  // - accepted in lenient form and normalized by reconciler
+  // - canonical semantic permission name remains dotted in spec.name
+  // - invalid declarations are rejected during validation/reconciliation
+  // - these declarations are treated as built-in platform permissions
+  repeated iam.v1.Permission declared_permissions = 20;
+
+  // built_in_roles embeds IAM built-in role declarations for this service.
+  //
+  // Input contract:
+  // - accepted in lenient form and normalized by reconciler
+  // - role permission references must resolve to canonical permission names
+  // - invalid references are rejected during reconciliation
+  // - these roles are treated as built-in platform roles
+  repeated iam.v1.Role built_in_roles = 30;
+
+  // v1 supports only APPLY semantics.
+  // APPLY is authoritative desired-state reconciliation for descriptor-owned
+  // built-in permissions and roles:
+  // - upsert entries present in descriptor
+  // - prune previously projected descriptor-owned entries that are now absent
+  ReconciliationMode mode = 40 [(buf.validate.field).enum = {
+    defined_only: true,
+    in: [1]
+  }];
+}
+
+enum ResourceScope {
+  RESOURCE_SCOPE_UNSPECIFIED = 0;
+  RESOURCE_SCOPE_GLOBAL = 1;
+  RESOURCE_SCOPE_ORG = 2;
+  RESOURCE_SCOPE_PROJECT = 3;
+}
+
+message ResourceKindDescriptor {
+  // type is singular kind name used in resource type identity: {service}/{type}
+  string type = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    pattern: "^[a-z][a-z0-9-]*$"
+  }];
+
+  // plural is the canonical plural form used in permission names.
+  string plural = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    pattern: "^[a-z][a-z0-9-]*$"
+  }];
+
+  ResourceScope scope = 3 [(buf.validate.field).enum.defined_only = true];
+
+  bool is_regional = 4;
+
+  // regex used to validate the resource ID segment in FQRN.
+  string id_pattern = 5 [(buf.validate.field).string.min_len = 1];
+
+  // aligns with optimistic concurrency ADR capabilities by kind.
+  bool supports_resource_version = 6;
+}
+
+enum ReconciliationMode {
+  RECONCILIATION_MODE_UNSPECIFIED = 0;
+  // APPLY is authoritative desired-state reconciliation.
+  RECONCILIATION_MODE_APPLY = 1;
+}
+
+message ServiceDescriptorStatus {
+  status.v1.Status status = 1;
+}
+
+message ServiceDescriptorList {
+  repeated ServiceDescriptor items = 1;
+}
