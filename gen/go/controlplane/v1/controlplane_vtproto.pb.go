@@ -8,7 +8,7 @@ import (
 	fmt "fmt"
 	v1 "github.com/Mattilsynet/mapis/gen/go/meta/v1"
 	v12 "github.com/Mattilsynet/mapis/gen/go/status/v1"
-	v11 "github.com/Mattilsynet/mapis/gen/iam/v1"
+	v11 "github.com/Mattilsynet/mapis/gen/go/iam/v1"
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"

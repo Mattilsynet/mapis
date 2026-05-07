@@ -10,7 +10,7 @@ import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	v1 "github.com/Mattilsynet/mapis/gen/go/meta/v1"
 	v12 "github.com/Mattilsynet/mapis/gen/go/status/v1"
-	v11 "github.com/Mattilsynet/mapis/gen/iam/v1"
+	v11 "github.com/Mattilsynet/mapis/gen/go/iam/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
