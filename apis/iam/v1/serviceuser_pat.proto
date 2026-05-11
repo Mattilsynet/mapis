@@ -1,0 +1,33 @@
+syntax = "proto3";
+package iam.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/iam/v1;iamv1";
+
+// ServiceUserPATRequest is the internal bridge request from iam-serviceuser
+// to zitadel-sync for listing/creating service-user personal access tokens.
+message ServiceUserPATRequest {
+  string action = 1;
+  string service_user = 2;
+  string service_uid = 3;
+  string service_fqrn = 4;
+  string zitadel_id = 5;
+  string bridge_token = 6;
+  string expiration_at = 7;
+}
+
+message ServiceUserPATItem {
+  string id = 1;
+  string created_at = 2;
+  string expires_at = 3;
+  string user_id = 4;
+  string organization_id = 5;
+}
+
+message ServiceUserPATResponse {
+  bool success = 1;
+  string error = 2;
+  string message = 3;
+  string token = 4;
+  string token_id = 5;
+  repeated ServiceUserPATItem items = 6;
+}
