@@ -13,6 +13,7 @@ message ServiceUserPATRequest {
   string zitadel_id = 5;
   string bridge_token = 6;
   string expiration_at = 7;
+  string token_id = 8;
 }
 
 message ServiceUserPATItem {
@@ -21,6 +22,10 @@ message ServiceUserPATItem {
   string expires_at = 3;
   string user_id = 4;
   string organization_id = 5;
+  bool revoked = 6;
+  string revoked_at = 7;
+  string reconcile_error = 8;
+  string pending_action = 9;
 }
 
 message ServiceUserPATResponse {
@@ -30,4 +35,18 @@ message ServiceUserPATResponse {
   string token = 4;
   string token_id = 5;
   repeated ServiceUserPATItem items = 6;
+}
+
+// PIPLookupRequest is the authorization lookup payload from CQRS to authz PIP.
+message PIPLookupRequest {
+  string principal = 1;
+  string org = 2;
+  string token_id = 3;
+}
+
+// PIPLookupResponse returns authorization grants for a principal.
+message PIPLookupResponse {
+  bool allowed = 1;
+  string reason = 2;
+  repeated string grants = 3;
 }
