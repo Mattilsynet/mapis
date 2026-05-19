@@ -1,0 +1,25 @@
+syntax = "proto3";
+package iam.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/iam/v1;iamv1";
+
+// PersonalAccessTokenCommandPayload is the external command payload for
+// service-user PAT lifecycle operations flowing through CQRS.
+//
+// Notes:
+// - Command.Spec.Operation remains authoritative (CREATE_PAT/REVOKE_PAT/etc).
+// - This payload intentionally excludes internal bridge/runtime secrets.
+message PersonalAccessTokenCommandPayload {
+  // service_uid identifies the owning service user.
+  string service_uid = 101;
+
+  // service_name is an alternative identifier for the owning service user.
+  string service_name = 102;
+
+  // token_id is required for token mutation operations
+  // (REVOKE_PAT, UNREVOKE_PAT, DELETE_PAT).
+  string token_id = 103;
+
+  // expires_on is required for CREATE_PAT and must be YYYY-MM-DD.
+  string expires_on = 104;
+}

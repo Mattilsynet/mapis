@@ -17,7 +17,7 @@ message Command {
 
 message CommandSpec {
   string Operation = 1 [ (buf.validate.field).string = {
-    in : [ "CREATE", "UPDATE", "DELETE", "create", "update", "delete" ]
+    in : [ "CREATE", "UPDATE", "DELETE", "create", "update", "delete", "CREATE_PAT", "REVOKE_PAT", "UNREVOKE_PAT", "DELETE_PAT", "RECONCILE_POLICY" ]
   } ];
   meta.v1.TypeMeta type = 10;
   bytes type_payload = 20;
