@@ -6,7 +6,7 @@ import "meta/v1/meta.proto";
 import "status/v1/status.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+option go_package = "github.com/Mattilsynet/mapis/gen/go/iam/v1;iamv1";
 
 // UserPermission - computed permissions for a user derived from RoleBindings
 // metadata.name = user_email

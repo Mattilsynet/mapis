@@ -5,7 +5,7 @@ import "buf/validate/validate.proto";
 import "meta/v1/meta.proto";
 import "status/v1/status.proto";
 
-option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+option go_package = "github.com/Mattilsynet/mapis/gen/go/iam/v1;iamv1";
 
 // Group - platform-only collection of users (NOT synced to ZITADEL)
 // Groups are expanded during policy sync to ZITADEL

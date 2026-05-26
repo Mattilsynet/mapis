@@ -8,7 +8,7 @@ import "iam/v1/role.proto";
 import "meta/v1/meta.proto";
 import "status/v1/status.proto";
 
-option go_package = "github.com/Mattilsynet/mapis/gen/controlplane/v1;controlplanev1";
+option go_package = "github.com/Mattilsynet/mapis/gen/go/controlplane/v1;controlplanev1";
 
 // ServiceDescriptor is the declarative source for platform service metadata
 // and built-in IAM declarations for a service.

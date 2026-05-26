@@ -5,7 +5,7 @@ import "buf/validate/validate.proto";
 import "meta/v1/meta.proto";
 import "status/v1/status.proto";
 
-option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+option go_package = "github.com/Mattilsynet/mapis/gen/go/iam/v1;iamv1";
 
 // Policy - defines required roles for a specific resource
 // Each resource (org, project, resource) has its own Policy
@@ -38,5 +38,4 @@ message PolicyStatus {
 message PolicyList {
   repeated Policy items = 1;
 }
-
 

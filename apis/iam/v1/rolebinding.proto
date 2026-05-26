@@ -7,7 +7,7 @@ import "status/v1/status.proto";
 import "google/protobuf/duration.proto";
 import "iam/v1/condition.proto";
 
-option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+option go_package = "github.com/Mattilsynet/mapis/gen/go/iam/v1;iamv1";
 
 // RoleBinding - grants a role to users/groups for a specific resource
 // metadata.name = user-provided unique identifier

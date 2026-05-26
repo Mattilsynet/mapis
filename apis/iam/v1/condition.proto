@@ -4,7 +4,7 @@ package iam.v1;
 import "buf/validate/validate.proto";
 import "google/protobuf/duration.proto";
 
-option go_package = "github.com/Mattilsynet/mapis/gen/iam/v1;iamv1";
+option go_package = "github.com/Mattilsynet/mapis/gen/go/iam/v1;iamv1";
 
 // Condition - CEL expression for access control
 message Condition {
