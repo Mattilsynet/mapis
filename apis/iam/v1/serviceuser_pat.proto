@@ -50,3 +50,37 @@ message PIPLookupResponse {
   string reason = 2;
   repeated string grants = 3;
 }
+
+// AuthIntrospectionRequest is the request payload for token introspection
+// over auth subjects (e.g. zitadel.auth).
+message AuthIntrospectionRequest {
+  string token = 1;
+  repeated string required_roles = 2;
+}
+
+// AuthIntrospectionResponse is the normalized auth response payload used by
+// CQRS and IAM modules.
+message AuthIntrospectionResponse {
+  bool allowed = 1;
+  string principal = 2;
+  string username = 3;
+  string user_id = 4;
+  string organization_id = 5;
+  string token_id = 6;
+  int64 expires_at = 7;
+  string error = 8;
+  string message = 9;
+}
+
+// CQRSPrincipalSessionCacheEntry is the protobuf cache value for opaque PAT
+// principal resolution in CQRS.
+message CQRSPrincipalSessionCacheEntry {
+  string principal = 1;
+  string org = 2;
+  string token_id = 3;
+  int64 cached_unix = 4;
+  int64 expires_unix = 5;
+  string source = 6;
+  bool negative = 7;
+  string reason = 8;
+}
