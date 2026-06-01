@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package project.v1;
+
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/project/v1;project";
+
+message Project {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 10;
+  ProjectSpec spec = 20;
+  ProjectStatus status = 30;
+}
+
+message ProjectSpec {
+  string organization_id = 1;
+  string project_id = 2;
+  string display_name = 3;
+  string description = 4;
+  bool enabled = 5;
+}
+
+message ProjectStatus {
+  status.v1.Status status = 1;
+}
+
+message ProjectList {
+  repeated Project items = 1;
+}
