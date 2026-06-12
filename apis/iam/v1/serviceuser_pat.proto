@@ -49,6 +49,7 @@ message PIPLookupResponse {
   bool allowed = 1;
   string reason = 2;
   repeated string grants = 3;
+  repeated string groups = 4;
 }
 
 // AuthIntrospectionRequest is the request payload for token introspection

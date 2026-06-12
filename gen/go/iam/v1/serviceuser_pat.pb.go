@@ -268,6 +268,7 @@ type PIPLookupResponse struct {
 	Allowed       bool     `protobuf:"varint,1,opt,name=allowed,proto3" json:"allowed,omitempty"`
 	Reason        string   `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
 	Grants        []string `protobuf:"bytes,3,rep,name=grants,proto3" json:"grants,omitempty"`
+	Groups        []string `protobuf:"bytes,4,rep,name=groups,proto3" json:"groups,omitempty"`
 }
 
 func (x *PIPLookupResponse) Reset() {
@@ -293,6 +294,13 @@ func (x *PIPLookupResponse) GetReason() string {
 func (x *PIPLookupResponse) GetGrants() []string {
 	if x != nil {
 		return x.Grants
+	}
+	return nil
+}
+
+func (x *PIPLookupResponse) GetGroups() []string {
+	if x != nil {
+		return x.Groups
 	}
 	return nil
 }
@@ -593,6 +601,11 @@ func (m *PIPLookupResponse) CloneVT() *PIPLookupResponse {
 		copy(tmpContainer, rhs)
 		r.Grants = tmpContainer
 	}
+	if rhs := m.Groups; rhs != nil {
+		tmpContainer := make([]string, len(rhs))
+		copy(tmpContainer, rhs)
+		r.Groups = tmpContainer
+	}
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = make([]byte, len(m.unknownFields))
 		copy(r.unknownFields, m.unknownFields)
@@ -848,6 +861,15 @@ func (this *PIPLookupResponse) EqualVT(that *PIPLookupResponse) bool {
 	}
 	for i, vx := range this.Grants {
 		vy := that.Grants[i]
+		if vx != vy {
+			return false
+		}
+	}
+	if len(this.Groups) != len(that.Groups) {
+		return false
+	}
+	for i, vx := range this.Groups {
+		vy := that.Groups[i]
 		if vx != vy {
 			return false
 		}
@@ -1362,6 +1384,11 @@ func (x *PIPLookupResponse) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("grants")
 		s.WriteStringArray(x.Grants)
 	}
+	if len(x.Groups) > 0 || s.HasField("groups") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("groups")
+		s.WriteStringArray(x.Groups)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1392,6 +1419,13 @@ func (x *PIPLookupResponse) UnmarshalProtoJSON(s *json.UnmarshalState) {
 				return
 			}
 			x.Grants = s.ReadStringArray()
+		case "groups":
+			s.AddField("groups")
+			if s.ReadNil() {
+				x.Groups = nil
+				return
+			}
+			x.Groups = s.ReadStringArray()
 		}
 	})
 }
@@ -2014,6 +2048,15 @@ func (m *PIPLookupResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.Groups) > 0 {
+		for iNdEx := len(m.Groups) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Groups[iNdEx])
+			copy(dAtA[i:], m.Groups[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Groups[iNdEx])))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
 	if len(m.Grants) > 0 {
 		for iNdEx := len(m.Grants) - 1; iNdEx >= 0; iNdEx-- {
 			i -= len(m.Grants[iNdEx])
@@ -2436,6 +2479,12 @@ func (m *PIPLookupResponse) SizeVT() (n int) {
 	}
 	if len(m.Grants) > 0 {
 		for _, s := range m.Grants {
+			l = len(s)
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.Groups) > 0 {
+		for _, s := range m.Groups {
 			l = len(s)
 			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 		}
@@ -3673,6 +3722,38 @@ func (m *PIPLookupResponse) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Grants = append(m.Grants, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Groups", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Groups = append(m.Groups, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
