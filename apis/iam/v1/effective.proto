@@ -69,3 +69,28 @@ message ServiceUserPermissionStatus {
 message ServiceUserPermissionList {
   repeated ServiceUserPermission items = 1;
 }
+
+// PRPEffectivePolicy - cached effective required permissions for PRP evaluation
+// metadata.name = canonical resource_id
+message PRPEffectivePolicy {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  PRPEffectivePolicySpec spec = 20;
+  PRPEffectivePolicyStatus status = 30;
+}
+
+message PRPEffectivePolicySpec {
+  // resource_id - canonical resource this effective policy applies to
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+
+  // required_permissions - resolved permissions required for access
+  repeated string required_permissions = 2;
+
+  // source_version - PRP source version used when this effective policy was computed
+  uint64 source_version = 3;
+}
+
+message PRPEffectivePolicyStatus {
+  status.v1.Status status = 20;
+  google.protobuf.Timestamp computed_timestamp = 31;
+}

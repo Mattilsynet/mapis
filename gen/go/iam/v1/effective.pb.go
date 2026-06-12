@@ -277,6 +277,113 @@ func (x *ServiceUserPermissionList) GetItems() []*ServiceUserPermission {
 	return nil
 }
 
+// PRPEffectivePolicy - cached effective required permissions for PRP evaluation
+// metadata.name = canonical resource_id
+type PRPEffectivePolicy struct {
+	unknownFields []byte
+	Type          *v1.TypeMeta              `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Metadata      *v1.ObjectMeta            `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Spec          *PRPEffectivePolicySpec   `protobuf:"bytes,20,opt,name=spec,proto3" json:"spec,omitempty"`
+	Status        *PRPEffectivePolicyStatus `protobuf:"bytes,30,opt,name=status,proto3" json:"status,omitempty"`
+}
+
+func (x *PRPEffectivePolicy) Reset() {
+	*x = PRPEffectivePolicy{}
+}
+
+func (*PRPEffectivePolicy) ProtoMessage() {}
+
+func (x *PRPEffectivePolicy) GetType() *v1.TypeMeta {
+	if x != nil {
+		return x.Type
+	}
+	return nil
+}
+
+func (x *PRPEffectivePolicy) GetMetadata() *v1.ObjectMeta {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+func (x *PRPEffectivePolicy) GetSpec() *PRPEffectivePolicySpec {
+	if x != nil {
+		return x.Spec
+	}
+	return nil
+}
+
+func (x *PRPEffectivePolicy) GetStatus() *PRPEffectivePolicyStatus {
+	if x != nil {
+		return x.Status
+	}
+	return nil
+}
+
+type PRPEffectivePolicySpec struct {
+	unknownFields []byte
+	// resource_id - canonical resource this effective policy applies to
+	ResourceId string `protobuf:"bytes,1,opt,name=resource_id,json=resourceId,proto3" json:"resourceId,omitempty"`
+	// required_permissions - resolved permissions required for access
+	RequiredPermissions []string `protobuf:"bytes,2,rep,name=required_permissions,json=requiredPermissions,proto3" json:"requiredPermissions,omitempty"`
+	// source_version - PRP source version used when this effective policy was computed
+	SourceVersion uint64 `protobuf:"varint,3,opt,name=source_version,json=sourceVersion,proto3" json:"sourceVersion,omitempty"`
+}
+
+func (x *PRPEffectivePolicySpec) Reset() {
+	*x = PRPEffectivePolicySpec{}
+}
+
+func (*PRPEffectivePolicySpec) ProtoMessage() {}
+
+func (x *PRPEffectivePolicySpec) GetResourceId() string {
+	if x != nil {
+		return x.ResourceId
+	}
+	return ""
+}
+
+func (x *PRPEffectivePolicySpec) GetRequiredPermissions() []string {
+	if x != nil {
+		return x.RequiredPermissions
+	}
+	return nil
+}
+
+func (x *PRPEffectivePolicySpec) GetSourceVersion() uint64 {
+	if x != nil {
+		return x.SourceVersion
+	}
+	return 0
+}
+
+type PRPEffectivePolicyStatus struct {
+	unknownFields     []byte
+	Status            *v11.Status            `protobuf:"bytes,20,opt,name=status,proto3" json:"status,omitempty"`
+	ComputedTimestamp *timestamppb.Timestamp `protobuf:"bytes,31,opt,name=computed_timestamp,json=computedTimestamp,proto3" json:"computedTimestamp,omitempty"`
+}
+
+func (x *PRPEffectivePolicyStatus) Reset() {
+	*x = PRPEffectivePolicyStatus{}
+}
+
+func (*PRPEffectivePolicyStatus) ProtoMessage() {}
+
+func (x *PRPEffectivePolicyStatus) GetStatus() *v11.Status {
+	if x != nil {
+		return x.Status
+	}
+	return nil
+}
+
+func (x *PRPEffectivePolicyStatus) GetComputedTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ComputedTimestamp
+	}
+	return nil
+}
+
 func (m *UserPermission) CloneVT() *UserPermission {
 	if m == nil {
 		return (*UserPermission)(nil)
@@ -478,6 +585,75 @@ func (m *ServiceUserPermissionList) CloneVT() *ServiceUserPermissionList {
 }
 
 func (m *ServiceUserPermissionList) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *PRPEffectivePolicy) CloneVT() *PRPEffectivePolicy {
+	if m == nil {
+		return (*PRPEffectivePolicy)(nil)
+	}
+	r := new(PRPEffectivePolicy)
+	r.Spec = m.Spec.CloneVT()
+	r.Status = m.Status.CloneVT()
+	if rhs := m.Type; rhs != nil {
+		r.Type = rhs.CloneVT()
+	}
+	if rhs := m.Metadata; rhs != nil {
+		r.Metadata = rhs.CloneVT()
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = make([]byte, len(m.unknownFields))
+		copy(r.unknownFields, m.unknownFields)
+	}
+	return r
+}
+
+func (m *PRPEffectivePolicy) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *PRPEffectivePolicySpec) CloneVT() *PRPEffectivePolicySpec {
+	if m == nil {
+		return (*PRPEffectivePolicySpec)(nil)
+	}
+	r := new(PRPEffectivePolicySpec)
+	r.ResourceId = m.ResourceId
+	r.SourceVersion = m.SourceVersion
+	if rhs := m.RequiredPermissions; rhs != nil {
+		tmpContainer := make([]string, len(rhs))
+		copy(tmpContainer, rhs)
+		r.RequiredPermissions = tmpContainer
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = make([]byte, len(m.unknownFields))
+		copy(r.unknownFields, m.unknownFields)
+	}
+	return r
+}
+
+func (m *PRPEffectivePolicySpec) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *PRPEffectivePolicyStatus) CloneVT() *PRPEffectivePolicyStatus {
+	if m == nil {
+		return (*PRPEffectivePolicyStatus)(nil)
+	}
+	r := new(PRPEffectivePolicyStatus)
+	if rhs := m.Status; rhs != nil {
+		r.Status = rhs.CloneVT()
+	}
+	if rhs := m.ComputedTimestamp; rhs != nil {
+		r.ComputedTimestamp = rhs.CloneVT()
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = make([]byte, len(m.unknownFields))
+		copy(r.unknownFields, m.unknownFields)
+	}
+	return r
+}
+
+func (m *PRPEffectivePolicyStatus) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
@@ -736,6 +912,87 @@ func (this *ServiceUserPermissionList) EqualVT(that *ServiceUserPermissionList) 
 
 func (this *ServiceUserPermissionList) EqualMessageVT(thatMsg any) bool {
 	that, ok := thatMsg.(*ServiceUserPermissionList)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *PRPEffectivePolicy) EqualVT(that *PRPEffectivePolicy) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if !this.Type.EqualVT(that.Type) {
+		return false
+	}
+	if !this.Metadata.EqualVT(that.Metadata) {
+		return false
+	}
+	if !this.Spec.EqualVT(that.Spec) {
+		return false
+	}
+	if !this.Status.EqualVT(that.Status) {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *PRPEffectivePolicy) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*PRPEffectivePolicy)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *PRPEffectivePolicySpec) EqualVT(that *PRPEffectivePolicySpec) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if this.ResourceId != that.ResourceId {
+		return false
+	}
+	if len(this.RequiredPermissions) != len(that.RequiredPermissions) {
+		return false
+	}
+	for i, vx := range this.RequiredPermissions {
+		vy := that.RequiredPermissions[i]
+		if vx != vy {
+			return false
+		}
+	}
+	if this.SourceVersion != that.SourceVersion {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *PRPEffectivePolicySpec) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*PRPEffectivePolicySpec)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *PRPEffectivePolicyStatus) EqualVT(that *PRPEffectivePolicyStatus) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if !this.Status.EqualVT(that.Status) {
+		return false
+	}
+	if !this.ComputedTimestamp.EqualVT(that.ComputedTimestamp) {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *PRPEffectivePolicyStatus) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*PRPEffectivePolicyStatus)
 	if !ok {
 		return false
 	}
@@ -1340,6 +1597,208 @@ func (x *ServiceUserPermissionList) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the PRPEffectivePolicy message to JSON.
+func (x *PRPEffectivePolicy) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Type != nil || s.HasField("type") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("type")
+		x.Type.MarshalProtoJSON(s.WithField("type"))
+	}
+	if x.Metadata != nil || s.HasField("metadata") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("metadata")
+		x.Metadata.MarshalProtoJSON(s.WithField("metadata"))
+	}
+	if x.Spec != nil || s.HasField("spec") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("spec")
+		x.Spec.MarshalProtoJSON(s.WithField("spec"))
+	}
+	if x.Status != nil || s.HasField("status") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("status")
+		x.Status.MarshalProtoJSON(s.WithField("status"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the PRPEffectivePolicy to JSON.
+func (x *PRPEffectivePolicy) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the PRPEffectivePolicy message from JSON.
+func (x *PRPEffectivePolicy) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "type":
+			if s.ReadNil() {
+				x.Type = nil
+				return
+			}
+			x.Type = &v1.TypeMeta{}
+			x.Type.UnmarshalProtoJSON(s.WithField("type", true))
+		case "metadata":
+			if s.ReadNil() {
+				x.Metadata = nil
+				return
+			}
+			x.Metadata = &v1.ObjectMeta{}
+			x.Metadata.UnmarshalProtoJSON(s.WithField("metadata", true))
+		case "spec":
+			if s.ReadNil() {
+				x.Spec = nil
+				return
+			}
+			x.Spec = &PRPEffectivePolicySpec{}
+			x.Spec.UnmarshalProtoJSON(s.WithField("spec", true))
+		case "status":
+			if s.ReadNil() {
+				x.Status = nil
+				return
+			}
+			x.Status = &PRPEffectivePolicyStatus{}
+			x.Status.UnmarshalProtoJSON(s.WithField("status", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the PRPEffectivePolicy from JSON.
+func (x *PRPEffectivePolicy) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the PRPEffectivePolicySpec message to JSON.
+func (x *PRPEffectivePolicySpec) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.ResourceId != "" || s.HasField("resourceId") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("resourceId")
+		s.WriteString(x.ResourceId)
+	}
+	if len(x.RequiredPermissions) > 0 || s.HasField("requiredPermissions") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("requiredPermissions")
+		s.WriteStringArray(x.RequiredPermissions)
+	}
+	if x.SourceVersion != 0 || s.HasField("sourceVersion") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("sourceVersion")
+		s.WriteUint64(x.SourceVersion)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the PRPEffectivePolicySpec to JSON.
+func (x *PRPEffectivePolicySpec) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the PRPEffectivePolicySpec message from JSON.
+func (x *PRPEffectivePolicySpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "resource_id", "resourceId":
+			s.AddField("resource_id")
+			x.ResourceId = s.ReadString()
+		case "required_permissions", "requiredPermissions":
+			s.AddField("required_permissions")
+			if s.ReadNil() {
+				x.RequiredPermissions = nil
+				return
+			}
+			x.RequiredPermissions = s.ReadStringArray()
+		case "source_version", "sourceVersion":
+			s.AddField("source_version")
+			x.SourceVersion = s.ReadUint64()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the PRPEffectivePolicySpec from JSON.
+func (x *PRPEffectivePolicySpec) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the PRPEffectivePolicyStatus message to JSON.
+func (x *PRPEffectivePolicyStatus) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Status != nil || s.HasField("status") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("status")
+		x.Status.MarshalProtoJSON(s.WithField("status"))
+	}
+	if x.ComputedTimestamp != nil || s.HasField("computedTimestamp") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("computedTimestamp")
+		x.ComputedTimestamp.MarshalProtoJSON(s.WithField("computedTimestamp"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the PRPEffectivePolicyStatus to JSON.
+func (x *PRPEffectivePolicyStatus) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the PRPEffectivePolicyStatus message from JSON.
+func (x *PRPEffectivePolicyStatus) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "status":
+			if s.ReadNil() {
+				x.Status = nil
+				return
+			}
+			x.Status = &v11.Status{}
+			x.Status.UnmarshalProtoJSON(s.WithField("status", true))
+		case "computed_timestamp", "computedTimestamp":
+			if s.ReadNil() {
+				x.ComputedTimestamp = nil
+				return
+			}
+			x.ComputedTimestamp = &timestamppb.Timestamp{}
+			x.ComputedTimestamp.UnmarshalProtoJSON(s.WithField("computed_timestamp", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the PRPEffectivePolicyStatus from JSON.
+func (x *PRPEffectivePolicyStatus) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 func (m *UserPermission) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -1849,6 +2308,194 @@ func (m *ServiceUserPermissionList) MarshalToSizedBufferVT(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
+func (m *PRPEffectivePolicy) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PRPEffectivePolicy) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *PRPEffectivePolicy) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Status != nil {
+		size, err := m.Status.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf2
+	}
+	if m.Spec != nil {
+		size, err := m.Spec.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa2
+	}
+	if m.Metadata != nil {
+		size, err := m.Metadata.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Type != nil {
+		size, err := m.Type.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PRPEffectivePolicySpec) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PRPEffectivePolicySpec) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *PRPEffectivePolicySpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.SourceVersion != 0 {
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.SourceVersion))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.RequiredPermissions) > 0 {
+		for iNdEx := len(m.RequiredPermissions) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.RequiredPermissions[iNdEx])
+			copy(dAtA[i:], m.RequiredPermissions[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.RequiredPermissions[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.ResourceId) > 0 {
+		i -= len(m.ResourceId)
+		copy(dAtA[i:], m.ResourceId)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ResourceId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PRPEffectivePolicyStatus) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PRPEffectivePolicyStatus) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *PRPEffectivePolicyStatus) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ComputedTimestamp != nil {
+		size, err := m.ComputedTimestamp.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xfa
+	}
+	if m.Status != nil {
+		size, err := m.Status.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa2
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *UserPermission) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -2022,6 +2669,73 @@ func (m *ServiceUserPermissionList) SizeVT() (n int) {
 			l = e.SizeVT()
 			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 		}
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *PRPEffectivePolicy) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Type != nil {
+		l = m.Type.SizeVT()
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.Metadata != nil {
+		l = m.Metadata.SizeVT()
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.Spec != nil {
+		l = m.Spec.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.Status != nil {
+		l = m.Status.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *PRPEffectivePolicySpec) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.ResourceId)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if len(m.RequiredPermissions) > 0 {
+		for _, s := range m.RequiredPermissions {
+			l = len(s)
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	if m.SourceVersion != 0 {
+		n += 1 + protobuf_go_lite.SizeOfVarint(uint64(m.SourceVersion))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *PRPEffectivePolicyStatus) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Status != nil {
+		l = m.Status.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.ComputedTimestamp != nil {
+		l = m.ComputedTimestamp.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -3157,6 +3871,458 @@ func (m *ServiceUserPermissionList) UnmarshalVT(dAtA []byte) error {
 			}
 			m.Items = append(m.Items, &ServiceUserPermission{})
 			if err := m.Items[len(m.Items)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PRPEffectivePolicy) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return protobuf_go_lite.ErrIntOverflow
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PRPEffectivePolicy: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PRPEffectivePolicy: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Type == nil {
+				m.Type = &v1.TypeMeta{}
+			}
+			if err := m.Type.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Metadata == nil {
+				m.Metadata = &v1.ObjectMeta{}
+			}
+			if err := m.Metadata.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 20:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Spec == nil {
+				m.Spec = &PRPEffectivePolicySpec{}
+			}
+			if err := m.Spec.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 30:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Status == nil {
+				m.Status = &PRPEffectivePolicyStatus{}
+			}
+			if err := m.Status.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PRPEffectivePolicySpec) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return protobuf_go_lite.ErrIntOverflow
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PRPEffectivePolicySpec: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PRPEffectivePolicySpec: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ResourceId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RequiredPermissions", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RequiredPermissions = append(m.RequiredPermissions, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SourceVersion", wireType)
+			}
+			m.SourceVersion = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SourceVersion |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PRPEffectivePolicyStatus) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return protobuf_go_lite.ErrIntOverflow
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PRPEffectivePolicyStatus: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PRPEffectivePolicyStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 20:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Status == nil {
+				m.Status = &v11.Status{}
+			}
+			if err := m.Status.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 31:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ComputedTimestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ComputedTimestamp == nil {
+				m.ComputedTimestamp = &timestamppb.Timestamp{}
+			}
+			if err := m.ComputedTimestamp.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
