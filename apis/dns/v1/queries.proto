@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package dns.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/dns/v1;dnsv1";
+
+message GetZone {
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message ListZones {
+  string project_ref = 1 [(buf.validate.field).string.min_len = 1];
+  uint32 page_size = 2;
+  string page_token = 3;
+}
+
+message GetRecordSet {
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message ListRecordSets {
+  string zone_ref = 1 [(buf.validate.field).string.min_len = 1];
+  string name_filter = 2;
+  string type_filter = 3;
+  uint32 page_size = 4;
+  string page_token = 5;
+}
+
+message GetZoneSnapshot {
+  string zone_ref = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message Watch {
+  repeated string scope_selectors = 1;
+  uint64 from_revision = 2;
+}

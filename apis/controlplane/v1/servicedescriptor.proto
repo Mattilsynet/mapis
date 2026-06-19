@@ -72,7 +72,7 @@ enum ResourceScope {
 }
 
 message ResourceKindDescriptor {
-  // type is singular kind name used in resource type identity: {service}/{type}
+  // type is singular kind name used in resource type identity: {service}/{version}/{type}
   string type = 1 [(buf.validate.field).string = {
     min_len: 1,
     pattern: "^[a-z][a-z0-9-]*$"
@@ -80,6 +80,12 @@ message ResourceKindDescriptor {
 
   // plural is the canonical plural form used in permission names.
   string plural = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    pattern: "^[a-z][a-z0-9-]*$"
+  }];
+
+  // version is the canonical API version for this kind within the service.
+  string version = 7 [(buf.validate.field).string = {
     min_len: 1,
     pattern: "^[a-z][a-z0-9-]*$"
   }];

@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package dns.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+import "dns/v1/record.proto";
+import "dns/v1/zone.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/dns/v1;dnsv1";
+
+message AgentRegistration {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  AgentRegistrationSpec spec = 20;
+  AgentRegistrationStatus status = 30;
+}
+
+message AgentRegistrationSpec {
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+  repeated string scope_selectors = 2;
+  AgentBackend backend = 3 [(buf.validate.field).enum.defined_only = true];
+  uint64 last_applied_revision = 4;
+}
+
+enum AgentBackend {
+  AGENT_BACKEND_UNSPECIFIED = 0;
+  AGENT_BACKEND_FILE_AUTO = 1;
+  AGENT_BACKEND_ETCD = 2;
+  AGENT_BACKEND_CUSTOM = 3;
+}
+
+message AgentRegistrationStatus {
+  status.v1.Status status = 1;
+}
+
+message DnsConfigSnapshot {
+  Zone zone = 1;
+  repeated RecordSet records = 2;
+  uint64 revision = 3;
+}
+
+message AgentRegistrationList {
+  repeated AgentRegistration items = 1;
+}

@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package dns.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/dns/v1;dnsv1";
+
+message DnsEventEnvelope {
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+  string project_ref = 2 [(buf.validate.field).string.min_len = 1];
+  string zone_ref = 3;
+  uint64 revision = 4;
+  oneof event {
+    ZoneCreated zone_created = 10;
+    ZoneUpdated zone_updated = 11;
+    ZoneDeleted zone_deleted = 12;
+    RecordSetCreated recordset_created = 13;
+    RecordSetUpdated recordset_updated = 14;
+    RecordSetDeleted recordset_deleted = 15;
+    ZoneSerialBumped zone_serial_bumped = 16;
+    DelegationChanged delegation_changed = 17;
+    AgentRegistered agent_registered = 18;
+    AgentScopeUpdated agent_scope_updated = 19;
+    AgentDeregistered agent_deregistered = 20;
+  }
+}
+
+message ZoneCreated {}
+message ZoneUpdated {}
+message ZoneDeleted {}
+message RecordSetCreated {}
+message RecordSetUpdated {}
+message RecordSetDeleted {}
+message ZoneSerialBumped {
+  uint32 serial = 1;
+}
+message DelegationChanged {}
+message AgentRegistered {}
+message AgentScopeUpdated {}
+message AgentDeregistered {}

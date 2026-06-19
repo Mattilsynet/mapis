@@ -6,7 +6,7 @@ toolchain go1.24.3
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260209202127-80ab13bee0bf.1
-	github.com/aperturerobotics/protobuf-go-lite v0.8.0
+	github.com/aperturerobotics/protobuf-go-lite v0.14.0
 )
 
 require (

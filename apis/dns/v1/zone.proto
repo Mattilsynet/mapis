@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package dns.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/dns/v1;dnsv1";
+
+message Zone {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  ZoneSpec spec = 20;
+  ZoneStatus status = 30;
+}
+
+message ZoneSpec {
+  // Project scoped ID: orgs/{org}/projects/{project}/dns/zones/{zone}
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+  string project_ref = 2 [(buf.validate.field).string.min_len = 1];
+  string fqdn = 3 [(buf.validate.field).string.min_len = 1];
+  ZoneKind kind = 4 [(buf.validate.field).enum = {
+    defined_only: true,
+    in: [1]
+  }];
+  Soa soa = 5;
+  repeated string nameservers = 6;
+  ZoneView view = 7 [(buf.validate.field).enum.defined_only = true];
+  map<string, string> labels = 8;
+  string etag = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+
+  // Reserved expansion ranges.
+  reserved 50 to 59;
+  reserved 60 to 69;
+}
+
+message Soa {
+  string mname = 1;
+  string rname = 2;
+  uint32 serial = 3;
+  uint32 refresh = 4;
+  uint32 retry = 5;
+  uint32 expire = 6;
+  uint32 minimum = 7;
+}
+
+enum ZoneKind {
+  ZONE_KIND_UNSPECIFIED = 0;
+  ZONE_KIND_PRIMARY = 1;
+}
+
+enum ZoneView {
+  ZONE_VIEW_UNSPECIFIED = 0;
+  ZONE_VIEW_ANY = 1;
+  ZONE_VIEW_INTERNAL = 2;
+  ZONE_VIEW_EXTERNAL = 3;
+}
+
+message ZoneStatus {
+  status.v1.Status status = 1;
+  uint64 revision = 2;
+}
+
+message ZoneList {
+  repeated Zone items = 1;
+}

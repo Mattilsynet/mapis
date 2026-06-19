@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package dns.v1;
+
+import "buf/validate/validate.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/dns/v1;dnsv1";
+
+message RecordSet {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  RecordSetSpec spec = 20;
+  RecordSetStatus status = 30;
+}
+
+message RecordSetSpec {
+  // Project/zone scoped ID:
+  // orgs/{org}/projects/{project}/dns/zones/{zone}/records/{name}/{type}
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+  string zone_ref = 2 [(buf.validate.field).string.min_len = 1];
+  string name = 3 [(buf.validate.field).string.min_len = 1];
+  RecordType type = 4 [(buf.validate.field).enum.defined_only = true];
+  uint32 ttl = 5;
+  repeated RecordData rrdata = 6;
+  string etag = 7;
+}
+
+enum RecordType {
+  RECORD_TYPE_UNSPECIFIED = 0;
+  RECORD_TYPE_A = 1;
+  RECORD_TYPE_AAAA = 2;
+  RECORD_TYPE_CNAME = 3;
+  RECORD_TYPE_MX = 4;
+  RECORD_TYPE_TXT = 5;
+  RECORD_TYPE_SRV = 6;
+  RECORD_TYPE_NS = 7;
+  RECORD_TYPE_CAA = 8;
+  RECORD_TYPE_PTR = 9;
+}
+
+message RecordData {
+  oneof value {
+    RecordA a = 1;
+    RecordAAAA aaaa = 2;
+    RecordCNAME cname = 3;
+    RecordMX mx = 4;
+    RecordTXT txt = 5;
+    RecordSRV srv = 6;
+    RecordNS ns = 7;
+    RecordCAA caa = 8;
+    RecordPTR ptr = 9;
+  }
+}
+
+message RecordA {
+  string address = 1;
+}
+
+message RecordAAAA {
+  string address = 1;
+}
+
+message RecordCNAME {
+  string target = 1;
+}
+
+message RecordMX {
+  uint32 preference = 1;
+  string exchange = 2;
+}
+
+message RecordTXT {
+  repeated string values = 1;
+}
+
+message RecordSRV {
+  uint32 priority = 1;
+  uint32 weight = 2;
+  uint32 port = 3;
+  string target = 4;
+}
+
+message RecordNS {
+  string host = 1;
+}
+
+message RecordCAA {
+  uint32 flags = 1;
+  string tag = 2;
+  string value = 3;
+}
+
+message RecordPTR {
+  string target = 1;
+}
+
+message RecordSetStatus {
+  status.v1.Status status = 1;
+  uint64 revision = 2;
+}
+
+message RecordSetList {
+  repeated RecordSet items = 1;
+}

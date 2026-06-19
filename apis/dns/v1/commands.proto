@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package dns.v1;
+
+import "buf/validate/validate.proto";
+import "dns/v1/agent.proto";
+import "dns/v1/delegation.proto";
+import "dns/v1/record.proto";
+import "dns/v1/zone.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/dns/v1;dnsv1";
+
+message CreateZone {
+  Zone zone = 1;
+}
+
+message UpdateZone {
+  Zone zone = 1;
+}
+
+message DeleteZone {
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+  string project_ref = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message RotateZoneSerial {
+  string zone_ref = 1 [(buf.validate.field).string.min_len = 1];
+  uint32 serial = 2;
+}
+
+message CreateRecordSet {
+  RecordSet recordset = 1;
+}
+
+message UpdateRecordSet {
+  RecordSet recordset = 1;
+}
+
+message UpsertRecordSet {
+  RecordSet recordset = 1;
+}
+
+message DeleteRecordSet {
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+  string zone_ref = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message CreateDelegation {
+  Delegation delegation = 1;
+}
+
+message DeleteDelegation {
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+  string parent_zone_ref = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message RegisterAgent {
+  AgentRegistration registration = 1;
+}
+
+message UpdateAgentScope {
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+  repeated string scope_selectors = 2;
+}
+
+message DeregisterAgent {
+  string resource_id = 1 [(buf.validate.field).string.min_len = 1];
+}
