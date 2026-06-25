@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package profile.v1;
+
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/profile/v1;profilev1";
+
+message Profile {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 10;
+  ProfileSpec spec = 20;
+  ProfileStatus status = 30;
+}
+
+message ProfileSpec {
+  string principal = 1;
+  string organization_id = 2;
+  ThemeMode theme_mode = 3;
+}
+
+enum ThemeMode {
+  THEME_MODE_UNSPECIFIED = 0;
+  THEME_MODE_SYSTEM = 1;
+  THEME_MODE_LIGHT = 2;
+  THEME_MODE_DARK = 3;
+}
+
+message ProfileStatus {
+  status.v1.Status status = 1;
+}
+
+message ProfileList {
+  repeated Profile items = 1;
+}
