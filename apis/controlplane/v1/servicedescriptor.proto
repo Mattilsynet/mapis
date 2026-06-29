@@ -53,6 +53,14 @@ message ServiceDescriptorSpec {
   // - these roles are treated as built-in platform roles
   repeated iam.v1.Role built_in_roles = 30;
 
+  // built_in_role_templates declares built-in role intent using permission
+  // filters and explicit permission names.
+  repeated BuiltInRoleTemplate built_in_role_templates = 31;
+
+  // built_in_permission_filters declares reusable permission filters that role
+  // templates may reference by name.
+  repeated BuiltInPermissionFilter built_in_permission_filters = 32;
+
   // v1 supports only APPLY semantics.
   // APPLY is authoritative desired-state reconciliation for descriptor-owned
   // built-in permissions and roles:
@@ -62,6 +70,61 @@ message ServiceDescriptorSpec {
     defined_only: true,
     in: [1]
   }];
+
+  // provenance describes where this descriptor came from and whether it is a
+  // virtual/generated platform descriptor.
+  ServiceDescriptorProvenance provenance = 50;
+}
+
+enum ServiceDescriptorOrigin {
+  SERVICE_DESCRIPTOR_ORIGIN_UNSPECIFIED = 0;
+  SERVICE_DESCRIPTOR_ORIGIN_DECLARED = 1;
+  SERVICE_DESCRIPTOR_ORIGIN_SYNCED_FROM_IAM = 2;
+  SERVICE_DESCRIPTOR_ORIGIN_GENERATED = 3;
+}
+
+message ServiceDescriptorProvenance {
+  ServiceDescriptorOrigin origin = 1 [(buf.validate.field).enum.defined_only = true];
+
+  bool virtual_descriptor = 2;
+
+  string generator_id = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    pattern: "^[a-z][a-z0-9-]*$"
+  }];
+
+  repeated string input_refs = 4;
+}
+
+message BuiltInRoleTemplate {
+  string role_name = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    pattern: "^[a-z][a-z0-9-]*$"
+  }];
+
+  string display_name = 2;
+  string description = 3;
+
+  // Inline filters. Multiple filters are unioned during materialization.
+  repeated BuiltInPermissionFilter permission_filters = 10;
+
+  // References to named filters from spec.built_in_permission_filters.
+  repeated string permission_filter_names = 11;
+}
+
+message BuiltInPermissionFilter {
+  // name is used when declaring reusable filters at descriptor scope.
+  // Inline filters may omit this field.
+  string name = 1;
+
+  // Canonical permission names, e.g. iam.users.create.
+  repeated string permission_names = 2;
+
+  repeated string service_names = 3;
+
+  repeated string resource_types = 4;
+  repeated string actions = 5;
+  repeated string group_names = 6;
 }
 
 enum ResourceScope {

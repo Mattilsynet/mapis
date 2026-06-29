@@ -17,6 +17,45 @@ import (
 	strconv "strconv"
 )
 
+type ServiceDescriptorOrigin int32
+
+const (
+	ServiceDescriptorOrigin_SERVICE_DESCRIPTOR_ORIGIN_UNSPECIFIED     ServiceDescriptorOrigin = 0
+	ServiceDescriptorOrigin_SERVICE_DESCRIPTOR_ORIGIN_DECLARED        ServiceDescriptorOrigin = 1
+	ServiceDescriptorOrigin_SERVICE_DESCRIPTOR_ORIGIN_SYNCED_FROM_IAM ServiceDescriptorOrigin = 2
+	ServiceDescriptorOrigin_SERVICE_DESCRIPTOR_ORIGIN_GENERATED       ServiceDescriptorOrigin = 3
+)
+
+// Enum value maps for ServiceDescriptorOrigin.
+var (
+	ServiceDescriptorOrigin_name = map[int32]string{
+		0: "SERVICE_DESCRIPTOR_ORIGIN_UNSPECIFIED",
+		1: "SERVICE_DESCRIPTOR_ORIGIN_DECLARED",
+		2: "SERVICE_DESCRIPTOR_ORIGIN_SYNCED_FROM_IAM",
+		3: "SERVICE_DESCRIPTOR_ORIGIN_GENERATED",
+	}
+	ServiceDescriptorOrigin_value = map[string]int32{
+		"SERVICE_DESCRIPTOR_ORIGIN_UNSPECIFIED":     0,
+		"SERVICE_DESCRIPTOR_ORIGIN_DECLARED":        1,
+		"SERVICE_DESCRIPTOR_ORIGIN_SYNCED_FROM_IAM": 2,
+		"SERVICE_DESCRIPTOR_ORIGIN_GENERATED":       3,
+	}
+)
+
+func (x ServiceDescriptorOrigin) Enum() *ServiceDescriptorOrigin {
+	p := new(ServiceDescriptorOrigin)
+	*p = x
+	return p
+}
+
+func (x ServiceDescriptorOrigin) String() string {
+	name, valid := ServiceDescriptorOrigin_name[int32(x)]
+	if valid {
+		return name
+	}
+	return strconv.Itoa(int(x))
+}
+
 type ResourceScope int32
 
 const (
@@ -161,12 +200,21 @@ type ServiceDescriptorSpec struct {
 	// - invalid references are rejected during reconciliation
 	// - these roles are treated as built-in platform roles
 	BuiltInRoles []*v11.Role `protobuf:"bytes,30,rep,name=built_in_roles,json=builtInRoles,proto3" json:"builtInRoles,omitempty"`
+	// built_in_role_templates declares built-in role intent using permission
+	// filters and explicit permission names.
+	BuiltInRoleTemplates []*BuiltInRoleTemplate `protobuf:"bytes,31,rep,name=built_in_role_templates,json=builtInRoleTemplates,proto3" json:"builtInRoleTemplates,omitempty"`
+	// built_in_permission_filters declares reusable permission filters that role
+	// templates may reference by name.
+	BuiltInPermissionFilters []*BuiltInPermissionFilter `protobuf:"bytes,32,rep,name=built_in_permission_filters,json=builtInPermissionFilters,proto3" json:"builtInPermissionFilters,omitempty"`
 	// v1 supports only APPLY semantics.
 	// APPLY is authoritative desired-state reconciliation for descriptor-owned
 	// built-in permissions and roles:
 	// - upsert entries present in descriptor
 	// - prune previously projected descriptor-owned entries that are now absent
 	Mode ReconciliationMode `protobuf:"varint,40,opt,name=mode,proto3" json:"mode,omitempty"`
+	// provenance describes where this descriptor came from and whether it is a
+	// virtual/generated platform descriptor.
+	Provenance *ServiceDescriptorProvenance `protobuf:"bytes,50,opt,name=provenance,proto3" json:"provenance,omitempty"`
 }
 
 func (x *ServiceDescriptorSpec) Reset() {
@@ -217,11 +265,187 @@ func (x *ServiceDescriptorSpec) GetBuiltInRoles() []*v11.Role {
 	return nil
 }
 
+func (x *ServiceDescriptorSpec) GetBuiltInRoleTemplates() []*BuiltInRoleTemplate {
+	if x != nil {
+		return x.BuiltInRoleTemplates
+	}
+	return nil
+}
+
+func (x *ServiceDescriptorSpec) GetBuiltInPermissionFilters() []*BuiltInPermissionFilter {
+	if x != nil {
+		return x.BuiltInPermissionFilters
+	}
+	return nil
+}
+
 func (x *ServiceDescriptorSpec) GetMode() ReconciliationMode {
 	if x != nil {
 		return x.Mode
 	}
 	return ReconciliationMode_RECONCILIATION_MODE_UNSPECIFIED
+}
+
+func (x *ServiceDescriptorSpec) GetProvenance() *ServiceDescriptorProvenance {
+	if x != nil {
+		return x.Provenance
+	}
+	return nil
+}
+
+type ServiceDescriptorProvenance struct {
+	unknownFields     []byte
+	Origin            ServiceDescriptorOrigin `protobuf:"varint,1,opt,name=origin,proto3" json:"origin,omitempty"`
+	VirtualDescriptor bool                    `protobuf:"varint,2,opt,name=virtual_descriptor,json=virtualDescriptor,proto3" json:"virtualDescriptor,omitempty"`
+	GeneratorId       string                  `protobuf:"bytes,3,opt,name=generator_id,json=generatorId,proto3" json:"generatorId,omitempty"`
+	InputRefs         []string                `protobuf:"bytes,4,rep,name=input_refs,json=inputRefs,proto3" json:"inputRefs,omitempty"`
+}
+
+func (x *ServiceDescriptorProvenance) Reset() {
+	*x = ServiceDescriptorProvenance{}
+}
+
+func (*ServiceDescriptorProvenance) ProtoMessage() {}
+
+func (x *ServiceDescriptorProvenance) GetOrigin() ServiceDescriptorOrigin {
+	if x != nil {
+		return x.Origin
+	}
+	return ServiceDescriptorOrigin_SERVICE_DESCRIPTOR_ORIGIN_UNSPECIFIED
+}
+
+func (x *ServiceDescriptorProvenance) GetVirtualDescriptor() bool {
+	if x != nil {
+		return x.VirtualDescriptor
+	}
+	return false
+}
+
+func (x *ServiceDescriptorProvenance) GetGeneratorId() string {
+	if x != nil {
+		return x.GeneratorId
+	}
+	return ""
+}
+
+func (x *ServiceDescriptorProvenance) GetInputRefs() []string {
+	if x != nil {
+		return x.InputRefs
+	}
+	return nil
+}
+
+type BuiltInRoleTemplate struct {
+	unknownFields []byte
+	RoleName      string `protobuf:"bytes,1,opt,name=role_name,json=roleName,proto3" json:"roleName,omitempty"`
+	DisplayName   string `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"displayName,omitempty"`
+	Description   string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// Inline filters. Multiple filters are unioned during materialization.
+	PermissionFilters []*BuiltInPermissionFilter `protobuf:"bytes,10,rep,name=permission_filters,json=permissionFilters,proto3" json:"permissionFilters,omitempty"`
+	// References to named filters from spec.built_in_permission_filters.
+	PermissionFilterNames []string `protobuf:"bytes,11,rep,name=permission_filter_names,json=permissionFilterNames,proto3" json:"permissionFilterNames,omitempty"`
+}
+
+func (x *BuiltInRoleTemplate) Reset() {
+	*x = BuiltInRoleTemplate{}
+}
+
+func (*BuiltInRoleTemplate) ProtoMessage() {}
+
+func (x *BuiltInRoleTemplate) GetRoleName() string {
+	if x != nil {
+		return x.RoleName
+	}
+	return ""
+}
+
+func (x *BuiltInRoleTemplate) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *BuiltInRoleTemplate) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *BuiltInRoleTemplate) GetPermissionFilters() []*BuiltInPermissionFilter {
+	if x != nil {
+		return x.PermissionFilters
+	}
+	return nil
+}
+
+func (x *BuiltInRoleTemplate) GetPermissionFilterNames() []string {
+	if x != nil {
+		return x.PermissionFilterNames
+	}
+	return nil
+}
+
+type BuiltInPermissionFilter struct {
+	unknownFields []byte
+	// name is used when declaring reusable filters at descriptor scope.
+	// Inline filters may omit this field.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Canonical permission names, e.g. iam.users.create.
+	PermissionNames []string `protobuf:"bytes,2,rep,name=permission_names,json=permissionNames,proto3" json:"permissionNames,omitempty"`
+	ServiceNames    []string `protobuf:"bytes,3,rep,name=service_names,json=serviceNames,proto3" json:"serviceNames,omitempty"`
+	ResourceTypes   []string `protobuf:"bytes,4,rep,name=resource_types,json=resourceTypes,proto3" json:"resourceTypes,omitempty"`
+	Actions         []string `protobuf:"bytes,5,rep,name=actions,proto3" json:"actions,omitempty"`
+	GroupNames      []string `protobuf:"bytes,6,rep,name=group_names,json=groupNames,proto3" json:"groupNames,omitempty"`
+}
+
+func (x *BuiltInPermissionFilter) Reset() {
+	*x = BuiltInPermissionFilter{}
+}
+
+func (*BuiltInPermissionFilter) ProtoMessage() {}
+
+func (x *BuiltInPermissionFilter) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *BuiltInPermissionFilter) GetPermissionNames() []string {
+	if x != nil {
+		return x.PermissionNames
+	}
+	return nil
+}
+
+func (x *BuiltInPermissionFilter) GetServiceNames() []string {
+	if x != nil {
+		return x.ServiceNames
+	}
+	return nil
+}
+
+func (x *BuiltInPermissionFilter) GetResourceTypes() []string {
+	if x != nil {
+		return x.ResourceTypes
+	}
+	return nil
+}
+
+func (x *BuiltInPermissionFilter) GetActions() []string {
+	if x != nil {
+		return x.Actions
+	}
+	return nil
+}
+
+func (x *BuiltInPermissionFilter) GetGroupNames() []string {
+	if x != nil {
+		return x.GroupNames
+	}
+	return nil
 }
 
 type ResourceKindDescriptor struct {
@@ -363,6 +587,7 @@ func (m *ServiceDescriptorSpec) CloneVT() *ServiceDescriptorSpec {
 	r.DisplayName = m.DisplayName
 	r.Description = m.Description
 	r.Mode = m.Mode
+	r.Provenance = m.Provenance.CloneVT()
 	if rhs := m.ResourceKinds; rhs != nil {
 		r.ResourceKinds = make([]*ResourceKindDescriptor, len(rhs))
 		for k, v := range rhs {
@@ -381,6 +606,18 @@ func (m *ServiceDescriptorSpec) CloneVT() *ServiceDescriptorSpec {
 			r.BuiltInRoles[k] = v.CloneVT()
 		}
 	}
+	if rhs := m.BuiltInRoleTemplates; rhs != nil {
+		r.BuiltInRoleTemplates = make([]*BuiltInRoleTemplate, len(rhs))
+		for k, v := range rhs {
+			r.BuiltInRoleTemplates[k] = v.CloneVT()
+		}
+	}
+	if rhs := m.BuiltInPermissionFilters; rhs != nil {
+		r.BuiltInPermissionFilters = make([]*BuiltInPermissionFilter, len(rhs))
+		for k, v := range rhs {
+			r.BuiltInPermissionFilters[k] = v.CloneVT()
+		}
+	}
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = slices.Clone(m.unknownFields)
 	}
@@ -388,6 +625,85 @@ func (m *ServiceDescriptorSpec) CloneVT() *ServiceDescriptorSpec {
 }
 
 func (m *ServiceDescriptorSpec) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *ServiceDescriptorProvenance) CloneVT() *ServiceDescriptorProvenance {
+	if m == nil {
+		return (*ServiceDescriptorProvenance)(nil)
+	}
+	r := new(ServiceDescriptorProvenance)
+	r.Origin = m.Origin
+	r.VirtualDescriptor = m.VirtualDescriptor
+	r.GeneratorId = m.GeneratorId
+	if rhs := m.InputRefs; rhs != nil {
+		r.InputRefs = slices.Clone(rhs)
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *ServiceDescriptorProvenance) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *BuiltInRoleTemplate) CloneVT() *BuiltInRoleTemplate {
+	if m == nil {
+		return (*BuiltInRoleTemplate)(nil)
+	}
+	r := new(BuiltInRoleTemplate)
+	r.RoleName = m.RoleName
+	r.DisplayName = m.DisplayName
+	r.Description = m.Description
+	if rhs := m.PermissionFilters; rhs != nil {
+		r.PermissionFilters = make([]*BuiltInPermissionFilter, len(rhs))
+		for k, v := range rhs {
+			r.PermissionFilters[k] = v.CloneVT()
+		}
+	}
+	if rhs := m.PermissionFilterNames; rhs != nil {
+		r.PermissionFilterNames = slices.Clone(rhs)
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *BuiltInRoleTemplate) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *BuiltInPermissionFilter) CloneVT() *BuiltInPermissionFilter {
+	if m == nil {
+		return (*BuiltInPermissionFilter)(nil)
+	}
+	r := new(BuiltInPermissionFilter)
+	r.Name = m.Name
+	if rhs := m.PermissionNames; rhs != nil {
+		r.PermissionNames = slices.Clone(rhs)
+	}
+	if rhs := m.ServiceNames; rhs != nil {
+		r.ServiceNames = slices.Clone(rhs)
+	}
+	if rhs := m.ResourceTypes; rhs != nil {
+		r.ResourceTypes = slices.Clone(rhs)
+	}
+	if rhs := m.Actions; rhs != nil {
+		r.Actions = slices.Clone(rhs)
+	}
+	if rhs := m.GroupNames; rhs != nil {
+		r.GroupNames = slices.Clone(rhs)
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *BuiltInPermissionFilter) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
@@ -546,7 +862,44 @@ func (this *ServiceDescriptorSpec) EqualVT(that *ServiceDescriptorSpec) bool {
 			}
 		}
 	}
+	if len(this.BuiltInRoleTemplates) != len(that.BuiltInRoleTemplates) {
+		return false
+	}
+	for i, vx := range this.BuiltInRoleTemplates {
+		vy := that.BuiltInRoleTemplates[i]
+		if p, q := vx, vy; p != q {
+			if p == nil {
+				p = &BuiltInRoleTemplate{}
+			}
+			if q == nil {
+				q = &BuiltInRoleTemplate{}
+			}
+			if !p.EqualVT(q) {
+				return false
+			}
+		}
+	}
+	if len(this.BuiltInPermissionFilters) != len(that.BuiltInPermissionFilters) {
+		return false
+	}
+	for i, vx := range this.BuiltInPermissionFilters {
+		vy := that.BuiltInPermissionFilters[i]
+		if p, q := vx, vy; p != q {
+			if p == nil {
+				p = &BuiltInPermissionFilter{}
+			}
+			if q == nil {
+				q = &BuiltInPermissionFilter{}
+			}
+			if !p.EqualVT(q) {
+				return false
+			}
+		}
+	}
 	if this.Mode != that.Mode {
+		return false
+	}
+	if !this.Provenance.EqualVT(that.Provenance) {
 		return false
 	}
 	return string(this.unknownFields) == string(that.unknownFields)
@@ -554,6 +907,155 @@ func (this *ServiceDescriptorSpec) EqualVT(that *ServiceDescriptorSpec) bool {
 
 func (this *ServiceDescriptorSpec) EqualMessageVT(thatMsg any) bool {
 	that, ok := thatMsg.(*ServiceDescriptorSpec)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *ServiceDescriptorProvenance) EqualVT(that *ServiceDescriptorProvenance) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if this.Origin != that.Origin {
+		return false
+	}
+	if this.VirtualDescriptor != that.VirtualDescriptor {
+		return false
+	}
+	if this.GeneratorId != that.GeneratorId {
+		return false
+	}
+	if len(this.InputRefs) != len(that.InputRefs) {
+		return false
+	}
+	for i, vx := range this.InputRefs {
+		vy := that.InputRefs[i]
+		if vx != vy {
+			return false
+		}
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *ServiceDescriptorProvenance) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*ServiceDescriptorProvenance)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *BuiltInRoleTemplate) EqualVT(that *BuiltInRoleTemplate) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if this.RoleName != that.RoleName {
+		return false
+	}
+	if this.DisplayName != that.DisplayName {
+		return false
+	}
+	if this.Description != that.Description {
+		return false
+	}
+	if len(this.PermissionFilters) != len(that.PermissionFilters) {
+		return false
+	}
+	for i, vx := range this.PermissionFilters {
+		vy := that.PermissionFilters[i]
+		if p, q := vx, vy; p != q {
+			if p == nil {
+				p = &BuiltInPermissionFilter{}
+			}
+			if q == nil {
+				q = &BuiltInPermissionFilter{}
+			}
+			if !p.EqualVT(q) {
+				return false
+			}
+		}
+	}
+	if len(this.PermissionFilterNames) != len(that.PermissionFilterNames) {
+		return false
+	}
+	for i, vx := range this.PermissionFilterNames {
+		vy := that.PermissionFilterNames[i]
+		if vx != vy {
+			return false
+		}
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *BuiltInRoleTemplate) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*BuiltInRoleTemplate)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *BuiltInPermissionFilter) EqualVT(that *BuiltInPermissionFilter) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if this.Name != that.Name {
+		return false
+	}
+	if len(this.PermissionNames) != len(that.PermissionNames) {
+		return false
+	}
+	for i, vx := range this.PermissionNames {
+		vy := that.PermissionNames[i]
+		if vx != vy {
+			return false
+		}
+	}
+	if len(this.ServiceNames) != len(that.ServiceNames) {
+		return false
+	}
+	for i, vx := range this.ServiceNames {
+		vy := that.ServiceNames[i]
+		if vx != vy {
+			return false
+		}
+	}
+	if len(this.ResourceTypes) != len(that.ResourceTypes) {
+		return false
+	}
+	for i, vx := range this.ResourceTypes {
+		vy := that.ResourceTypes[i]
+		if vx != vy {
+			return false
+		}
+	}
+	if len(this.Actions) != len(that.Actions) {
+		return false
+	}
+	for i, vx := range this.Actions {
+		vy := that.Actions[i]
+		if vx != vy {
+			return false
+		}
+	}
+	if len(this.GroupNames) != len(that.GroupNames) {
+		return false
+	}
+	for i, vx := range this.GroupNames {
+		vy := that.GroupNames[i]
+		if vx != vy {
+			return false
+		}
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *BuiltInPermissionFilter) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*BuiltInPermissionFilter)
 	if !ok {
 		return false
 	}
@@ -647,6 +1149,46 @@ func (this *ServiceDescriptorList) EqualMessageVT(thatMsg any) bool {
 		return false
 	}
 	return this.EqualVT(that)
+}
+
+// MarshalProtoJSON marshals the ServiceDescriptorOrigin to JSON.
+func (x ServiceDescriptorOrigin) MarshalProtoJSON(s *json.MarshalState) {
+	s.WriteEnum(int32(x), ServiceDescriptorOrigin_name)
+}
+
+// MarshalText marshals the ServiceDescriptorOrigin to text.
+func (x ServiceDescriptorOrigin) MarshalText() ([]byte, error) {
+	return []byte(json.GetEnumString(int32(x), ServiceDescriptorOrigin_name)), nil
+}
+
+// MarshalJSON marshals the ServiceDescriptorOrigin to JSON.
+func (x ServiceDescriptorOrigin) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ServiceDescriptorOrigin from JSON.
+func (x *ServiceDescriptorOrigin) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	v := s.ReadEnum(ServiceDescriptorOrigin_value)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read ServiceDescriptorOrigin enum: %v", err)
+		return
+	}
+	*x = ServiceDescriptorOrigin(v)
+}
+
+// UnmarshalText unmarshals the ServiceDescriptorOrigin from text.
+func (x *ServiceDescriptorOrigin) UnmarshalText(b []byte) error {
+	i, err := json.ParseEnumString(string(b), ServiceDescriptorOrigin_value)
+	if err != nil {
+		return err
+	}
+	*x = ServiceDescriptorOrigin(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the ServiceDescriptorOrigin from JSON.
+func (x *ServiceDescriptorOrigin) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the ResourceScope to JSON.
@@ -867,10 +1409,37 @@ func (x *ServiceDescriptorSpec) MarshalProtoJSON(s *json.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
+	if len(x.BuiltInRoleTemplates) > 0 || s.HasField("builtInRoleTemplates") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("builtInRoleTemplates")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.BuiltInRoleTemplates {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("builtInRoleTemplates"))
+		}
+		s.WriteArrayEnd()
+	}
+	if len(x.BuiltInPermissionFilters) > 0 || s.HasField("builtInPermissionFilters") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("builtInPermissionFilters")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.BuiltInPermissionFilters {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("builtInPermissionFilters"))
+		}
+		s.WriteArrayEnd()
+	}
 	if x.Mode != 0 || s.HasField("mode") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("mode")
 		x.Mode.MarshalProtoJSON(s)
+	}
+	if x.Provenance != nil || s.HasField("provenance") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("provenance")
+		x.Provenance.MarshalProtoJSON(s.WithField("provenance"))
 	}
 	s.WriteObjectEnd()
 }
@@ -952,15 +1521,329 @@ func (x *ServiceDescriptorSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 				}
 				x.BuiltInRoles = append(x.BuiltInRoles, v)
 			})
+		case "built_in_role_templates", "builtInRoleTemplates":
+			s.AddField("built_in_role_templates")
+			if s.ReadNil() {
+				x.BuiltInRoleTemplates = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.BuiltInRoleTemplates = append(x.BuiltInRoleTemplates, nil)
+					return
+				}
+				v := &BuiltInRoleTemplate{}
+				v.UnmarshalProtoJSON(s.WithField("built_in_role_templates", false))
+				if s.Err() != nil {
+					return
+				}
+				x.BuiltInRoleTemplates = append(x.BuiltInRoleTemplates, v)
+			})
+		case "built_in_permission_filters", "builtInPermissionFilters":
+			s.AddField("built_in_permission_filters")
+			if s.ReadNil() {
+				x.BuiltInPermissionFilters = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.BuiltInPermissionFilters = append(x.BuiltInPermissionFilters, nil)
+					return
+				}
+				v := &BuiltInPermissionFilter{}
+				v.UnmarshalProtoJSON(s.WithField("built_in_permission_filters", false))
+				if s.Err() != nil {
+					return
+				}
+				x.BuiltInPermissionFilters = append(x.BuiltInPermissionFilters, v)
+			})
 		case "mode":
 			s.AddField("mode")
 			x.Mode.UnmarshalProtoJSON(s)
+		case "provenance":
+			if s.ReadNil() {
+				x.Provenance = nil
+				return
+			}
+			x.Provenance = &ServiceDescriptorProvenance{}
+			x.Provenance.UnmarshalProtoJSON(s.WithField("provenance", true))
 		}
 	})
 }
 
 // UnmarshalJSON unmarshals the ServiceDescriptorSpec from JSON.
 func (x *ServiceDescriptorSpec) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ServiceDescriptorProvenance message to JSON.
+func (x *ServiceDescriptorProvenance) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Origin != 0 || s.HasField("origin") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("origin")
+		x.Origin.MarshalProtoJSON(s)
+	}
+	if x.VirtualDescriptor || s.HasField("virtualDescriptor") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("virtualDescriptor")
+		s.WriteBool(x.VirtualDescriptor)
+	}
+	if x.GeneratorId != "" || s.HasField("generatorId") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("generatorId")
+		s.WriteString(x.GeneratorId)
+	}
+	if len(x.InputRefs) > 0 || s.HasField("inputRefs") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("inputRefs")
+		s.WriteStringArray(x.InputRefs)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ServiceDescriptorProvenance to JSON.
+func (x *ServiceDescriptorProvenance) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ServiceDescriptorProvenance message from JSON.
+func (x *ServiceDescriptorProvenance) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "origin":
+			s.AddField("origin")
+			x.Origin.UnmarshalProtoJSON(s)
+		case "virtual_descriptor", "virtualDescriptor":
+			s.AddField("virtual_descriptor")
+			x.VirtualDescriptor = s.ReadBool()
+		case "generator_id", "generatorId":
+			s.AddField("generator_id")
+			x.GeneratorId = s.ReadString()
+		case "input_refs", "inputRefs":
+			s.AddField("input_refs")
+			if s.ReadNil() {
+				x.InputRefs = nil
+				return
+			}
+			x.InputRefs = s.ReadStringArray()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ServiceDescriptorProvenance from JSON.
+func (x *ServiceDescriptorProvenance) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the BuiltInRoleTemplate message to JSON.
+func (x *BuiltInRoleTemplate) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.RoleName != "" || s.HasField("roleName") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("roleName")
+		s.WriteString(x.RoleName)
+	}
+	if x.DisplayName != "" || s.HasField("displayName") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("displayName")
+		s.WriteString(x.DisplayName)
+	}
+	if x.Description != "" || s.HasField("description") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("description")
+		s.WriteString(x.Description)
+	}
+	if len(x.PermissionFilters) > 0 || s.HasField("permissionFilters") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("permissionFilters")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.PermissionFilters {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("permissionFilters"))
+		}
+		s.WriteArrayEnd()
+	}
+	if len(x.PermissionFilterNames) > 0 || s.HasField("permissionFilterNames") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("permissionFilterNames")
+		s.WriteStringArray(x.PermissionFilterNames)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BuiltInRoleTemplate to JSON.
+func (x *BuiltInRoleTemplate) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BuiltInRoleTemplate message from JSON.
+func (x *BuiltInRoleTemplate) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "role_name", "roleName":
+			s.AddField("role_name")
+			x.RoleName = s.ReadString()
+		case "display_name", "displayName":
+			s.AddField("display_name")
+			x.DisplayName = s.ReadString()
+		case "description":
+			s.AddField("description")
+			x.Description = s.ReadString()
+		case "permission_filters", "permissionFilters":
+			s.AddField("permission_filters")
+			if s.ReadNil() {
+				x.PermissionFilters = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.PermissionFilters = append(x.PermissionFilters, nil)
+					return
+				}
+				v := &BuiltInPermissionFilter{}
+				v.UnmarshalProtoJSON(s.WithField("permission_filters", false))
+				if s.Err() != nil {
+					return
+				}
+				x.PermissionFilters = append(x.PermissionFilters, v)
+			})
+		case "permission_filter_names", "permissionFilterNames":
+			s.AddField("permission_filter_names")
+			if s.ReadNil() {
+				x.PermissionFilterNames = nil
+				return
+			}
+			x.PermissionFilterNames = s.ReadStringArray()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BuiltInRoleTemplate from JSON.
+func (x *BuiltInRoleTemplate) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the BuiltInPermissionFilter message to JSON.
+func (x *BuiltInPermissionFilter) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Name != "" || s.HasField("name") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("name")
+		s.WriteString(x.Name)
+	}
+	if len(x.PermissionNames) > 0 || s.HasField("permissionNames") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("permissionNames")
+		s.WriteStringArray(x.PermissionNames)
+	}
+	if len(x.ServiceNames) > 0 || s.HasField("serviceNames") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("serviceNames")
+		s.WriteStringArray(x.ServiceNames)
+	}
+	if len(x.ResourceTypes) > 0 || s.HasField("resourceTypes") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("resourceTypes")
+		s.WriteStringArray(x.ResourceTypes)
+	}
+	if len(x.Actions) > 0 || s.HasField("actions") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("actions")
+		s.WriteStringArray(x.Actions)
+	}
+	if len(x.GroupNames) > 0 || s.HasField("groupNames") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("groupNames")
+		s.WriteStringArray(x.GroupNames)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BuiltInPermissionFilter to JSON.
+func (x *BuiltInPermissionFilter) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BuiltInPermissionFilter message from JSON.
+func (x *BuiltInPermissionFilter) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "name":
+			s.AddField("name")
+			x.Name = s.ReadString()
+		case "permission_names", "permissionNames":
+			s.AddField("permission_names")
+			if s.ReadNil() {
+				x.PermissionNames = nil
+				return
+			}
+			x.PermissionNames = s.ReadStringArray()
+		case "service_names", "serviceNames":
+			s.AddField("service_names")
+			if s.ReadNil() {
+				x.ServiceNames = nil
+				return
+			}
+			x.ServiceNames = s.ReadStringArray()
+		case "resource_types", "resourceTypes":
+			s.AddField("resource_types")
+			if s.ReadNil() {
+				x.ResourceTypes = nil
+				return
+			}
+			x.ResourceTypes = s.ReadStringArray()
+		case "actions":
+			s.AddField("actions")
+			if s.ReadNil() {
+				x.Actions = nil
+				return
+			}
+			x.Actions = s.ReadStringArray()
+		case "group_names", "groupNames":
+			s.AddField("group_names")
+			if s.ReadNil() {
+				x.GroupNames = nil
+				return
+			}
+			x.GroupNames = s.ReadStringArray()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BuiltInPermissionFilter from JSON.
+func (x *BuiltInPermissionFilter) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -1270,12 +2153,52 @@ func (m *ServiceDescriptorSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.Provenance != nil {
+		size, err := m.Provenance.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0x92
+	}
 	if m.Mode != 0 {
 		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.Mode))
 		i--
 		dAtA[i] = 0x2
 		i--
 		dAtA[i] = 0xc0
+	}
+	if len(m.BuiltInPermissionFilters) > 0 {
+		for iNdEx := len(m.BuiltInPermissionFilters) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.BuiltInPermissionFilters[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x2
+			i--
+			dAtA[i] = 0x82
+		}
+	}
+	if len(m.BuiltInRoleTemplates) > 0 {
+		for iNdEx := len(m.BuiltInRoleTemplates) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.BuiltInRoleTemplates[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0xfa
+		}
 	}
 	if len(m.BuiltInRoles) > 0 {
 		for iNdEx := len(m.BuiltInRoles) - 1; iNdEx >= 0; iNdEx-- {
@@ -1335,6 +2258,230 @@ func (m *ServiceDescriptorSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error)
 		i -= len(m.ServiceName)
 		copy(dAtA[i:], m.ServiceName)
 		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ServiceName)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ServiceDescriptorProvenance) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ServiceDescriptorProvenance) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *ServiceDescriptorProvenance) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.InputRefs) > 0 {
+		for iNdEx := len(m.InputRefs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.InputRefs[iNdEx])
+			copy(dAtA[i:], m.InputRefs[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.InputRefs[iNdEx])))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.GeneratorId) > 0 {
+		i -= len(m.GeneratorId)
+		copy(dAtA[i:], m.GeneratorId)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.GeneratorId)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.VirtualDescriptor {
+		i--
+		if m.VirtualDescriptor {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Origin != 0 {
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.Origin))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *BuiltInRoleTemplate) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BuiltInRoleTemplate) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *BuiltInRoleTemplate) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.PermissionFilterNames) > 0 {
+		for iNdEx := len(m.PermissionFilterNames) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PermissionFilterNames[iNdEx])
+			copy(dAtA[i:], m.PermissionFilterNames[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.PermissionFilterNames[iNdEx])))
+			i--
+			dAtA[i] = 0x5a
+		}
+	}
+	if len(m.PermissionFilters) > 0 {
+		for iNdEx := len(m.PermissionFilters) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.PermissionFilters[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x52
+		}
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.DisplayName) > 0 {
+		i -= len(m.DisplayName)
+		copy(dAtA[i:], m.DisplayName)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.DisplayName)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.RoleName) > 0 {
+		i -= len(m.RoleName)
+		copy(dAtA[i:], m.RoleName)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.RoleName)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *BuiltInPermissionFilter) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BuiltInPermissionFilter) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *BuiltInPermissionFilter) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.GroupNames) > 0 {
+		for iNdEx := len(m.GroupNames) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.GroupNames[iNdEx])
+			copy(dAtA[i:], m.GroupNames[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.GroupNames[iNdEx])))
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.Actions) > 0 {
+		for iNdEx := len(m.Actions) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Actions[iNdEx])
+			copy(dAtA[i:], m.Actions[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Actions[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if len(m.ResourceTypes) > 0 {
+		for iNdEx := len(m.ResourceTypes) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ResourceTypes[iNdEx])
+			copy(dAtA[i:], m.ResourceTypes[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ResourceTypes[iNdEx])))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.ServiceNames) > 0 {
+		for iNdEx := len(m.ServiceNames) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ServiceNames[iNdEx])
+			copy(dAtA[i:], m.ServiceNames[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ServiceNames[iNdEx])))
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.PermissionNames) > 0 {
+		for iNdEx := len(m.PermissionNames) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PermissionNames[iNdEx])
+			copy(dAtA[i:], m.PermissionNames[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.PermissionNames[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Name)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -1577,8 +2724,128 @@ func (m *ServiceDescriptorSpec) SizeVT() (n int) {
 			n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 		}
 	}
+	if len(m.BuiltInRoleTemplates) > 0 {
+		for _, e := range m.BuiltInRoleTemplates {
+			l = e.SizeVT()
+			n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.BuiltInPermissionFilters) > 0 {
+		for _, e := range m.BuiltInPermissionFilters {
+			l = e.SizeVT()
+			n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
 	if m.Mode != 0 {
 		n += 2 + protobuf_go_lite.SizeOfVarint(uint64(m.Mode))
+	}
+	if m.Provenance != nil {
+		l = m.Provenance.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *ServiceDescriptorProvenance) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Origin != 0 {
+		n += 1 + protobuf_go_lite.SizeOfVarint(uint64(m.Origin))
+	}
+	if m.VirtualDescriptor {
+		n += 2
+	}
+	l = len(m.GeneratorId)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if len(m.InputRefs) > 0 {
+		for _, s := range m.InputRefs {
+			l = len(s)
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *BuiltInRoleTemplate) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.RoleName)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.DisplayName)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if len(m.PermissionFilters) > 0 {
+		for _, e := range m.PermissionFilters {
+			l = e.SizeVT()
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.PermissionFilterNames) > 0 {
+		for _, s := range m.PermissionFilterNames {
+			l = len(s)
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *BuiltInPermissionFilter) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if len(m.PermissionNames) > 0 {
+		for _, s := range m.PermissionNames {
+			l = len(s)
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.ServiceNames) > 0 {
+		for _, s := range m.ServiceNames {
+			l = len(s)
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.ResourceTypes) > 0 {
+		for _, s := range m.ResourceTypes {
+			l = len(s)
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.Actions) > 0 {
+		for _, s := range m.Actions {
+			l = len(s)
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.GroupNames) > 0 {
+		for _, s := range m.GroupNames {
+			l = len(s)
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n
@@ -1967,6 +3234,58 @@ func (m *ServiceDescriptorSpec) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 31:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BuiltInRoleTemplates", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BuiltInRoleTemplates = append(m.BuiltInRoleTemplates, &BuiltInRoleTemplate{})
+			if err := m.BuiltInRoleTemplates[len(m.BuiltInRoleTemplates)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 32:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BuiltInPermissionFilters", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BuiltInPermissionFilters = append(m.BuiltInPermissionFilters, &BuiltInPermissionFilter{})
+			if err := m.BuiltInPermissionFilters[len(m.BuiltInPermissionFilters)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 40:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Mode", wireType)
@@ -1978,6 +3297,473 @@ func (m *ServiceDescriptorSpec) UnmarshalVT(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
+		case 50:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Provenance", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Provenance == nil {
+				m.Provenance = &ServiceDescriptorProvenance{}
+			}
+			if err := m.Provenance.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ServiceDescriptorProvenance) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ServiceDescriptorProvenance: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ServiceDescriptorProvenance: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Origin", wireType)
+			}
+			m.Origin = 0
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			m.Origin = ServiceDescriptorOrigin(_v)
+			if err != nil {
+				return err
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VirtualDescriptor", wireType)
+			}
+			var v int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			v = int(_v)
+			if err != nil {
+				return err
+			}
+			m.VirtualDescriptor = bool(v != 0)
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GeneratorId", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GeneratorId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InputRefs", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.InputRefs = append(m.InputRefs, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BuiltInRoleTemplate) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BuiltInRoleTemplate: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BuiltInRoleTemplate: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoleName", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RoleName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DisplayName", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DisplayName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PermissionFilters", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PermissionFilters = append(m.PermissionFilters, &BuiltInPermissionFilter{})
+			if err := m.PermissionFilters[len(m.PermissionFilters)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PermissionFilterNames", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PermissionFilterNames = append(m.PermissionFilterNames, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BuiltInPermissionFilter) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BuiltInPermissionFilter: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BuiltInPermissionFilter: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PermissionNames", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PermissionNames = append(m.PermissionNames, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceNames", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ServiceNames = append(m.ServiceNames, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceTypes", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ResourceTypes = append(m.ResourceTypes, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Actions", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Actions = append(m.Actions, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GroupNames", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GroupNames = append(m.GroupNames, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
