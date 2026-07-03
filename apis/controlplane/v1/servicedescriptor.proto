@@ -33,6 +33,10 @@ message ServiceDescriptorSpec {
   string display_name = 2;
   string description = 3;
 
+  // service_visibility controls whether this service is tenant-discoverable.
+  // UNSPECIFIED defaults to PUBLIC for backward compatibility.
+  ServiceVisibility service_visibility = 4 [(buf.validate.field).enum.defined_only = true];
+
   repeated ResourceKindDescriptor resource_kinds = 10;
 
   // declared_permissions embeds IAM permission declarations for this service.
@@ -74,6 +78,12 @@ message ServiceDescriptorSpec {
   // provenance describes where this descriptor came from and whether it is a
   // virtual/generated platform descriptor.
   ServiceDescriptorProvenance provenance = 50;
+}
+
+enum ServiceVisibility {
+  SERVICE_VISIBILITY_UNSPECIFIED = 0;
+  SERVICE_VISIBILITY_PUBLIC = 1;
+  SERVICE_VISIBILITY_INTERNAL = 2;
 }
 
 enum ServiceDescriptorOrigin {

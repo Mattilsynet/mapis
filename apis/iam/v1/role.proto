@@ -33,6 +33,16 @@ message RoleSpec {
 
   // is_builtin - if true, this is a system-provided role
   bool is_builtin = 30;
+
+  // bindability controls which principal classes may bind this role.
+  // UNSPECIFIED defaults to TENANT_BINDABLE for backward compatibility.
+  RoleBindability bindability = 31 [(buf.validate.field).enum.defined_only = true];
+}
+
+enum RoleBindability {
+  ROLE_BINDABILITY_UNSPECIFIED = 0;
+  ROLE_BINDABILITY_TENANT_BINDABLE = 1;
+  ROLE_BINDABILITY_INTERNAL_ONLY = 2;
 }
 
 message RoleStatus {

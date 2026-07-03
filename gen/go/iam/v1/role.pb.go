@@ -13,7 +13,44 @@ import (
 	json "github.com/aperturerobotics/protobuf-go-lite/json"
 	io "io"
 	slices "slices"
+	strconv "strconv"
 )
+
+type RoleBindability int32
+
+const (
+	RoleBindability_ROLE_BINDABILITY_UNSPECIFIED     RoleBindability = 0
+	RoleBindability_ROLE_BINDABILITY_TENANT_BINDABLE RoleBindability = 1
+	RoleBindability_ROLE_BINDABILITY_INTERNAL_ONLY   RoleBindability = 2
+)
+
+// Enum value maps for RoleBindability.
+var (
+	RoleBindability_name = map[int32]string{
+		0: "ROLE_BINDABILITY_UNSPECIFIED",
+		1: "ROLE_BINDABILITY_TENANT_BINDABLE",
+		2: "ROLE_BINDABILITY_INTERNAL_ONLY",
+	}
+	RoleBindability_value = map[string]int32{
+		"ROLE_BINDABILITY_UNSPECIFIED":     0,
+		"ROLE_BINDABILITY_TENANT_BINDABLE": 1,
+		"ROLE_BINDABILITY_INTERNAL_ONLY":   2,
+	}
+)
+
+func (x RoleBindability) Enum() *RoleBindability {
+	p := new(RoleBindability)
+	*p = x
+	return p
+}
+
+func (x RoleBindability) String() string {
+	name, valid := RoleBindability_name[int32(x)]
+	if valid {
+		return name
+	}
+	return strconv.Itoa(int(x))
+}
 
 // Role - defines a set of permissions (flat namespace)
 // Roles are granted via Policy bindings
@@ -73,6 +110,9 @@ type RoleSpec struct {
 	ExternalId string `protobuf:"bytes,20,opt,name=external_id,json=externalId,proto3" json:"externalId,omitempty"`
 	// is_builtin - if true, this is a system-provided role
 	IsBuiltin bool `protobuf:"varint,30,opt,name=is_builtin,json=isBuiltin,proto3" json:"isBuiltin,omitempty"`
+	// bindability controls which principal classes may bind this role.
+	// UNSPECIFIED defaults to TENANT_BINDABLE for backward compatibility.
+	Bindability RoleBindability `protobuf:"varint,31,opt,name=bindability,proto3" json:"bindability,omitempty"`
 }
 
 func (x *RoleSpec) Reset() {
@@ -114,6 +154,13 @@ func (x *RoleSpec) GetIsBuiltin() bool {
 		return x.IsBuiltin
 	}
 	return false
+}
+
+func (x *RoleSpec) GetBindability() RoleBindability {
+	if x != nil {
+		return x.Bindability
+	}
+	return RoleBindability_ROLE_BINDABILITY_UNSPECIFIED
 }
 
 type RoleStatus struct {
@@ -184,6 +231,7 @@ func (m *RoleSpec) CloneVT() *RoleSpec {
 	r.Description = m.Description
 	r.ExternalId = m.ExternalId
 	r.IsBuiltin = m.IsBuiltin
+	r.Bindability = m.Bindability
 	if rhs := m.Permissions; rhs != nil {
 		r.Permissions = slices.Clone(rhs)
 	}
@@ -291,6 +339,9 @@ func (this *RoleSpec) EqualVT(that *RoleSpec) bool {
 	if this.IsBuiltin != that.IsBuiltin {
 		return false
 	}
+	if this.Bindability != that.Bindability {
+		return false
+	}
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
@@ -352,6 +403,46 @@ func (this *RoleList) EqualMessageVT(thatMsg any) bool {
 		return false
 	}
 	return this.EqualVT(that)
+}
+
+// MarshalProtoJSON marshals the RoleBindability to JSON.
+func (x RoleBindability) MarshalProtoJSON(s *json.MarshalState) {
+	s.WriteEnum(int32(x), RoleBindability_name)
+}
+
+// MarshalText marshals the RoleBindability to text.
+func (x RoleBindability) MarshalText() ([]byte, error) {
+	return []byte(json.GetEnumString(int32(x), RoleBindability_name)), nil
+}
+
+// MarshalJSON marshals the RoleBindability to JSON.
+func (x RoleBindability) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RoleBindability from JSON.
+func (x *RoleBindability) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	v := s.ReadEnum(RoleBindability_value)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read RoleBindability enum: %v", err)
+		return
+	}
+	*x = RoleBindability(v)
+}
+
+// UnmarshalText unmarshals the RoleBindability from text.
+func (x *RoleBindability) UnmarshalText(b []byte) error {
+	i, err := json.ParseEnumString(string(b), RoleBindability_value)
+	if err != nil {
+		return err
+	}
+	*x = RoleBindability(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the RoleBindability from JSON.
+func (x *RoleBindability) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the Role message to JSON.
@@ -469,6 +560,11 @@ func (x *RoleSpec) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("isBuiltin")
 		s.WriteBool(x.IsBuiltin)
 	}
+	if x.Bindability != 0 || s.HasField("bindability") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("bindability")
+		x.Bindability.MarshalProtoJSON(s)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -505,6 +601,9 @@ func (x *RoleSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 		case "is_builtin", "isBuiltin":
 			s.AddField("is_builtin")
 			x.IsBuiltin = s.ReadBool()
+		case "bindability":
+			s.AddField("bindability")
+			x.Bindability.UnmarshalProtoJSON(s)
 		}
 	})
 }
@@ -730,6 +829,13 @@ func (m *RoleSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.Bindability != 0 {
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.Bindability))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf8
+	}
 	if m.IsBuiltin {
 		i--
 		if m.IsBuiltin {
@@ -919,6 +1025,9 @@ func (m *RoleSpec) SizeVT() (n int) {
 	}
 	if m.IsBuiltin {
 		n += 3
+	}
+	if m.Bindability != 0 {
+		n += 2 + protobuf_go_lite.SizeOfVarint(uint64(m.Bindability))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -1228,6 +1337,17 @@ func (m *RoleSpec) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			m.IsBuiltin = bool(v != 0)
+		case 31:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Bindability", wireType)
+			}
+			m.Bindability = 0
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			m.Bindability = RoleBindability(_v)
+			if err != nil {
+				return err
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
