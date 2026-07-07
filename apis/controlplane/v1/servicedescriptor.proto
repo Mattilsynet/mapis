@@ -37,6 +37,11 @@ message ServiceDescriptorSpec {
   // UNSPECIFIED defaults to PUBLIC for backward compatibility.
   ServiceVisibility service_visibility = 4 [(buf.validate.field).enum.defined_only = true];
 
+  // service_activation_mode declares whether this service is always enabled or
+  // project-selectable.
+  // UNSPECIFIED defaults to BUILTIN_ALWAYS_ON for backward compatibility.
+  ServiceActivationMode service_activation_mode = 5 [(buf.validate.field).enum.defined_only = true];
+
   repeated ResourceKindDescriptor resource_kinds = 10;
 
   // declared_permissions embeds IAM permission declarations for this service.
@@ -84,6 +89,12 @@ enum ServiceVisibility {
   SERVICE_VISIBILITY_UNSPECIFIED = 0;
   SERVICE_VISIBILITY_PUBLIC = 1;
   SERVICE_VISIBILITY_INTERNAL = 2;
+}
+
+enum ServiceActivationMode {
+  SERVICE_ACTIVATION_MODE_UNSPECIFIED = 0;
+  SERVICE_ACTIVATION_MODE_BUILTIN_ALWAYS_ON = 1;
+  SERVICE_ACTIVATION_MODE_OPTIONAL_PROJECT_SELECTABLE = 2;
 }
 
 enum ServiceDescriptorOrigin {

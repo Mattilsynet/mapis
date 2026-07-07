@@ -53,6 +53,42 @@ func (x ServiceVisibility) String() string {
 	return strconv.Itoa(int(x))
 }
 
+type ServiceActivationMode int32
+
+const (
+	ServiceActivationMode_SERVICE_ACTIVATION_MODE_UNSPECIFIED                 ServiceActivationMode = 0
+	ServiceActivationMode_SERVICE_ACTIVATION_MODE_BUILTIN_ALWAYS_ON           ServiceActivationMode = 1
+	ServiceActivationMode_SERVICE_ACTIVATION_MODE_OPTIONAL_PROJECT_SELECTABLE ServiceActivationMode = 2
+)
+
+// Enum value maps for ServiceActivationMode.
+var (
+	ServiceActivationMode_name = map[int32]string{
+		0: "SERVICE_ACTIVATION_MODE_UNSPECIFIED",
+		1: "SERVICE_ACTIVATION_MODE_BUILTIN_ALWAYS_ON",
+		2: "SERVICE_ACTIVATION_MODE_OPTIONAL_PROJECT_SELECTABLE",
+	}
+	ServiceActivationMode_value = map[string]int32{
+		"SERVICE_ACTIVATION_MODE_UNSPECIFIED":                 0,
+		"SERVICE_ACTIVATION_MODE_BUILTIN_ALWAYS_ON":           1,
+		"SERVICE_ACTIVATION_MODE_OPTIONAL_PROJECT_SELECTABLE": 2,
+	}
+)
+
+func (x ServiceActivationMode) Enum() *ServiceActivationMode {
+	p := new(ServiceActivationMode)
+	*p = x
+	return p
+}
+
+func (x ServiceActivationMode) String() string {
+	name, valid := ServiceActivationMode_name[int32(x)]
+	if valid {
+		return name
+	}
+	return strconv.Itoa(int(x))
+}
+
 type ServiceDescriptorOrigin int32
 
 const (
@@ -221,8 +257,12 @@ type ServiceDescriptorSpec struct {
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// service_visibility controls whether this service is tenant-discoverable.
 	// UNSPECIFIED defaults to PUBLIC for backward compatibility.
-	ServiceVisibility ServiceVisibility         `protobuf:"varint,4,opt,name=service_visibility,json=serviceVisibility,proto3" json:"serviceVisibility,omitempty"`
-	ResourceKinds     []*ResourceKindDescriptor `protobuf:"bytes,10,rep,name=resource_kinds,json=resourceKinds,proto3" json:"resourceKinds,omitempty"`
+	ServiceVisibility ServiceVisibility `protobuf:"varint,4,opt,name=service_visibility,json=serviceVisibility,proto3" json:"serviceVisibility,omitempty"`
+	// service_activation_mode declares whether this service is always enabled or
+	// project-selectable.
+	// UNSPECIFIED defaults to BUILTIN_ALWAYS_ON for backward compatibility.
+	ServiceActivationMode ServiceActivationMode     `protobuf:"varint,5,opt,name=service_activation_mode,json=serviceActivationMode,proto3" json:"serviceActivationMode,omitempty"`
+	ResourceKinds         []*ResourceKindDescriptor `protobuf:"bytes,10,rep,name=resource_kinds,json=resourceKinds,proto3" json:"resourceKinds,omitempty"`
 	// declared_permissions embeds IAM permission declarations for this service.
 	//
 	// Input contract:
@@ -288,6 +328,13 @@ func (x *ServiceDescriptorSpec) GetServiceVisibility() ServiceVisibility {
 		return x.ServiceVisibility
 	}
 	return ServiceVisibility_SERVICE_VISIBILITY_UNSPECIFIED
+}
+
+func (x *ServiceDescriptorSpec) GetServiceActivationMode() ServiceActivationMode {
+	if x != nil {
+		return x.ServiceActivationMode
+	}
+	return ServiceActivationMode_SERVICE_ACTIVATION_MODE_UNSPECIFIED
 }
 
 func (x *ServiceDescriptorSpec) GetResourceKinds() []*ResourceKindDescriptor {
@@ -633,6 +680,7 @@ func (m *ServiceDescriptorSpec) CloneVT() *ServiceDescriptorSpec {
 	r.DisplayName = m.DisplayName
 	r.Description = m.Description
 	r.ServiceVisibility = m.ServiceVisibility
+	r.ServiceActivationMode = m.ServiceActivationMode
 	r.Mode = m.Mode
 	r.Provenance = m.Provenance.CloneVT()
 	if rhs := m.ResourceKinds; rhs != nil {
@@ -859,6 +907,9 @@ func (this *ServiceDescriptorSpec) EqualVT(that *ServiceDescriptorSpec) bool {
 		return false
 	}
 	if this.ServiceVisibility != that.ServiceVisibility {
+		return false
+	}
+	if this.ServiceActivationMode != that.ServiceActivationMode {
 		return false
 	}
 	if len(this.ResourceKinds) != len(that.ResourceKinds) {
@@ -1241,6 +1292,46 @@ func (x *ServiceVisibility) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the ServiceActivationMode to JSON.
+func (x ServiceActivationMode) MarshalProtoJSON(s *json.MarshalState) {
+	s.WriteEnum(int32(x), ServiceActivationMode_name)
+}
+
+// MarshalText marshals the ServiceActivationMode to text.
+func (x ServiceActivationMode) MarshalText() ([]byte, error) {
+	return []byte(json.GetEnumString(int32(x), ServiceActivationMode_name)), nil
+}
+
+// MarshalJSON marshals the ServiceActivationMode to JSON.
+func (x ServiceActivationMode) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ServiceActivationMode from JSON.
+func (x *ServiceActivationMode) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	v := s.ReadEnum(ServiceActivationMode_value)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read ServiceActivationMode enum: %v", err)
+		return
+	}
+	*x = ServiceActivationMode(v)
+}
+
+// UnmarshalText unmarshals the ServiceActivationMode from text.
+func (x *ServiceActivationMode) UnmarshalText(b []byte) error {
+	i, err := json.ParseEnumString(string(b), ServiceActivationMode_value)
+	if err != nil {
+		return err
+	}
+	*x = ServiceActivationMode(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the ServiceActivationMode from JSON.
+func (x *ServiceActivationMode) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the ServiceDescriptorOrigin to JSON.
 func (x ServiceDescriptorOrigin) MarshalProtoJSON(s *json.MarshalState) {
 	s.WriteEnum(int32(x), ServiceDescriptorOrigin_name)
@@ -1471,6 +1562,11 @@ func (x *ServiceDescriptorSpec) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("serviceVisibility")
 		x.ServiceVisibility.MarshalProtoJSON(s)
 	}
+	if x.ServiceActivationMode != 0 || s.HasField("serviceActivationMode") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("serviceActivationMode")
+		x.ServiceActivationMode.MarshalProtoJSON(s)
+	}
 	if len(x.ResourceKinds) > 0 || s.HasField("resourceKinds") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("resourceKinds")
@@ -1565,6 +1661,9 @@ func (x *ServiceDescriptorSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 		case "service_visibility", "serviceVisibility":
 			s.AddField("service_visibility")
 			x.ServiceVisibility.UnmarshalProtoJSON(s)
+		case "service_activation_mode", "serviceActivationMode":
+			s.AddField("service_activation_mode")
+			x.ServiceActivationMode.UnmarshalProtoJSON(s)
 		case "resource_kinds", "resourceKinds":
 			s.AddField("resource_kinds")
 			if s.ReadNil() {
@@ -2338,6 +2437,11 @@ func (m *ServiceDescriptorSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error)
 			dAtA[i] = 0x52
 		}
 	}
+	if m.ServiceActivationMode != 0 {
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.ServiceActivationMode))
+		i--
+		dAtA[i] = 0x28
+	}
 	if m.ServiceVisibility != 0 {
 		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.ServiceVisibility))
 		i--
@@ -2812,6 +2916,9 @@ func (m *ServiceDescriptorSpec) SizeVT() (n int) {
 	if m.ServiceVisibility != 0 {
 		n += 1 + protobuf_go_lite.SizeOfVarint(uint64(m.ServiceVisibility))
 	}
+	if m.ServiceActivationMode != 0 {
+		n += 1 + protobuf_go_lite.SizeOfVarint(uint64(m.ServiceActivationMode))
+	}
 	if len(m.ResourceKinds) > 0 {
 		for _, e := range m.ResourceKinds {
 			l = e.SizeVT()
@@ -3270,6 +3377,17 @@ func (m *ServiceDescriptorSpec) UnmarshalVT(dAtA []byte) error {
 			var _v uint64
 			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
 			m.ServiceVisibility = ServiceVisibility(_v)
+			if err != nil {
+				return err
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceActivationMode", wireType)
+			}
+			m.ServiceActivationMode = 0
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			m.ServiceActivationMode = ServiceActivationMode(_v)
 			if err != nil {
 				return err
 			}
