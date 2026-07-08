@@ -142,6 +142,126 @@ func (x *ProjectList) GetItems() []*Project {
 	return nil
 }
 
+type ProjectServiceActivation struct {
+	unknownFields []byte
+	Type          *v1.TypeMeta                    `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Metadata      *v1.ObjectMeta                  `protobuf:"bytes,10,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Spec          *ProjectServiceActivationSpec   `protobuf:"bytes,20,opt,name=spec,proto3" json:"spec,omitempty"`
+	Status        *ProjectServiceActivationStatus `protobuf:"bytes,30,opt,name=status,proto3" json:"status,omitempty"`
+}
+
+func (x *ProjectServiceActivation) Reset() {
+	*x = ProjectServiceActivation{}
+}
+
+func (*ProjectServiceActivation) ProtoMessage() {}
+
+func (x *ProjectServiceActivation) GetType() *v1.TypeMeta {
+	if x != nil {
+		return x.Type
+	}
+	return nil
+}
+
+func (x *ProjectServiceActivation) GetMetadata() *v1.ObjectMeta {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+func (x *ProjectServiceActivation) GetSpec() *ProjectServiceActivationSpec {
+	if x != nil {
+		return x.Spec
+	}
+	return nil
+}
+
+func (x *ProjectServiceActivation) GetStatus() *ProjectServiceActivationStatus {
+	if x != nil {
+		return x.Status
+	}
+	return nil
+}
+
+type ProjectServiceActivationSpec struct {
+	unknownFields  []byte
+	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organizationId,omitempty"`
+	ProjectId      string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"projectId,omitempty"`
+	ServiceName    string `protobuf:"bytes,3,opt,name=service_name,json=serviceName,proto3" json:"serviceName,omitempty"`
+	Enabled        bool   `protobuf:"varint,4,opt,name=enabled,proto3" json:"enabled,omitempty"`
+}
+
+func (x *ProjectServiceActivationSpec) Reset() {
+	*x = ProjectServiceActivationSpec{}
+}
+
+func (*ProjectServiceActivationSpec) ProtoMessage() {}
+
+func (x *ProjectServiceActivationSpec) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *ProjectServiceActivationSpec) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *ProjectServiceActivationSpec) GetServiceName() string {
+	if x != nil {
+		return x.ServiceName
+	}
+	return ""
+}
+
+func (x *ProjectServiceActivationSpec) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+type ProjectServiceActivationStatus struct {
+	unknownFields []byte
+	Status        *v11.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+}
+
+func (x *ProjectServiceActivationStatus) Reset() {
+	*x = ProjectServiceActivationStatus{}
+}
+
+func (*ProjectServiceActivationStatus) ProtoMessage() {}
+
+func (x *ProjectServiceActivationStatus) GetStatus() *v11.Status {
+	if x != nil {
+		return x.Status
+	}
+	return nil
+}
+
+type ProjectServiceActivationList struct {
+	unknownFields []byte
+	Items         []*ProjectServiceActivation `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+}
+
+func (x *ProjectServiceActivationList) Reset() {
+	*x = ProjectServiceActivationList{}
+}
+
+func (*ProjectServiceActivationList) ProtoMessage() {}
+
+func (x *ProjectServiceActivationList) GetItems() []*ProjectServiceActivation {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
 func (m *Project) CloneVT() *Project {
 	if m == nil {
 		return (*Project)(nil)
@@ -221,6 +341,87 @@ func (m *ProjectList) CloneVT() *ProjectList {
 }
 
 func (m *ProjectList) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *ProjectServiceActivation) CloneVT() *ProjectServiceActivation {
+	if m == nil {
+		return (*ProjectServiceActivation)(nil)
+	}
+	r := new(ProjectServiceActivation)
+	r.Spec = m.Spec.CloneVT()
+	r.Status = m.Status.CloneVT()
+	if rhs := m.Type; rhs != nil {
+		r.Type = rhs.CloneVT()
+	}
+	if rhs := m.Metadata; rhs != nil {
+		r.Metadata = rhs.CloneVT()
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *ProjectServiceActivation) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *ProjectServiceActivationSpec) CloneVT() *ProjectServiceActivationSpec {
+	if m == nil {
+		return (*ProjectServiceActivationSpec)(nil)
+	}
+	r := new(ProjectServiceActivationSpec)
+	r.OrganizationId = m.OrganizationId
+	r.ProjectId = m.ProjectId
+	r.ServiceName = m.ServiceName
+	r.Enabled = m.Enabled
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *ProjectServiceActivationSpec) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *ProjectServiceActivationStatus) CloneVT() *ProjectServiceActivationStatus {
+	if m == nil {
+		return (*ProjectServiceActivationStatus)(nil)
+	}
+	r := new(ProjectServiceActivationStatus)
+	if rhs := m.Status; rhs != nil {
+		r.Status = rhs.CloneVT()
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *ProjectServiceActivationStatus) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *ProjectServiceActivationList) CloneVT() *ProjectServiceActivationList {
+	if m == nil {
+		return (*ProjectServiceActivationList)(nil)
+	}
+	r := new(ProjectServiceActivationList)
+	if rhs := m.Items; rhs != nil {
+		r.Items = make([]*ProjectServiceActivation, len(rhs))
+		for k, v := range rhs {
+			r.Items[k] = v.CloneVT()
+		}
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *ProjectServiceActivationList) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
@@ -330,6 +531,114 @@ func (this *ProjectList) EqualVT(that *ProjectList) bool {
 
 func (this *ProjectList) EqualMessageVT(thatMsg any) bool {
 	that, ok := thatMsg.(*ProjectList)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *ProjectServiceActivation) EqualVT(that *ProjectServiceActivation) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if !this.Type.EqualVT(that.Type) {
+		return false
+	}
+	if !this.Metadata.EqualVT(that.Metadata) {
+		return false
+	}
+	if !this.Spec.EqualVT(that.Spec) {
+		return false
+	}
+	if !this.Status.EqualVT(that.Status) {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *ProjectServiceActivation) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*ProjectServiceActivation)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *ProjectServiceActivationSpec) EqualVT(that *ProjectServiceActivationSpec) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if this.OrganizationId != that.OrganizationId {
+		return false
+	}
+	if this.ProjectId != that.ProjectId {
+		return false
+	}
+	if this.ServiceName != that.ServiceName {
+		return false
+	}
+	if this.Enabled != that.Enabled {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *ProjectServiceActivationSpec) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*ProjectServiceActivationSpec)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *ProjectServiceActivationStatus) EqualVT(that *ProjectServiceActivationStatus) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if !this.Status.EqualVT(that.Status) {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *ProjectServiceActivationStatus) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*ProjectServiceActivationStatus)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *ProjectServiceActivationList) EqualVT(that *ProjectServiceActivationList) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if len(this.Items) != len(that.Items) {
+		return false
+	}
+	for i, vx := range this.Items {
+		vy := that.Items[i]
+		if p, q := vx, vy; p != q {
+			if p == nil {
+				p = &ProjectServiceActivation{}
+			}
+			if q == nil {
+				q = &ProjectServiceActivation{}
+			}
+			if !p.EqualVT(q) {
+				return false
+			}
+		}
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *ProjectServiceActivationList) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*ProjectServiceActivationList)
 	if !ok {
 		return false
 	}
@@ -601,6 +910,263 @@ func (x *ProjectList) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the ProjectServiceActivation message to JSON.
+func (x *ProjectServiceActivation) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Type != nil || s.HasField("type") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("type")
+		x.Type.MarshalProtoJSON(s.WithField("type"))
+	}
+	if x.Metadata != nil || s.HasField("metadata") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("metadata")
+		x.Metadata.MarshalProtoJSON(s.WithField("metadata"))
+	}
+	if x.Spec != nil || s.HasField("spec") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("spec")
+		x.Spec.MarshalProtoJSON(s.WithField("spec"))
+	}
+	if x.Status != nil || s.HasField("status") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("status")
+		x.Status.MarshalProtoJSON(s.WithField("status"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ProjectServiceActivation to JSON.
+func (x *ProjectServiceActivation) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ProjectServiceActivation message from JSON.
+func (x *ProjectServiceActivation) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "type":
+			if s.ReadNil() {
+				x.Type = nil
+				return
+			}
+			x.Type = &v1.TypeMeta{}
+			x.Type.UnmarshalProtoJSON(s.WithField("type", true))
+		case "metadata":
+			if s.ReadNil() {
+				x.Metadata = nil
+				return
+			}
+			x.Metadata = &v1.ObjectMeta{}
+			x.Metadata.UnmarshalProtoJSON(s.WithField("metadata", true))
+		case "spec":
+			if s.ReadNil() {
+				x.Spec = nil
+				return
+			}
+			x.Spec = &ProjectServiceActivationSpec{}
+			x.Spec.UnmarshalProtoJSON(s.WithField("spec", true))
+		case "status":
+			if s.ReadNil() {
+				x.Status = nil
+				return
+			}
+			x.Status = &ProjectServiceActivationStatus{}
+			x.Status.UnmarshalProtoJSON(s.WithField("status", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ProjectServiceActivation from JSON.
+func (x *ProjectServiceActivation) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ProjectServiceActivationSpec message to JSON.
+func (x *ProjectServiceActivationSpec) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.OrganizationId != "" || s.HasField("organizationId") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("organizationId")
+		s.WriteString(x.OrganizationId)
+	}
+	if x.ProjectId != "" || s.HasField("projectId") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("projectId")
+		s.WriteString(x.ProjectId)
+	}
+	if x.ServiceName != "" || s.HasField("serviceName") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("serviceName")
+		s.WriteString(x.ServiceName)
+	}
+	if x.Enabled || s.HasField("enabled") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("enabled")
+		s.WriteBool(x.Enabled)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ProjectServiceActivationSpec to JSON.
+func (x *ProjectServiceActivationSpec) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ProjectServiceActivationSpec message from JSON.
+func (x *ProjectServiceActivationSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "organization_id", "organizationId":
+			s.AddField("organization_id")
+			x.OrganizationId = s.ReadString()
+		case "project_id", "projectId":
+			s.AddField("project_id")
+			x.ProjectId = s.ReadString()
+		case "service_name", "serviceName":
+			s.AddField("service_name")
+			x.ServiceName = s.ReadString()
+		case "enabled":
+			s.AddField("enabled")
+			x.Enabled = s.ReadBool()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ProjectServiceActivationSpec from JSON.
+func (x *ProjectServiceActivationSpec) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ProjectServiceActivationStatus message to JSON.
+func (x *ProjectServiceActivationStatus) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Status != nil || s.HasField("status") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("status")
+		x.Status.MarshalProtoJSON(s.WithField("status"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ProjectServiceActivationStatus to JSON.
+func (x *ProjectServiceActivationStatus) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ProjectServiceActivationStatus message from JSON.
+func (x *ProjectServiceActivationStatus) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "status":
+			if s.ReadNil() {
+				x.Status = nil
+				return
+			}
+			x.Status = &v11.Status{}
+			x.Status.UnmarshalProtoJSON(s.WithField("status", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ProjectServiceActivationStatus from JSON.
+func (x *ProjectServiceActivationStatus) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ProjectServiceActivationList message to JSON.
+func (x *ProjectServiceActivationList) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Items) > 0 || s.HasField("items") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("items")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Items {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("items"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ProjectServiceActivationList to JSON.
+func (x *ProjectServiceActivationList) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ProjectServiceActivationList message from JSON.
+func (x *ProjectServiceActivationList) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "items":
+			s.AddField("items")
+			if s.ReadNil() {
+				x.Items = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Items = append(x.Items, nil)
+					return
+				}
+				v := &ProjectServiceActivation{}
+				v.UnmarshalProtoJSON(s.WithField("items", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Items = append(x.Items, v)
+			})
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ProjectServiceActivationList from JSON.
+func (x *ProjectServiceActivationList) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 func (m *Project) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -837,6 +1403,235 @@ func (m *ProjectList) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *ProjectServiceActivation) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ProjectServiceActivation) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *ProjectServiceActivation) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Status != nil {
+		size, err := m.Status.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf2
+	}
+	if m.Spec != nil {
+		size, err := m.Spec.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa2
+	}
+	if m.Metadata != nil {
+		size, err := m.Metadata.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x52
+	}
+	if m.Type != nil {
+		size, err := m.Type.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ProjectServiceActivationSpec) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ProjectServiceActivationSpec) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *ProjectServiceActivationSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Enabled {
+		i--
+		if m.Enabled {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.ServiceName) > 0 {
+		i -= len(m.ServiceName)
+		copy(dAtA[i:], m.ServiceName)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ServiceName)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ProjectId) > 0 {
+		i -= len(m.ProjectId)
+		copy(dAtA[i:], m.ProjectId)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ProjectId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.OrganizationId) > 0 {
+		i -= len(m.OrganizationId)
+		copy(dAtA[i:], m.OrganizationId)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.OrganizationId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ProjectServiceActivationStatus) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ProjectServiceActivationStatus) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *ProjectServiceActivationStatus) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Status != nil {
+		size, err := m.Status.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ProjectServiceActivationList) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ProjectServiceActivationList) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *ProjectServiceActivationList) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.Items) > 0 {
+		for iNdEx := len(m.Items) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.Items[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *Project) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -907,6 +1702,87 @@ func (m *ProjectStatus) SizeVT() (n int) {
 }
 
 func (m *ProjectList) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Items) > 0 {
+		for _, e := range m.Items {
+			l = e.SizeVT()
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *ProjectServiceActivation) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Type != nil {
+		l = m.Type.SizeVT()
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.Metadata != nil {
+		l = m.Metadata.SizeVT()
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.Spec != nil {
+		l = m.Spec.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.Status != nil {
+		l = m.Status.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *ProjectServiceActivationSpec) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.OrganizationId)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ProjectId)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ServiceName)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.Enabled {
+		n += 2
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *ProjectServiceActivationStatus) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Status != nil {
+		l = m.Status.SizeVT()
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *ProjectServiceActivationList) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1330,6 +2206,418 @@ func (m *ProjectList) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Items = append(m.Items, &Project{})
+			if err := m.Items[len(m.Items)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectServiceActivation) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectServiceActivation: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectServiceActivation: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Type == nil {
+				m.Type = &v1.TypeMeta{}
+			}
+			if err := m.Type.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Metadata == nil {
+				m.Metadata = &v1.ObjectMeta{}
+			}
+			if err := m.Metadata.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 20:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Spec == nil {
+				m.Spec = &ProjectServiceActivationSpec{}
+			}
+			if err := m.Spec.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 30:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Status == nil {
+				m.Status = &ProjectServiceActivationStatus{}
+			}
+			if err := m.Status.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectServiceActivationSpec) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectServiceActivationSpec: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectServiceActivationSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OrganizationId", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OrganizationId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProjectId", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ProjectId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceName", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ServiceName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Enabled", wireType)
+			}
+			var v int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			v = int(_v)
+			if err != nil {
+				return err
+			}
+			m.Enabled = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectServiceActivationStatus) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectServiceActivationStatus: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectServiceActivationStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Status == nil {
+				m.Status = &v11.Status{}
+			}
+			if err := m.Status.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectServiceActivationList) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectServiceActivationList: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectServiceActivationList: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Items = append(m.Items, &ProjectServiceActivation{})
 			if err := m.Items[len(m.Items)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

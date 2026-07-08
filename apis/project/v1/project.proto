@@ -29,3 +29,25 @@ message ProjectStatus {
 message ProjectList {
   repeated Project items = 1;
 }
+
+message ProjectServiceActivation {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 10;
+  ProjectServiceActivationSpec spec = 20;
+  ProjectServiceActivationStatus status = 30;
+}
+
+message ProjectServiceActivationSpec {
+  string organization_id = 1;
+  string project_id = 2;
+  string service_name = 3;
+  bool enabled = 4;
+}
+
+message ProjectServiceActivationStatus {
+  status.v1.Status status = 1;
+}
+
+message ProjectServiceActivationList {
+  repeated ProjectServiceActivation items = 1;
+}
