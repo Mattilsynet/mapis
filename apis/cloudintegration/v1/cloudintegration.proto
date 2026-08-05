@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package cloudintegration.v1;
+
+import "google/protobuf/timestamp.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/cloudintegration/v1;cloudintegration";
+
+message CloudIntegration {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  CloudIntegrationSpec spec = 20;
+  CloudIntegrationStatus status = 30;
+}
+
+message CloudIntegrationSpec {
+  meta.v1.TypeMeta type = 1;
+
+  ResourceBinding resource_binding = 20;
+  CloudScope cloud_scope = 30;
+  Auth auth = 40;
+  ProviderConfig provider_config = 41;
+
+  bool enabled = 50;
+  repeated string capabilities = 51;
+
+  string project_id_prefix = 60;
+  map<string, string> labels = 61;
+}
+
+message ResourceBinding {
+  string organization_id = 1;
+  string cloud_name = 2;
+}
+
+message CloudScope {
+  // Boundary identifier managed by this integration.
+  // Reconciler must fail closed for resources outside this boundary subtree.
+  string boundary_id = 1;
+  ScopeType boundary_type = 2;
+}
+
+enum ScopeType {
+  SCOPE_TYPE_UNSPECIFIED = 0;
+  SCOPE_TYPE_FOLDER = 1;
+  SCOPE_TYPE_SUBSCRIPTION = 2;
+  SCOPE_TYPE_ACCOUNT = 3;
+  SCOPE_TYPE_TENANCY = 4;
+}
+
+message Auth {
+  AuthMode auth_mode = 1;
+  CredentialSource credential_source = 2;
+  string credential_ref = 3;
+}
+
+enum AuthMode {
+  AUTH_MODE_UNSPECIFIED = 0;
+  AUTH_MODE_SERVICE_ACCOUNT_JSON = 1;
+  AUTH_MODE_WORKLOAD_IDENTITY_FEDERATION = 2;
+  AUTH_MODE_PLATFORM_IDENTITY = 3;
+}
+
+enum CredentialSource {
+  CREDENTIAL_SOURCE_UNSPECIFIED = 0;
+  CREDENTIAL_SOURCE_GOOGLE_APPLICATION_CREDENTIALS = 1;
+  CREDENTIAL_SOURCE_SECRET_REF = 2;
+  CREDENTIAL_SOURCE_INLINE = 3;
+}
+
+message ProviderConfig {
+  oneof provider {
+    GcpConfig gcp = 1;
+    AwsConfig aws = 2;
+    OnPremConfig on_prem = 3;
+  }
+}
+
+message GcpConfig {
+  string folder_id = 1;
+}
+
+message AwsConfig {
+  string account_id = 1;
+}
+
+message OnPremConfig {
+  string environment_id = 1;
+}
+
+message CloudIntegrationStatus {
+  status.v1.Status status = 1;
+
+  string reconciler_reason = 20;
+  string reconciler_message = 21;
+  google.protobuf.Timestamp last_attempted_at = 22;
+  google.protobuf.Timestamp last_succeeded_at = 23;
+
+  StepState folder = 30;
+  StepState projects = 31;
+  StepState service_accounts = 32;
+  StepState iam = 33;
+}
+
+message StepState {
+  bool ready = 1;
+  string reason = 2;
+  string message = 3;
+  google.protobuf.Timestamp observed_at = 4;
+}
+
+message CloudIntegrationList {
+  repeated CloudIntegration items = 1;
+}
