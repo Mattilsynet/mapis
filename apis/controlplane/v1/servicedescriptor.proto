@@ -4,6 +4,7 @@ package controlplane.v1;
 
 import "buf/validate/validate.proto";
 import "iam/v1/permission.proto";
+import "iam/v1/rolebinding.proto";
 import "iam/v1/role.proto";
 import "meta/v1/meta.proto";
 import "status/v1/status.proto";
@@ -70,6 +71,10 @@ message ServiceDescriptorSpec {
   // templates may reference by name.
   repeated BuiltInPermissionFilter built_in_permission_filters = 32;
 
+  // built_in_role_bindings declares built-in rolebinding intent for managed
+  // defaults projected by reconciler.
+  repeated BuiltInRoleBinding built_in_role_bindings = 33;
+
   // v1 supports only APPLY semantics.
   // APPLY is authoritative desired-state reconciliation for descriptor-owned
   // built-in permissions and roles:
@@ -131,6 +136,22 @@ message BuiltInRoleTemplate {
 
   // References to named filters from spec.built_in_permission_filters.
   repeated string permission_filter_names = 11;
+
+  // bindability controls who may bind this role at runtime.
+  iam.v1.RoleBindability bindability = 12 [(buf.validate.field).enum.defined_only = true];
+}
+
+message BuiltInRoleBinding {
+  // rolebinding_name is optional explicit canonical name override.
+  string rolebinding_name = 1;
+
+  string resource_id = 2;
+
+  string role = 3;
+
+  repeated string members = 10;
+
+  iam.v1.RoleBindingMutationPolicy mutation_policy = 20 [(buf.validate.field).enum.defined_only = true];
 }
 
 message BuiltInPermissionFilter {

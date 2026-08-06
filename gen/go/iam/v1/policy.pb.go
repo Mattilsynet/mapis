@@ -64,7 +64,14 @@ func (x *Policy) GetStatus() *PolicyStatus {
 type PolicySpec struct {
 	unknownFields []byte
 	// resource_id - the resource this policy applies to
-	// Format: orgs/{org} OR orgs/{org}/projects/{project} OR orgs/{org}/projects/{project}/resources/{resource}
+	// Canonical format (ADR-0004 FQRN style), for example:
+	//
+	//	organization/global/all/organization/{org}
+	//	project/{org}/all/project/{project}
+	//	iam/{org}/all/role/{role}
+	//
+	// Note: proto validation only enforces non-empty value; canonical format
+	// is enforced by IAM service runtime validation.
 	ResourceId string `protobuf:"bytes,1,opt,name=resource_id,json=resourceId,proto3" json:"resourceId,omitempty"`
 	// required_roles - list of roles required to access this resource
 	// These roles are inherited by child resources in the hierarchy

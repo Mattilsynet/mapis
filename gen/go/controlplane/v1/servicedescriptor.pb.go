@@ -285,6 +285,9 @@ type ServiceDescriptorSpec struct {
 	// built_in_permission_filters declares reusable permission filters that role
 	// templates may reference by name.
 	BuiltInPermissionFilters []*BuiltInPermissionFilter `protobuf:"bytes,32,rep,name=built_in_permission_filters,json=builtInPermissionFilters,proto3" json:"builtInPermissionFilters,omitempty"`
+	// built_in_role_bindings declares built-in rolebinding intent for managed
+	// defaults projected by reconciler.
+	BuiltInRoleBindings []*BuiltInRoleBinding `protobuf:"bytes,33,rep,name=built_in_role_bindings,json=builtInRoleBindings,proto3" json:"builtInRoleBindings,omitempty"`
 	// v1 supports only APPLY semantics.
 	// APPLY is authoritative desired-state reconciliation for descriptor-owned
 	// built-in permissions and roles:
@@ -372,6 +375,13 @@ func (x *ServiceDescriptorSpec) GetBuiltInPermissionFilters() []*BuiltInPermissi
 	return nil
 }
 
+func (x *ServiceDescriptorSpec) GetBuiltInRoleBindings() []*BuiltInRoleBinding {
+	if x != nil {
+		return x.BuiltInRoleBindings
+	}
+	return nil
+}
+
 func (x *ServiceDescriptorSpec) GetMode() ReconciliationMode {
 	if x != nil {
 		return x.Mode
@@ -437,6 +447,8 @@ type BuiltInRoleTemplate struct {
 	PermissionFilters []*BuiltInPermissionFilter `protobuf:"bytes,10,rep,name=permission_filters,json=permissionFilters,proto3" json:"permissionFilters,omitempty"`
 	// References to named filters from spec.built_in_permission_filters.
 	PermissionFilterNames []string `protobuf:"bytes,11,rep,name=permission_filter_names,json=permissionFilterNames,proto3" json:"permissionFilterNames,omitempty"`
+	// bindability controls who may bind this role at runtime.
+	Bindability v11.RoleBindability `protobuf:"varint,12,opt,name=bindability,proto3" json:"bindability,omitempty"`
 }
 
 func (x *BuiltInRoleTemplate) Reset() {
@@ -478,6 +490,64 @@ func (x *BuiltInRoleTemplate) GetPermissionFilterNames() []string {
 		return x.PermissionFilterNames
 	}
 	return nil
+}
+
+func (x *BuiltInRoleTemplate) GetBindability() v11.RoleBindability {
+	if x != nil {
+		return x.Bindability
+	}
+	return v11.RoleBindability(0)
+}
+
+type BuiltInRoleBinding struct {
+	unknownFields []byte
+	// rolebinding_name is optional explicit canonical name override.
+	RolebindingName string                        `protobuf:"bytes,1,opt,name=rolebinding_name,json=rolebindingName,proto3" json:"rolebindingName,omitempty"`
+	ResourceId      string                        `protobuf:"bytes,2,opt,name=resource_id,json=resourceId,proto3" json:"resourceId,omitempty"`
+	Role            string                        `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`
+	Members         []string                      `protobuf:"bytes,10,rep,name=members,proto3" json:"members,omitempty"`
+	MutationPolicy  v11.RoleBindingMutationPolicy `protobuf:"varint,20,opt,name=mutation_policy,json=mutationPolicy,proto3" json:"mutationPolicy,omitempty"`
+}
+
+func (x *BuiltInRoleBinding) Reset() {
+	*x = BuiltInRoleBinding{}
+}
+
+func (*BuiltInRoleBinding) ProtoMessage() {}
+
+func (x *BuiltInRoleBinding) GetRolebindingName() string {
+	if x != nil {
+		return x.RolebindingName
+	}
+	return ""
+}
+
+func (x *BuiltInRoleBinding) GetResourceId() string {
+	if x != nil {
+		return x.ResourceId
+	}
+	return ""
+}
+
+func (x *BuiltInRoleBinding) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *BuiltInRoleBinding) GetMembers() []string {
+	if x != nil {
+		return x.Members
+	}
+	return nil
+}
+
+func (x *BuiltInRoleBinding) GetMutationPolicy() v11.RoleBindingMutationPolicy {
+	if x != nil {
+		return x.MutationPolicy
+	}
+	return v11.RoleBindingMutationPolicy(0)
 }
 
 type BuiltInPermissionFilter struct {
@@ -713,6 +783,12 @@ func (m *ServiceDescriptorSpec) CloneVT() *ServiceDescriptorSpec {
 			r.BuiltInPermissionFilters[k] = v.CloneVT()
 		}
 	}
+	if rhs := m.BuiltInRoleBindings; rhs != nil {
+		r.BuiltInRoleBindings = make([]*BuiltInRoleBinding, len(rhs))
+		for k, v := range rhs {
+			r.BuiltInRoleBindings[k] = v.CloneVT()
+		}
+	}
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = slices.Clone(m.unknownFields)
 	}
@@ -752,6 +828,7 @@ func (m *BuiltInRoleTemplate) CloneVT() *BuiltInRoleTemplate {
 	r.RoleName = m.RoleName
 	r.DisplayName = m.DisplayName
 	r.Description = m.Description
+	r.Bindability = m.Bindability
 	if rhs := m.PermissionFilters; rhs != nil {
 		r.PermissionFilters = make([]*BuiltInPermissionFilter, len(rhs))
 		for k, v := range rhs {
@@ -768,6 +845,28 @@ func (m *BuiltInRoleTemplate) CloneVT() *BuiltInRoleTemplate {
 }
 
 func (m *BuiltInRoleTemplate) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *BuiltInRoleBinding) CloneVT() *BuiltInRoleBinding {
+	if m == nil {
+		return (*BuiltInRoleBinding)(nil)
+	}
+	r := new(BuiltInRoleBinding)
+	r.RolebindingName = m.RolebindingName
+	r.ResourceId = m.ResourceId
+	r.Role = m.Role
+	r.MutationPolicy = m.MutationPolicy
+	if rhs := m.Members; rhs != nil {
+		r.Members = slices.Clone(rhs)
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *BuiltInRoleBinding) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
@@ -997,6 +1096,23 @@ func (this *ServiceDescriptorSpec) EqualVT(that *ServiceDescriptorSpec) bool {
 			}
 		}
 	}
+	if len(this.BuiltInRoleBindings) != len(that.BuiltInRoleBindings) {
+		return false
+	}
+	for i, vx := range this.BuiltInRoleBindings {
+		vy := that.BuiltInRoleBindings[i]
+		if p, q := vx, vy; p != q {
+			if p == nil {
+				p = &BuiltInRoleBinding{}
+			}
+			if q == nil {
+				q = &BuiltInRoleBinding{}
+			}
+			if !p.EqualVT(q) {
+				return false
+			}
+		}
+	}
 	if this.Mode != that.Mode {
 		return false
 	}
@@ -1088,11 +1204,51 @@ func (this *BuiltInRoleTemplate) EqualVT(that *BuiltInRoleTemplate) bool {
 			return false
 		}
 	}
+	if this.Bindability != that.Bindability {
+		return false
+	}
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
 func (this *BuiltInRoleTemplate) EqualMessageVT(thatMsg any) bool {
 	that, ok := thatMsg.(*BuiltInRoleTemplate)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *BuiltInRoleBinding) EqualVT(that *BuiltInRoleBinding) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if this.RolebindingName != that.RolebindingName {
+		return false
+	}
+	if this.ResourceId != that.ResourceId {
+		return false
+	}
+	if this.Role != that.Role {
+		return false
+	}
+	if len(this.Members) != len(that.Members) {
+		return false
+	}
+	for i, vx := range this.Members {
+		vy := that.Members[i]
+		if vx != vy {
+			return false
+		}
+	}
+	if this.MutationPolicy != that.MutationPolicy {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *BuiltInRoleBinding) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*BuiltInRoleBinding)
 	if !ok {
 		return false
 	}
@@ -1622,6 +1778,17 @@ func (x *ServiceDescriptorSpec) MarshalProtoJSON(s *json.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
+	if len(x.BuiltInRoleBindings) > 0 || s.HasField("builtInRoleBindings") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("builtInRoleBindings")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.BuiltInRoleBindings {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("builtInRoleBindings"))
+		}
+		s.WriteArrayEnd()
+	}
 	if x.Mode != 0 || s.HasField("mode") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("mode")
@@ -1754,6 +1921,24 @@ func (x *ServiceDescriptorSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 				}
 				x.BuiltInPermissionFilters = append(x.BuiltInPermissionFilters, v)
 			})
+		case "built_in_role_bindings", "builtInRoleBindings":
+			s.AddField("built_in_role_bindings")
+			if s.ReadNil() {
+				x.BuiltInRoleBindings = nil
+				return
+			}
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.BuiltInRoleBindings = append(x.BuiltInRoleBindings, nil)
+					return
+				}
+				v := &BuiltInRoleBinding{}
+				v.UnmarshalProtoJSON(s.WithField("built_in_role_bindings", false))
+				if s.Err() != nil {
+					return
+				}
+				x.BuiltInRoleBindings = append(x.BuiltInRoleBindings, v)
+			})
 		case "mode":
 			s.AddField("mode")
 			x.Mode.UnmarshalProtoJSON(s)
@@ -1882,6 +2067,11 @@ func (x *BuiltInRoleTemplate) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("permissionFilterNames")
 		s.WriteStringArray(x.PermissionFilterNames)
 	}
+	if x.Bindability != 0 || s.HasField("bindability") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("bindability")
+		x.Bindability.MarshalProtoJSON(s)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1933,12 +2123,93 @@ func (x *BuiltInRoleTemplate) UnmarshalProtoJSON(s *json.UnmarshalState) {
 				return
 			}
 			x.PermissionFilterNames = s.ReadStringArray()
+		case "bindability":
+			s.AddField("bindability")
+			x.Bindability.UnmarshalProtoJSON(s)
 		}
 	})
 }
 
 // UnmarshalJSON unmarshals the BuiltInRoleTemplate from JSON.
 func (x *BuiltInRoleTemplate) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the BuiltInRoleBinding message to JSON.
+func (x *BuiltInRoleBinding) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.RolebindingName != "" || s.HasField("rolebindingName") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rolebindingName")
+		s.WriteString(x.RolebindingName)
+	}
+	if x.ResourceId != "" || s.HasField("resourceId") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("resourceId")
+		s.WriteString(x.ResourceId)
+	}
+	if x.Role != "" || s.HasField("role") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("role")
+		s.WriteString(x.Role)
+	}
+	if len(x.Members) > 0 || s.HasField("members") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("members")
+		s.WriteStringArray(x.Members)
+	}
+	if x.MutationPolicy != 0 || s.HasField("mutationPolicy") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("mutationPolicy")
+		x.MutationPolicy.MarshalProtoJSON(s)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the BuiltInRoleBinding to JSON.
+func (x *BuiltInRoleBinding) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the BuiltInRoleBinding message from JSON.
+func (x *BuiltInRoleBinding) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "rolebinding_name", "rolebindingName":
+			s.AddField("rolebinding_name")
+			x.RolebindingName = s.ReadString()
+		case "resource_id", "resourceId":
+			s.AddField("resource_id")
+			x.ResourceId = s.ReadString()
+		case "role":
+			s.AddField("role")
+			x.Role = s.ReadString()
+		case "members":
+			s.AddField("members")
+			if s.ReadNil() {
+				x.Members = nil
+				return
+			}
+			x.Members = s.ReadStringArray()
+		case "mutation_policy", "mutationPolicy":
+			s.AddField("mutation_policy")
+			x.MutationPolicy.UnmarshalProtoJSON(s)
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the BuiltInRoleBinding from JSON.
+func (x *BuiltInRoleBinding) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -2369,6 +2640,20 @@ func (m *ServiceDescriptorSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error)
 		i--
 		dAtA[i] = 0xc0
 	}
+	if len(m.BuiltInRoleBindings) > 0 {
+		for iNdEx := len(m.BuiltInRoleBindings) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.BuiltInRoleBindings[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x2
+			i--
+			dAtA[i] = 0x8a
+		}
+	}
 	if len(m.BuiltInPermissionFilters) > 0 {
 		for iNdEx := len(m.BuiltInPermissionFilters) - 1; iNdEx >= 0; iNdEx-- {
 			size, err := m.BuiltInPermissionFilters[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
@@ -2565,6 +2850,11 @@ func (m *BuiltInRoleTemplate) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.Bindability != 0 {
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.Bindability))
+		i--
+		dAtA[i] = 0x60
+	}
 	if len(m.PermissionFilterNames) > 0 {
 		for iNdEx := len(m.PermissionFilterNames) - 1; iNdEx >= 0; iNdEx-- {
 			i -= len(m.PermissionFilterNames[iNdEx])
@@ -2604,6 +2894,76 @@ func (m *BuiltInRoleTemplate) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.RoleName)
 		copy(dAtA[i:], m.RoleName)
 		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.RoleName)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *BuiltInRoleBinding) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BuiltInRoleBinding) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *BuiltInRoleBinding) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.MutationPolicy != 0 {
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.MutationPolicy))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa0
+	}
+	if len(m.Members) > 0 {
+		for iNdEx := len(m.Members) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Members[iNdEx])
+			copy(dAtA[i:], m.Members[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Members[iNdEx])))
+			i--
+			dAtA[i] = 0x52
+		}
+	}
+	if len(m.Role) > 0 {
+		i -= len(m.Role)
+		copy(dAtA[i:], m.Role)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Role)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ResourceId) > 0 {
+		i -= len(m.ResourceId)
+		copy(dAtA[i:], m.ResourceId)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ResourceId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.RolebindingName) > 0 {
+		i -= len(m.RolebindingName)
+		copy(dAtA[i:], m.RolebindingName)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.RolebindingName)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -2949,6 +3309,12 @@ func (m *ServiceDescriptorSpec) SizeVT() (n int) {
 			n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 		}
 	}
+	if len(m.BuiltInRoleBindings) > 0 {
+		for _, e := range m.BuiltInRoleBindings {
+			l = e.SizeVT()
+			n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
 	if m.Mode != 0 {
 		n += 2 + protobuf_go_lite.SizeOfVarint(uint64(m.Mode))
 	}
@@ -3015,6 +3381,40 @@ func (m *BuiltInRoleTemplate) SizeVT() (n int) {
 			l = len(s)
 			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.Bindability != 0 {
+		n += 1 + protobuf_go_lite.SizeOfVarint(uint64(m.Bindability))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *BuiltInRoleBinding) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.RolebindingName)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ResourceId)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Role)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if len(m.Members) > 0 {
+		for _, s := range m.Members {
+			l = len(s)
+			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
+	if m.MutationPolicy != 0 {
+		n += 2 + protobuf_go_lite.SizeOfVarint(uint64(m.MutationPolicy))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -3521,6 +3921,32 @@ func (m *ServiceDescriptorSpec) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 33:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BuiltInRoleBindings", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BuiltInRoleBindings = append(m.BuiltInRoleBindings, &BuiltInRoleBinding{})
+			if err := m.BuiltInRoleBindings[len(m.BuiltInRoleBindings)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 40:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Mode", wireType)
@@ -3825,6 +4251,158 @@ func (m *BuiltInRoleTemplate) UnmarshalVT(dAtA []byte) error {
 			}
 			m.PermissionFilterNames = append(m.PermissionFilterNames, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
+		case 12:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Bindability", wireType)
+			}
+			m.Bindability = 0
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			m.Bindability = v11.RoleBindability(_v)
+			if err != nil {
+				return err
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BuiltInRoleBinding) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BuiltInRoleBinding: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BuiltInRoleBinding: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RolebindingName", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RolebindingName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceId", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ResourceId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Role", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Role = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Members", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Members = append(m.Members, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 20:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MutationPolicy", wireType)
+			}
+			m.MutationPolicy = 0
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			m.MutationPolicy = v11.RoleBindingMutationPolicy(_v)
+			if err != nil {
+				return err
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])

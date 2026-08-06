@@ -33,6 +33,28 @@ message RoleBindingSpec {
 
   // conditions - CEL expressions that must evaluate to true
   repeated Condition conditions = 20;
+
+  // owner marks system-managed rolebindings and their reconciler ownership.
+  RoleBindingOwner owner = 30;
+
+  // mutation_policy controls whether non-trusted callers may mutate this
+  // rolebinding.
+  RoleBindingMutationPolicy mutation_policy = 31 [(buf.validate.field).enum.defined_only = true];
+}
+
+message RoleBindingOwner {
+  // owner_ref identifies the owning resource identity, e.g.
+  // project/{org}/{project}/projectserviceactivation/{service}.
+  string owner_ref = 1;
+
+  // managed_by identifies the reconciler/controller owning lifecycle.
+  string managed_by = 2;
+}
+
+enum RoleBindingMutationPolicy {
+  ROLE_BINDING_MUTATION_POLICY_UNSPECIFIED = 0;
+  ROLE_BINDING_MUTATION_POLICY_MUTABLE = 1;
+  ROLE_BINDING_MUTATION_POLICY_IMMUTABLE = 2;
 }
 
 message RoleBindingStatus {

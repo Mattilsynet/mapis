@@ -14,7 +14,44 @@ import (
 	_ "github.com/aperturerobotics/protobuf-go-lite/types/known/durationpb"
 	io "io"
 	slices "slices"
+	strconv "strconv"
 )
+
+type RoleBindingMutationPolicy int32
+
+const (
+	RoleBindingMutationPolicy_ROLE_BINDING_MUTATION_POLICY_UNSPECIFIED RoleBindingMutationPolicy = 0
+	RoleBindingMutationPolicy_ROLE_BINDING_MUTATION_POLICY_MUTABLE     RoleBindingMutationPolicy = 1
+	RoleBindingMutationPolicy_ROLE_BINDING_MUTATION_POLICY_IMMUTABLE   RoleBindingMutationPolicy = 2
+)
+
+// Enum value maps for RoleBindingMutationPolicy.
+var (
+	RoleBindingMutationPolicy_name = map[int32]string{
+		0: "ROLE_BINDING_MUTATION_POLICY_UNSPECIFIED",
+		1: "ROLE_BINDING_MUTATION_POLICY_MUTABLE",
+		2: "ROLE_BINDING_MUTATION_POLICY_IMMUTABLE",
+	}
+	RoleBindingMutationPolicy_value = map[string]int32{
+		"ROLE_BINDING_MUTATION_POLICY_UNSPECIFIED": 0,
+		"ROLE_BINDING_MUTATION_POLICY_MUTABLE":     1,
+		"ROLE_BINDING_MUTATION_POLICY_IMMUTABLE":   2,
+	}
+)
+
+func (x RoleBindingMutationPolicy) Enum() *RoleBindingMutationPolicy {
+	p := new(RoleBindingMutationPolicy)
+	*p = x
+	return p
+}
+
+func (x RoleBindingMutationPolicy) String() string {
+	name, valid := RoleBindingMutationPolicy_name[int32(x)]
+	if valid {
+		return name
+	}
+	return strconv.Itoa(int(x))
+}
 
 // RoleBinding - grants a role to users/groups for a specific resource
 // metadata.name = user-provided unique identifier
@@ -73,6 +110,11 @@ type RoleBindingSpec struct {
 	Members []string `protobuf:"bytes,10,rep,name=members,proto3" json:"members,omitempty"`
 	// conditions - CEL expressions that must evaluate to true
 	Conditions []*Condition `protobuf:"bytes,20,rep,name=conditions,proto3" json:"conditions,omitempty"`
+	// owner marks system-managed rolebindings and their reconciler ownership.
+	Owner *RoleBindingOwner `protobuf:"bytes,30,opt,name=owner,proto3" json:"owner,omitempty"`
+	// mutation_policy controls whether non-trusted callers may mutate this
+	// rolebinding.
+	MutationPolicy RoleBindingMutationPolicy `protobuf:"varint,31,opt,name=mutation_policy,json=mutationPolicy,proto3" json:"mutationPolicy,omitempty"`
 }
 
 func (x *RoleBindingSpec) Reset() {
@@ -107,6 +149,49 @@ func (x *RoleBindingSpec) GetConditions() []*Condition {
 		return x.Conditions
 	}
 	return nil
+}
+
+func (x *RoleBindingSpec) GetOwner() *RoleBindingOwner {
+	if x != nil {
+		return x.Owner
+	}
+	return nil
+}
+
+func (x *RoleBindingSpec) GetMutationPolicy() RoleBindingMutationPolicy {
+	if x != nil {
+		return x.MutationPolicy
+	}
+	return RoleBindingMutationPolicy_ROLE_BINDING_MUTATION_POLICY_UNSPECIFIED
+}
+
+type RoleBindingOwner struct {
+	unknownFields []byte
+	// owner_ref identifies the owning resource identity, e.g.
+	// project/{org}/{project}/projectserviceactivation/{service}.
+	OwnerRef string `protobuf:"bytes,1,opt,name=owner_ref,json=ownerRef,proto3" json:"ownerRef,omitempty"`
+	// managed_by identifies the reconciler/controller owning lifecycle.
+	ManagedBy string `protobuf:"bytes,2,opt,name=managed_by,json=managedBy,proto3" json:"managedBy,omitempty"`
+}
+
+func (x *RoleBindingOwner) Reset() {
+	*x = RoleBindingOwner{}
+}
+
+func (*RoleBindingOwner) ProtoMessage() {}
+
+func (x *RoleBindingOwner) GetOwnerRef() string {
+	if x != nil {
+		return x.OwnerRef
+	}
+	return ""
+}
+
+func (x *RoleBindingOwner) GetManagedBy() string {
+	if x != nil {
+		return x.ManagedBy
+	}
+	return ""
 }
 
 type RoleBindingStatus struct {
@@ -183,6 +268,8 @@ func (m *RoleBindingSpec) CloneVT() *RoleBindingSpec {
 	r := new(RoleBindingSpec)
 	r.ResourceId = m.ResourceId
 	r.Role = m.Role
+	r.Owner = m.Owner.CloneVT()
+	r.MutationPolicy = m.MutationPolicy
 	if rhs := m.Members; rhs != nil {
 		r.Members = slices.Clone(rhs)
 	}
@@ -199,6 +286,23 @@ func (m *RoleBindingSpec) CloneVT() *RoleBindingSpec {
 }
 
 func (m *RoleBindingSpec) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *RoleBindingOwner) CloneVT() *RoleBindingOwner {
+	if m == nil {
+		return (*RoleBindingOwner)(nil)
+	}
+	r := new(RoleBindingOwner)
+	r.OwnerRef = m.OwnerRef
+	r.ManagedBy = m.ManagedBy
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *RoleBindingOwner) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
@@ -308,11 +412,39 @@ func (this *RoleBindingSpec) EqualVT(that *RoleBindingSpec) bool {
 			}
 		}
 	}
+	if !this.Owner.EqualVT(that.Owner) {
+		return false
+	}
+	if this.MutationPolicy != that.MutationPolicy {
+		return false
+	}
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
 func (this *RoleBindingSpec) EqualMessageVT(thatMsg any) bool {
 	that, ok := thatMsg.(*RoleBindingSpec)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *RoleBindingOwner) EqualVT(that *RoleBindingOwner) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if this.OwnerRef != that.OwnerRef {
+		return false
+	}
+	if this.ManagedBy != that.ManagedBy {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *RoleBindingOwner) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*RoleBindingOwner)
 	if !ok {
 		return false
 	}
@@ -372,6 +504,46 @@ func (this *RoleBindingList) EqualMessageVT(thatMsg any) bool {
 		return false
 	}
 	return this.EqualVT(that)
+}
+
+// MarshalProtoJSON marshals the RoleBindingMutationPolicy to JSON.
+func (x RoleBindingMutationPolicy) MarshalProtoJSON(s *json.MarshalState) {
+	s.WriteEnum(int32(x), RoleBindingMutationPolicy_name)
+}
+
+// MarshalText marshals the RoleBindingMutationPolicy to text.
+func (x RoleBindingMutationPolicy) MarshalText() ([]byte, error) {
+	return []byte(json.GetEnumString(int32(x), RoleBindingMutationPolicy_name)), nil
+}
+
+// MarshalJSON marshals the RoleBindingMutationPolicy to JSON.
+func (x RoleBindingMutationPolicy) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RoleBindingMutationPolicy from JSON.
+func (x *RoleBindingMutationPolicy) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	v := s.ReadEnum(RoleBindingMutationPolicy_value)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read RoleBindingMutationPolicy enum: %v", err)
+		return
+	}
+	*x = RoleBindingMutationPolicy(v)
+}
+
+// UnmarshalText unmarshals the RoleBindingMutationPolicy from text.
+func (x *RoleBindingMutationPolicy) UnmarshalText(b []byte) error {
+	i, err := json.ParseEnumString(string(b), RoleBindingMutationPolicy_value)
+	if err != nil {
+		return err
+	}
+	*x = RoleBindingMutationPolicy(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the RoleBindingMutationPolicy from JSON.
+func (x *RoleBindingMutationPolicy) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the RoleBinding message to JSON.
@@ -490,6 +662,16 @@ func (x *RoleBindingSpec) MarshalProtoJSON(s *json.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
+	if x.Owner != nil || s.HasField("owner") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("owner")
+		x.Owner.MarshalProtoJSON(s.WithField("owner"))
+	}
+	if x.MutationPolicy != 0 || s.HasField("mutationPolicy") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("mutationPolicy")
+		x.MutationPolicy.MarshalProtoJSON(s)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -538,12 +720,72 @@ func (x *RoleBindingSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 				}
 				x.Conditions = append(x.Conditions, v)
 			})
+		case "owner":
+			if s.ReadNil() {
+				x.Owner = nil
+				return
+			}
+			x.Owner = &RoleBindingOwner{}
+			x.Owner.UnmarshalProtoJSON(s.WithField("owner", true))
+		case "mutation_policy", "mutationPolicy":
+			s.AddField("mutation_policy")
+			x.MutationPolicy.UnmarshalProtoJSON(s)
 		}
 	})
 }
 
 // UnmarshalJSON unmarshals the RoleBindingSpec from JSON.
 func (x *RoleBindingSpec) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the RoleBindingOwner message to JSON.
+func (x *RoleBindingOwner) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.OwnerRef != "" || s.HasField("ownerRef") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ownerRef")
+		s.WriteString(x.OwnerRef)
+	}
+	if x.ManagedBy != "" || s.HasField("managedBy") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("managedBy")
+		s.WriteString(x.ManagedBy)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the RoleBindingOwner to JSON.
+func (x *RoleBindingOwner) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the RoleBindingOwner message from JSON.
+func (x *RoleBindingOwner) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "owner_ref", "ownerRef":
+			s.AddField("owner_ref")
+			x.OwnerRef = s.ReadString()
+		case "managed_by", "managedBy":
+			s.AddField("managed_by")
+			x.ManagedBy = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the RoleBindingOwner from JSON.
+func (x *RoleBindingOwner) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -771,6 +1013,25 @@ func (m *RoleBindingSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MutationPolicy != 0 {
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.MutationPolicy))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf8
+	}
+	if m.Owner != nil {
+		size, err := m.Owner.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf2
+	}
 	if len(m.Conditions) > 0 {
 		for iNdEx := len(m.Conditions) - 1; iNdEx >= 0; iNdEx-- {
 			size, err := m.Conditions[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
@@ -805,6 +1066,53 @@ func (m *RoleBindingSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.ResourceId)
 		copy(dAtA[i:], m.ResourceId)
 		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ResourceId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RoleBindingOwner) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RoleBindingOwner) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *RoleBindingOwner) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.ManagedBy) > 0 {
+		i -= len(m.ManagedBy)
+		copy(dAtA[i:], m.ManagedBy)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ManagedBy)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.OwnerRef) > 0 {
+		i -= len(m.OwnerRef)
+		copy(dAtA[i:], m.OwnerRef)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.OwnerRef)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -961,6 +1269,31 @@ func (m *RoleBindingSpec) SizeVT() (n int) {
 			l = e.SizeVT()
 			n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.Owner != nil {
+		l = m.Owner.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.MutationPolicy != 0 {
+		n += 2 + protobuf_go_lite.SizeOfVarint(uint64(m.MutationPolicy))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *RoleBindingOwner) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.OwnerRef)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ManagedBy)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -1265,6 +1598,131 @@ func (m *RoleBindingSpec) UnmarshalVT(dAtA []byte) error {
 			if err := m.Conditions[len(m.Conditions)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 30:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Owner", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Owner == nil {
+				m.Owner = &RoleBindingOwner{}
+			}
+			if err := m.Owner.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 31:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MutationPolicy", wireType)
+			}
+			m.MutationPolicy = 0
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			m.MutationPolicy = RoleBindingMutationPolicy(_v)
+			if err != nil {
+				return err
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RoleBindingOwner) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RoleBindingOwner: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RoleBindingOwner: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnerRef", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OwnerRef = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ManagedBy", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ManagedBy = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

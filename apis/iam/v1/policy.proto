@@ -20,7 +20,12 @@ message Policy {
 
 message PolicySpec {
   // resource_id - the resource this policy applies to
-  // Format: orgs/{org} OR orgs/{org}/projects/{project} OR orgs/{org}/projects/{project}/resources/{resource}
+  // Canonical format (ADR-0004 FQRN style), for example:
+  //   organization/global/all/organization/{org}
+  //   project/{org}/all/project/{project}
+  //   iam/{org}/all/role/{role}
+  // Note: proto validation only enforces non-empty value; canonical format
+  // is enforced by IAM service runtime validation.
   string resource_id = 1 [(buf.validate.field).string.min_len = 1];
 
   // required_roles - list of roles required to access this resource
@@ -38,4 +43,3 @@ message PolicyStatus {
 message PolicyList {
   repeated Policy items = 1;
 }
-

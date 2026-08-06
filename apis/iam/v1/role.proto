@@ -24,8 +24,9 @@ message RoleSpec {
   // description - human-readable description
   string description = 2;
 
-  // permissions - list of permission names (references to iam.permission.{name})
-  // Format: resource:action (e.g., "projects:read", "secrets:write")
+  // permissions - list of permission identifiers referenced by this role.
+  // Canonical IAM permission names use dotted action notation (for example
+  // "iam.role.read", "iam.rolebinding.create", "dns.zone.update").
   repeated string permissions = 10 [(buf.validate.field).string.min_len = 1];
 
   // external_id - ZITADEL role ID (populated during sync)

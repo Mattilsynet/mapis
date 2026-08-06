@@ -91,7 +91,14 @@ func (x *UserPermissionSpec) GetPermissions() []*RoleAssignment {
 type RoleAssignment struct {
 	unknownFields []byte
 	// resource_id - the target resource this role grants access to
-	// Format: orgs/{org}/projects/{project}/resources/{resource}
+	// Canonical format (ADR-0004 FQRN style), for example:
+	//
+	//	organization/global/all/organization/{org}
+	//	project/{org}/all/project/{project}
+	//	iam/{org}/all/role/{role}
+	//
+	// Note: proto validation only enforces non-empty value; canonical format
+	// is enforced by IAM service runtime validation.
 	ResourceId string `protobuf:"bytes,1,opt,name=resource_id,json=resourceId,proto3" json:"resourceId,omitempty"`
 	// role - the role name being granted
 	Role string `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`
@@ -207,8 +214,9 @@ func (x *ServiceUserPermission) GetStatus() *ServiceUserPermissionStatus {
 
 type ServiceUserPermissionSpec struct {
 	unknownFields []byte
-	// service_user_name - the service user principal name
-	// Format: serviceuser@{org}.{domain} (e.g., serviceuser@acme.example.com)
+	// service_user_name - canonical service user member identifier in
+	// `{name}@{org}` form as carried by rolebinding members (for example
+	// "bootstrap-su@mapv2").
 	ServiceUserName string `protobuf:"bytes,1,opt,name=service_user_name,json=serviceUserName,proto3" json:"serviceUserName,omitempty"`
 	// permissions - list of role assignments granted to this service user
 	Permissions []*RoleAssignment `protobuf:"bytes,10,rep,name=permissions,proto3" json:"permissions,omitempty"`

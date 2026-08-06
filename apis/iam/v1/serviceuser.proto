@@ -33,6 +33,28 @@ message ServiceUserSpec {
   
   // is_active - if false, the service user is disabled
   bool is_active = 4;
+
+  // owner marks system-managed service users and their reconciler ownership.
+  ServiceUserOwner owner = 30;
+
+  // mutation_policy controls whether non-trusted callers may mutate this
+  // service user.
+  ServiceUserMutationPolicy mutation_policy = 31 [(buf.validate.field).enum.defined_only = true];
+}
+
+message ServiceUserOwner {
+  // owner_ref identifies the owning resource identity, e.g.
+  // project/{org}/{project}/projectserviceactivation/{service}.
+  string owner_ref = 1;
+
+  // managed_by identifies the reconciler/controller owning lifecycle.
+  string managed_by = 2;
+}
+
+enum ServiceUserMutationPolicy {
+  SERVICE_USER_MUTATION_POLICY_UNSPECIFIED = 0;
+  SERVICE_USER_MUTATION_POLICY_MUTABLE = 1;
+  SERVICE_USER_MUTATION_POLICY_IMMUTABLE = 2;
 }
 
 message ServiceUserStatus {

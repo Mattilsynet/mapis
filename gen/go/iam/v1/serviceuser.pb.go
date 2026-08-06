@@ -14,7 +14,44 @@ import (
 	timestamppb "github.com/aperturerobotics/protobuf-go-lite/types/known/timestamppb"
 	io "io"
 	slices "slices"
+	strconv "strconv"
 )
+
+type ServiceUserMutationPolicy int32
+
+const (
+	ServiceUserMutationPolicy_SERVICE_USER_MUTATION_POLICY_UNSPECIFIED ServiceUserMutationPolicy = 0
+	ServiceUserMutationPolicy_SERVICE_USER_MUTATION_POLICY_MUTABLE     ServiceUserMutationPolicy = 1
+	ServiceUserMutationPolicy_SERVICE_USER_MUTATION_POLICY_IMMUTABLE   ServiceUserMutationPolicy = 2
+)
+
+// Enum value maps for ServiceUserMutationPolicy.
+var (
+	ServiceUserMutationPolicy_name = map[int32]string{
+		0: "SERVICE_USER_MUTATION_POLICY_UNSPECIFIED",
+		1: "SERVICE_USER_MUTATION_POLICY_MUTABLE",
+		2: "SERVICE_USER_MUTATION_POLICY_IMMUTABLE",
+	}
+	ServiceUserMutationPolicy_value = map[string]int32{
+		"SERVICE_USER_MUTATION_POLICY_UNSPECIFIED": 0,
+		"SERVICE_USER_MUTATION_POLICY_MUTABLE":     1,
+		"SERVICE_USER_MUTATION_POLICY_IMMUTABLE":   2,
+	}
+)
+
+func (x ServiceUserMutationPolicy) Enum() *ServiceUserMutationPolicy {
+	p := new(ServiceUserMutationPolicy)
+	*p = x
+	return p
+}
+
+func (x ServiceUserMutationPolicy) String() string {
+	name, valid := ServiceUserMutationPolicy_name[int32(x)]
+	if valid {
+		return name
+	}
+	return strconv.Itoa(int(x))
+}
 
 // ServiceUser - a machine identity for API access
 // metadata.name = service user principal name (global unique)
@@ -74,6 +111,11 @@ type ServiceUserSpec struct {
 	DisplayName string `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"displayName,omitempty"`
 	// is_active - if false, the service user is disabled
 	IsActive bool `protobuf:"varint,4,opt,name=is_active,json=isActive,proto3" json:"isActive,omitempty"`
+	// owner marks system-managed service users and their reconciler ownership.
+	Owner *ServiceUserOwner `protobuf:"bytes,30,opt,name=owner,proto3" json:"owner,omitempty"`
+	// mutation_policy controls whether non-trusted callers may mutate this
+	// service user.
+	MutationPolicy ServiceUserMutationPolicy `protobuf:"varint,31,opt,name=mutation_policy,json=mutationPolicy,proto3" json:"mutationPolicy,omitempty"`
 }
 
 func (x *ServiceUserSpec) Reset() {
@@ -108,6 +150,49 @@ func (x *ServiceUserSpec) GetIsActive() bool {
 		return x.IsActive
 	}
 	return false
+}
+
+func (x *ServiceUserSpec) GetOwner() *ServiceUserOwner {
+	if x != nil {
+		return x.Owner
+	}
+	return nil
+}
+
+func (x *ServiceUserSpec) GetMutationPolicy() ServiceUserMutationPolicy {
+	if x != nil {
+		return x.MutationPolicy
+	}
+	return ServiceUserMutationPolicy_SERVICE_USER_MUTATION_POLICY_UNSPECIFIED
+}
+
+type ServiceUserOwner struct {
+	unknownFields []byte
+	// owner_ref identifies the owning resource identity, e.g.
+	// project/{org}/{project}/projectserviceactivation/{service}.
+	OwnerRef string `protobuf:"bytes,1,opt,name=owner_ref,json=ownerRef,proto3" json:"ownerRef,omitempty"`
+	// managed_by identifies the reconciler/controller owning lifecycle.
+	ManagedBy string `protobuf:"bytes,2,opt,name=managed_by,json=managedBy,proto3" json:"managedBy,omitempty"`
+}
+
+func (x *ServiceUserOwner) Reset() {
+	*x = ServiceUserOwner{}
+}
+
+func (*ServiceUserOwner) ProtoMessage() {}
+
+func (x *ServiceUserOwner) GetOwnerRef() string {
+	if x != nil {
+		return x.OwnerRef
+	}
+	return ""
+}
+
+func (x *ServiceUserOwner) GetManagedBy() string {
+	if x != nil {
+		return x.ManagedBy
+	}
+	return ""
 }
 
 type ServiceUserStatus struct {
@@ -196,6 +281,8 @@ func (m *ServiceUserSpec) CloneVT() *ServiceUserSpec {
 	r.Description = m.Description
 	r.DisplayName = m.DisplayName
 	r.IsActive = m.IsActive
+	r.Owner = m.Owner.CloneVT()
+	r.MutationPolicy = m.MutationPolicy
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = slices.Clone(m.unknownFields)
 	}
@@ -203,6 +290,23 @@ func (m *ServiceUserSpec) CloneVT() *ServiceUserSpec {
 }
 
 func (m *ServiceUserSpec) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *ServiceUserOwner) CloneVT() *ServiceUserOwner {
+	if m == nil {
+		return (*ServiceUserOwner)(nil)
+	}
+	r := new(ServiceUserOwner)
+	r.OwnerRef = m.OwnerRef
+	r.ManagedBy = m.ManagedBy
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *ServiceUserOwner) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
@@ -295,11 +399,39 @@ func (this *ServiceUserSpec) EqualVT(that *ServiceUserSpec) bool {
 	if this.IsActive != that.IsActive {
 		return false
 	}
+	if !this.Owner.EqualVT(that.Owner) {
+		return false
+	}
+	if this.MutationPolicy != that.MutationPolicy {
+		return false
+	}
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
 func (this *ServiceUserSpec) EqualMessageVT(thatMsg any) bool {
 	that, ok := thatMsg.(*ServiceUserSpec)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *ServiceUserOwner) EqualVT(that *ServiceUserOwner) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if this.OwnerRef != that.OwnerRef {
+		return false
+	}
+	if this.ManagedBy != that.ManagedBy {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *ServiceUserOwner) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*ServiceUserOwner)
 	if !ok {
 		return false
 	}
@@ -362,6 +494,46 @@ func (this *ServiceUserList) EqualMessageVT(thatMsg any) bool {
 		return false
 	}
 	return this.EqualVT(that)
+}
+
+// MarshalProtoJSON marshals the ServiceUserMutationPolicy to JSON.
+func (x ServiceUserMutationPolicy) MarshalProtoJSON(s *json.MarshalState) {
+	s.WriteEnum(int32(x), ServiceUserMutationPolicy_name)
+}
+
+// MarshalText marshals the ServiceUserMutationPolicy to text.
+func (x ServiceUserMutationPolicy) MarshalText() ([]byte, error) {
+	return []byte(json.GetEnumString(int32(x), ServiceUserMutationPolicy_name)), nil
+}
+
+// MarshalJSON marshals the ServiceUserMutationPolicy to JSON.
+func (x ServiceUserMutationPolicy) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ServiceUserMutationPolicy from JSON.
+func (x *ServiceUserMutationPolicy) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	v := s.ReadEnum(ServiceUserMutationPolicy_value)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read ServiceUserMutationPolicy enum: %v", err)
+		return
+	}
+	*x = ServiceUserMutationPolicy(v)
+}
+
+// UnmarshalText unmarshals the ServiceUserMutationPolicy from text.
+func (x *ServiceUserMutationPolicy) UnmarshalText(b []byte) error {
+	i, err := json.ParseEnumString(string(b), ServiceUserMutationPolicy_value)
+	if err != nil {
+		return err
+	}
+	*x = ServiceUserMutationPolicy(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the ServiceUserMutationPolicy from JSON.
+func (x *ServiceUserMutationPolicy) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the ServiceUser message to JSON.
@@ -474,6 +646,16 @@ func (x *ServiceUserSpec) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("isActive")
 		s.WriteBool(x.IsActive)
 	}
+	if x.Owner != nil || s.HasField("owner") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("owner")
+		x.Owner.MarshalProtoJSON(s.WithField("owner"))
+	}
+	if x.MutationPolicy != 0 || s.HasField("mutationPolicy") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("mutationPolicy")
+		x.MutationPolicy.MarshalProtoJSON(s)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -503,12 +685,72 @@ func (x *ServiceUserSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 		case "is_active", "isActive":
 			s.AddField("is_active")
 			x.IsActive = s.ReadBool()
+		case "owner":
+			if s.ReadNil() {
+				x.Owner = nil
+				return
+			}
+			x.Owner = &ServiceUserOwner{}
+			x.Owner.UnmarshalProtoJSON(s.WithField("owner", true))
+		case "mutation_policy", "mutationPolicy":
+			s.AddField("mutation_policy")
+			x.MutationPolicy.UnmarshalProtoJSON(s)
 		}
 	})
 }
 
 // UnmarshalJSON unmarshals the ServiceUserSpec from JSON.
 func (x *ServiceUserSpec) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ServiceUserOwner message to JSON.
+func (x *ServiceUserOwner) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.OwnerRef != "" || s.HasField("ownerRef") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ownerRef")
+		s.WriteString(x.OwnerRef)
+	}
+	if x.ManagedBy != "" || s.HasField("managedBy") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("managedBy")
+		s.WriteString(x.ManagedBy)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ServiceUserOwner to JSON.
+func (x *ServiceUserOwner) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ServiceUserOwner message from JSON.
+func (x *ServiceUserOwner) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "owner_ref", "ownerRef":
+			s.AddField("owner_ref")
+			x.OwnerRef = s.ReadString()
+		case "managed_by", "managedBy":
+			s.AddField("managed_by")
+			x.ManagedBy = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ServiceUserOwner from JSON.
+func (x *ServiceUserOwner) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -748,6 +990,25 @@ func (m *ServiceUserSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MutationPolicy != 0 {
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.MutationPolicy))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf8
+	}
+	if m.Owner != nil {
+		size, err := m.Owner.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf2
+	}
 	if m.IsActive {
 		i--
 		if m.IsActive {
@@ -776,6 +1037,53 @@ func (m *ServiceUserSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.Name)
 		copy(dAtA[i:], m.Name)
 		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ServiceUserOwner) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ServiceUserOwner) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *ServiceUserOwner) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.ManagedBy) > 0 {
+		i -= len(m.ManagedBy)
+		copy(dAtA[i:], m.ManagedBy)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ManagedBy)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.OwnerRef) > 0 {
+		i -= len(m.OwnerRef)
+		copy(dAtA[i:], m.OwnerRef)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.OwnerRef)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -939,6 +1247,31 @@ func (m *ServiceUserSpec) SizeVT() (n int) {
 	}
 	if m.IsActive {
 		n += 2
+	}
+	if m.Owner != nil {
+		l = m.Owner.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.MutationPolicy != 0 {
+		n += 2 + protobuf_go_lite.SizeOfVarint(uint64(m.MutationPolicy))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *ServiceUserOwner) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.OwnerRef)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ManagedBy)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -1234,6 +1567,131 @@ func (m *ServiceUserSpec) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			m.IsActive = bool(v != 0)
+		case 30:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Owner", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Owner == nil {
+				m.Owner = &ServiceUserOwner{}
+			}
+			if err := m.Owner.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 31:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MutationPolicy", wireType)
+			}
+			m.MutationPolicy = 0
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			m.MutationPolicy = ServiceUserMutationPolicy(_v)
+			if err != nil {
+				return err
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ServiceUserOwner) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ServiceUserOwner: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ServiceUserOwner: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnerRef", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OwnerRef = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ManagedBy", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ManagedBy = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
