@@ -28,6 +28,7 @@ message CloudIntegrationSpec {
 
   string project_id_prefix = 60;
   map<string, string> labels = 61;
+  repeated string mirror_project_ids = 62;
 }
 
 message ResourceBinding {
