@@ -10,130 +10,10 @@ import (
 	v11 "github.com/Mattilsynet/mapis/gen/go/status/v1"
 	protobuf_go_lite "github.com/aperturerobotics/protobuf-go-lite"
 	json "github.com/aperturerobotics/protobuf-go-lite/json"
+	anypb "github.com/aperturerobotics/protobuf-go-lite/types/known/anypb"
 	timestamppb "github.com/aperturerobotics/protobuf-go-lite/types/known/timestamppb"
 	io "io"
-	strconv "strconv"
 )
-
-type ScopeType int32
-
-const (
-	ScopeType_SCOPE_TYPE_UNSPECIFIED  ScopeType = 0
-	ScopeType_SCOPE_TYPE_FOLDER       ScopeType = 1
-	ScopeType_SCOPE_TYPE_SUBSCRIPTION ScopeType = 2
-	ScopeType_SCOPE_TYPE_ACCOUNT      ScopeType = 3
-	ScopeType_SCOPE_TYPE_TENANCY      ScopeType = 4
-)
-
-// Enum value maps for ScopeType.
-var (
-	ScopeType_name = map[int32]string{
-		0: "SCOPE_TYPE_UNSPECIFIED",
-		1: "SCOPE_TYPE_FOLDER",
-		2: "SCOPE_TYPE_SUBSCRIPTION",
-		3: "SCOPE_TYPE_ACCOUNT",
-		4: "SCOPE_TYPE_TENANCY",
-	}
-	ScopeType_value = map[string]int32{
-		"SCOPE_TYPE_UNSPECIFIED":  0,
-		"SCOPE_TYPE_FOLDER":       1,
-		"SCOPE_TYPE_SUBSCRIPTION": 2,
-		"SCOPE_TYPE_ACCOUNT":      3,
-		"SCOPE_TYPE_TENANCY":      4,
-	}
-)
-
-func (x ScopeType) Enum() *ScopeType {
-	p := new(ScopeType)
-	*p = x
-	return p
-}
-
-func (x ScopeType) String() string {
-	name, valid := ScopeType_name[int32(x)]
-	if valid {
-		return name
-	}
-	return strconv.Itoa(int(x))
-}
-
-type AuthMode int32
-
-const (
-	AuthMode_AUTH_MODE_UNSPECIFIED                  AuthMode = 0
-	AuthMode_AUTH_MODE_SERVICE_ACCOUNT_JSON         AuthMode = 1
-	AuthMode_AUTH_MODE_WORKLOAD_IDENTITY_FEDERATION AuthMode = 2
-	AuthMode_AUTH_MODE_PLATFORM_IDENTITY            AuthMode = 3
-)
-
-// Enum value maps for AuthMode.
-var (
-	AuthMode_name = map[int32]string{
-		0: "AUTH_MODE_UNSPECIFIED",
-		1: "AUTH_MODE_SERVICE_ACCOUNT_JSON",
-		2: "AUTH_MODE_WORKLOAD_IDENTITY_FEDERATION",
-		3: "AUTH_MODE_PLATFORM_IDENTITY",
-	}
-	AuthMode_value = map[string]int32{
-		"AUTH_MODE_UNSPECIFIED":                  0,
-		"AUTH_MODE_SERVICE_ACCOUNT_JSON":         1,
-		"AUTH_MODE_WORKLOAD_IDENTITY_FEDERATION": 2,
-		"AUTH_MODE_PLATFORM_IDENTITY":            3,
-	}
-)
-
-func (x AuthMode) Enum() *AuthMode {
-	p := new(AuthMode)
-	*p = x
-	return p
-}
-
-func (x AuthMode) String() string {
-	name, valid := AuthMode_name[int32(x)]
-	if valid {
-		return name
-	}
-	return strconv.Itoa(int(x))
-}
-
-type CredentialSource int32
-
-const (
-	CredentialSource_CREDENTIAL_SOURCE_UNSPECIFIED                    CredentialSource = 0
-	CredentialSource_CREDENTIAL_SOURCE_GOOGLE_APPLICATION_CREDENTIALS CredentialSource = 1
-	CredentialSource_CREDENTIAL_SOURCE_SECRET_REF                     CredentialSource = 2
-	CredentialSource_CREDENTIAL_SOURCE_INLINE                         CredentialSource = 3
-)
-
-// Enum value maps for CredentialSource.
-var (
-	CredentialSource_name = map[int32]string{
-		0: "CREDENTIAL_SOURCE_UNSPECIFIED",
-		1: "CREDENTIAL_SOURCE_GOOGLE_APPLICATION_CREDENTIALS",
-		2: "CREDENTIAL_SOURCE_SECRET_REF",
-		3: "CREDENTIAL_SOURCE_INLINE",
-	}
-	CredentialSource_value = map[string]int32{
-		"CREDENTIAL_SOURCE_UNSPECIFIED":                    0,
-		"CREDENTIAL_SOURCE_GOOGLE_APPLICATION_CREDENTIALS": 1,
-		"CREDENTIAL_SOURCE_SECRET_REF":                     2,
-		"CREDENTIAL_SOURCE_INLINE":                         3,
-	}
-)
-
-func (x CredentialSource) Enum() *CredentialSource {
-	p := new(CredentialSource)
-	*p = x
-	return p
-}
-
-func (x CredentialSource) String() string {
-	name, valid := CredentialSource_name[int32(x)]
-	if valid {
-		return name
-	}
-	return strconv.Itoa(int(x))
-}
 
 type CloudIntegration struct {
 	unknownFields []byte
@@ -178,17 +58,20 @@ func (x *CloudIntegration) GetStatus() *CloudIntegrationStatus {
 }
 
 type CloudIntegrationSpec struct {
-	unknownFields    []byte
-	Type             *v1.TypeMeta      `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	ResourceBinding  *ResourceBinding  `protobuf:"bytes,20,opt,name=resource_binding,json=resourceBinding,proto3" json:"resourceBinding,omitempty"`
-	CloudScope       *CloudScope       `protobuf:"bytes,30,opt,name=cloud_scope,json=cloudScope,proto3" json:"cloudScope,omitempty"`
-	Auth             *Auth             `protobuf:"bytes,40,opt,name=auth,proto3" json:"auth,omitempty"`
-	ProviderConfig   *ProviderConfig   `protobuf:"bytes,41,opt,name=provider_config,json=providerConfig,proto3" json:"providerConfig,omitempty"`
-	Enabled          bool              `protobuf:"varint,50,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Capabilities     []string          `protobuf:"bytes,51,rep,name=capabilities,proto3" json:"capabilities,omitempty"`
-	ProjectIdPrefix  string            `protobuf:"bytes,60,opt,name=project_id_prefix,json=projectIdPrefix,proto3" json:"projectIdPrefix,omitempty"`
-	Labels           map[string]string `protobuf:"bytes,61,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	MirrorProjectIds []string          `protobuf:"bytes,62,rep,name=mirror_project_ids,json=mirrorProjectIds,proto3" json:"mirrorProjectIds,omitempty"`
+	unknownFields []byte
+	Type          *v1.TypeMeta        `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Binding       *IntegrationBinding `protobuf:"bytes,20,opt,name=binding,proto3" json:"binding,omitempty"`
+	// Provider-specific integration configuration payload.
+	// Example type_url:
+	// type.googleapis.com/cloudintegration.providers.gcp.v1.GcpProviderConfig
+	ProviderConfig *anypb.Any `protobuf:"bytes,30,opt,name=provider_config,json=providerConfig,proto3" json:"providerConfig,omitempty"`
+	// Provider-specific mirror request payload.
+	// Example type_url:
+	// type.googleapis.com/cloudintegration.providers.gcp.v1.GcpMirrorRequest
+	ProviderMirror *anypb.Any        `protobuf:"bytes,31,opt,name=provider_mirror,json=providerMirror,proto3" json:"providerMirror,omitempty"`
+	Enabled        bool              `protobuf:"varint,40,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Capabilities   []string          `protobuf:"bytes,41,rep,name=capabilities,proto3" json:"capabilities,omitempty"`
+	Labels         map[string]string `protobuf:"bytes,42,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *CloudIntegrationSpec) Reset() {
@@ -204,30 +87,23 @@ func (x *CloudIntegrationSpec) GetType() *v1.TypeMeta {
 	return nil
 }
 
-func (x *CloudIntegrationSpec) GetResourceBinding() *ResourceBinding {
+func (x *CloudIntegrationSpec) GetBinding() *IntegrationBinding {
 	if x != nil {
-		return x.ResourceBinding
+		return x.Binding
 	}
 	return nil
 }
 
-func (x *CloudIntegrationSpec) GetCloudScope() *CloudScope {
-	if x != nil {
-		return x.CloudScope
-	}
-	return nil
-}
-
-func (x *CloudIntegrationSpec) GetAuth() *Auth {
-	if x != nil {
-		return x.Auth
-	}
-	return nil
-}
-
-func (x *CloudIntegrationSpec) GetProviderConfig() *ProviderConfig {
+func (x *CloudIntegrationSpec) GetProviderConfig() *anypb.Any {
 	if x != nil {
 		return x.ProviderConfig
+	}
+	return nil
+}
+
+func (x *CloudIntegrationSpec) GetProviderMirror() *anypb.Any {
+	if x != nil {
+		return x.ProviderMirror
 	}
 	return nil
 }
@@ -246,13 +122,6 @@ func (x *CloudIntegrationSpec) GetCapabilities() []string {
 	return nil
 }
 
-func (x *CloudIntegrationSpec) GetProjectIdPrefix() string {
-	if x != nil {
-		return x.ProjectIdPrefix
-	}
-	return ""
-}
-
 func (x *CloudIntegrationSpec) GetLabels() map[string]string {
 	if x != nil {
 		return x.Labels
@@ -260,217 +129,28 @@ func (x *CloudIntegrationSpec) GetLabels() map[string]string {
 	return nil
 }
 
-func (x *CloudIntegrationSpec) GetMirrorProjectIds() []string {
-	if x != nil {
-		return x.MirrorProjectIds
-	}
-	return nil
+type IntegrationBinding struct {
+	unknownFields   []byte
+	OrganizationId  string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organizationId,omitempty"`
+	IntegrationName string `protobuf:"bytes,2,opt,name=integration_name,json=integrationName,proto3" json:"integrationName,omitempty"`
 }
 
-type ResourceBinding struct {
-	unknownFields  []byte
-	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organizationId,omitempty"`
-	CloudName      string `protobuf:"bytes,2,opt,name=cloud_name,json=cloudName,proto3" json:"cloudName,omitempty"`
+func (x *IntegrationBinding) Reset() {
+	*x = IntegrationBinding{}
 }
 
-func (x *ResourceBinding) Reset() {
-	*x = ResourceBinding{}
-}
+func (*IntegrationBinding) ProtoMessage() {}
 
-func (*ResourceBinding) ProtoMessage() {}
-
-func (x *ResourceBinding) GetOrganizationId() string {
+func (x *IntegrationBinding) GetOrganizationId() string {
 	if x != nil {
 		return x.OrganizationId
 	}
 	return ""
 }
 
-func (x *ResourceBinding) GetCloudName() string {
+func (x *IntegrationBinding) GetIntegrationName() string {
 	if x != nil {
-		return x.CloudName
-	}
-	return ""
-}
-
-type CloudScope struct {
-	unknownFields []byte
-	// Boundary identifier managed by this integration.
-	// Reconciler must fail closed for resources outside this boundary subtree.
-	BoundaryId   string    `protobuf:"bytes,1,opt,name=boundary_id,json=boundaryId,proto3" json:"boundaryId,omitempty"`
-	BoundaryType ScopeType `protobuf:"varint,2,opt,name=boundary_type,json=boundaryType,proto3" json:"boundaryType,omitempty"`
-}
-
-func (x *CloudScope) Reset() {
-	*x = CloudScope{}
-}
-
-func (*CloudScope) ProtoMessage() {}
-
-func (x *CloudScope) GetBoundaryId() string {
-	if x != nil {
-		return x.BoundaryId
-	}
-	return ""
-}
-
-func (x *CloudScope) GetBoundaryType() ScopeType {
-	if x != nil {
-		return x.BoundaryType
-	}
-	return ScopeType_SCOPE_TYPE_UNSPECIFIED
-}
-
-type Auth struct {
-	unknownFields    []byte
-	AuthMode         AuthMode         `protobuf:"varint,1,opt,name=auth_mode,json=authMode,proto3" json:"authMode,omitempty"`
-	CredentialSource CredentialSource `protobuf:"varint,2,opt,name=credential_source,json=credentialSource,proto3" json:"credentialSource,omitempty"`
-	CredentialRef    string           `protobuf:"bytes,3,opt,name=credential_ref,json=credentialRef,proto3" json:"credentialRef,omitempty"`
-}
-
-func (x *Auth) Reset() {
-	*x = Auth{}
-}
-
-func (*Auth) ProtoMessage() {}
-
-func (x *Auth) GetAuthMode() AuthMode {
-	if x != nil {
-		return x.AuthMode
-	}
-	return AuthMode_AUTH_MODE_UNSPECIFIED
-}
-
-func (x *Auth) GetCredentialSource() CredentialSource {
-	if x != nil {
-		return x.CredentialSource
-	}
-	return CredentialSource_CREDENTIAL_SOURCE_UNSPECIFIED
-}
-
-func (x *Auth) GetCredentialRef() string {
-	if x != nil {
-		return x.CredentialRef
-	}
-	return ""
-}
-
-type ProviderConfig struct {
-	unknownFields []byte
-	// Types that are assignable to Provider:
-	//
-	//	*ProviderConfig_Gcp
-	//	*ProviderConfig_Aws
-	//	*ProviderConfig_OnPrem
-	Provider isProviderConfig_Provider `protobuf_oneof:"provider"`
-}
-
-func (x *ProviderConfig) Reset() {
-	*x = ProviderConfig{}
-}
-
-func (*ProviderConfig) ProtoMessage() {}
-
-func (m *ProviderConfig) GetProvider() isProviderConfig_Provider {
-	if m != nil {
-		return m.Provider
-	}
-	return nil
-}
-
-func (x *ProviderConfig) GetGcp() *GcpConfig {
-	if x, ok := x.GetProvider().(*ProviderConfig_Gcp); ok {
-		return x.Gcp
-	}
-	return nil
-}
-
-func (x *ProviderConfig) GetAws() *AwsConfig {
-	if x, ok := x.GetProvider().(*ProviderConfig_Aws); ok {
-		return x.Aws
-	}
-	return nil
-}
-
-func (x *ProviderConfig) GetOnPrem() *OnPremConfig {
-	if x, ok := x.GetProvider().(*ProviderConfig_OnPrem); ok {
-		return x.OnPrem
-	}
-	return nil
-}
-
-type isProviderConfig_Provider interface {
-	isProviderConfig_Provider()
-}
-
-type ProviderConfig_Gcp struct {
-	Gcp *GcpConfig `protobuf:"bytes,1,opt,name=gcp,proto3,oneof"`
-}
-
-type ProviderConfig_Aws struct {
-	Aws *AwsConfig `protobuf:"bytes,2,opt,name=aws,proto3,oneof"`
-}
-
-type ProviderConfig_OnPrem struct {
-	OnPrem *OnPremConfig `protobuf:"bytes,3,opt,name=on_prem,json=onPrem,proto3,oneof"`
-}
-
-func (*ProviderConfig_Gcp) isProviderConfig_Provider() {}
-
-func (*ProviderConfig_Aws) isProviderConfig_Provider() {}
-
-func (*ProviderConfig_OnPrem) isProviderConfig_Provider() {}
-
-type GcpConfig struct {
-	unknownFields []byte
-	FolderId      string `protobuf:"bytes,1,opt,name=folder_id,json=folderId,proto3" json:"folderId,omitempty"`
-}
-
-func (x *GcpConfig) Reset() {
-	*x = GcpConfig{}
-}
-
-func (*GcpConfig) ProtoMessage() {}
-
-func (x *GcpConfig) GetFolderId() string {
-	if x != nil {
-		return x.FolderId
-	}
-	return ""
-}
-
-type AwsConfig struct {
-	unknownFields []byte
-	AccountId     string `protobuf:"bytes,1,opt,name=account_id,json=accountId,proto3" json:"accountId,omitempty"`
-}
-
-func (x *AwsConfig) Reset() {
-	*x = AwsConfig{}
-}
-
-func (*AwsConfig) ProtoMessage() {}
-
-func (x *AwsConfig) GetAccountId() string {
-	if x != nil {
-		return x.AccountId
-	}
-	return ""
-}
-
-type OnPremConfig struct {
-	unknownFields []byte
-	EnvironmentId string `protobuf:"bytes,1,opt,name=environment_id,json=environmentId,proto3" json:"environmentId,omitempty"`
-}
-
-func (x *OnPremConfig) Reset() {
-	*x = OnPremConfig{}
-}
-
-func (*OnPremConfig) ProtoMessage() {}
-
-func (x *OnPremConfig) GetEnvironmentId() string {
-	if x != nil {
-		return x.EnvironmentId
+		return x.IntegrationName
 	}
 	return ""
 }
@@ -482,10 +162,6 @@ type CloudIntegrationStatus struct {
 	ReconcilerMessage string                 `protobuf:"bytes,21,opt,name=reconciler_message,json=reconcilerMessage,proto3" json:"reconcilerMessage,omitempty"`
 	LastAttemptedAt   *timestamppb.Timestamp `protobuf:"bytes,22,opt,name=last_attempted_at,json=lastAttemptedAt,proto3" json:"lastAttemptedAt,omitempty"`
 	LastSucceededAt   *timestamppb.Timestamp `protobuf:"bytes,23,opt,name=last_succeeded_at,json=lastSucceededAt,proto3" json:"lastSucceededAt,omitempty"`
-	Folder            *StepState             `protobuf:"bytes,30,opt,name=folder,proto3" json:"folder,omitempty"`
-	Projects          *StepState             `protobuf:"bytes,31,opt,name=projects,proto3" json:"projects,omitempty"`
-	ServiceAccounts   *StepState             `protobuf:"bytes,32,opt,name=service_accounts,json=serviceAccounts,proto3" json:"serviceAccounts,omitempty"`
-	Iam               *StepState             `protobuf:"bytes,33,opt,name=iam,proto3" json:"iam,omitempty"`
 }
 
 func (x *CloudIntegrationStatus) Reset() {
@@ -525,76 +201,6 @@ func (x *CloudIntegrationStatus) GetLastAttemptedAt() *timestamppb.Timestamp {
 func (x *CloudIntegrationStatus) GetLastSucceededAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.LastSucceededAt
-	}
-	return nil
-}
-
-func (x *CloudIntegrationStatus) GetFolder() *StepState {
-	if x != nil {
-		return x.Folder
-	}
-	return nil
-}
-
-func (x *CloudIntegrationStatus) GetProjects() *StepState {
-	if x != nil {
-		return x.Projects
-	}
-	return nil
-}
-
-func (x *CloudIntegrationStatus) GetServiceAccounts() *StepState {
-	if x != nil {
-		return x.ServiceAccounts
-	}
-	return nil
-}
-
-func (x *CloudIntegrationStatus) GetIam() *StepState {
-	if x != nil {
-		return x.Iam
-	}
-	return nil
-}
-
-type StepState struct {
-	unknownFields []byte
-	Ready         bool                   `protobuf:"varint,1,opt,name=ready,proto3" json:"ready,omitempty"`
-	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
-	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-	ObservedAt    *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=observed_at,json=observedAt,proto3" json:"observedAt,omitempty"`
-}
-
-func (x *StepState) Reset() {
-	*x = StepState{}
-}
-
-func (*StepState) ProtoMessage() {}
-
-func (x *StepState) GetReady() bool {
-	if x != nil {
-		return x.Ready
-	}
-	return false
-}
-
-func (x *StepState) GetReason() string {
-	if x != nil {
-		return x.Reason
-	}
-	return ""
-}
-
-func (x *StepState) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-func (x *StepState) GetObservedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.ObservedAt
 	}
 	return nil
 }
@@ -672,14 +278,16 @@ func (m *CloudIntegrationSpec) CloneVT() *CloudIntegrationSpec {
 		return (*CloudIntegrationSpec)(nil)
 	}
 	r := new(CloudIntegrationSpec)
-	r.ResourceBinding = m.ResourceBinding.CloneVT()
-	r.CloudScope = m.CloudScope.CloneVT()
-	r.Auth = m.Auth.CloneVT()
-	r.ProviderConfig = m.ProviderConfig.CloneVT()
+	r.Binding = m.Binding.CloneVT()
 	r.Enabled = m.Enabled
-	r.ProjectIdPrefix = m.ProjectIdPrefix
 	if rhs := m.Type; rhs != nil {
 		r.Type = rhs.CloneVT()
+	}
+	if rhs := m.ProviderConfig; rhs != nil {
+		r.ProviderConfig = rhs.CloneVT()
+	}
+	if rhs := m.ProviderMirror; rhs != nil {
+		r.ProviderMirror = rhs.CloneVT()
 	}
 	if rhs := m.Capabilities; rhs != nil {
 		tmpContainer := make([]string, len(rhs))
@@ -693,11 +301,6 @@ func (m *CloudIntegrationSpec) CloneVT() *CloudIntegrationSpec {
 		}
 		r.Labels = tmpContainer
 	}
-	if rhs := m.MirrorProjectIds; rhs != nil {
-		tmpContainer := make([]string, len(rhs))
-		copy(tmpContainer, rhs)
-		r.MirrorProjectIds = tmpContainer
-	}
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = make([]byte, len(m.unknownFields))
 		copy(r.unknownFields, m.unknownFields)
@@ -709,13 +312,13 @@ func (m *CloudIntegrationSpec) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
-func (m *ResourceBinding) CloneVT() *ResourceBinding {
+func (m *IntegrationBinding) CloneVT() *IntegrationBinding {
 	if m == nil {
-		return (*ResourceBinding)(nil)
+		return (*IntegrationBinding)(nil)
 	}
-	r := new(ResourceBinding)
+	r := new(IntegrationBinding)
 	r.OrganizationId = m.OrganizationId
-	r.CloudName = m.CloudName
+	r.IntegrationName = m.IntegrationName
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = make([]byte, len(m.unknownFields))
 		copy(r.unknownFields, m.unknownFields)
@@ -723,155 +326,7 @@ func (m *ResourceBinding) CloneVT() *ResourceBinding {
 	return r
 }
 
-func (m *ResourceBinding) CloneMessageVT() protobuf_go_lite.CloneMessage {
-	return m.CloneVT()
-}
-
-func (m *CloudScope) CloneVT() *CloudScope {
-	if m == nil {
-		return (*CloudScope)(nil)
-	}
-	r := new(CloudScope)
-	r.BoundaryId = m.BoundaryId
-	r.BoundaryType = m.BoundaryType
-	if len(m.unknownFields) > 0 {
-		r.unknownFields = make([]byte, len(m.unknownFields))
-		copy(r.unknownFields, m.unknownFields)
-	}
-	return r
-}
-
-func (m *CloudScope) CloneMessageVT() protobuf_go_lite.CloneMessage {
-	return m.CloneVT()
-}
-
-func (m *Auth) CloneVT() *Auth {
-	if m == nil {
-		return (*Auth)(nil)
-	}
-	r := new(Auth)
-	r.AuthMode = m.AuthMode
-	r.CredentialSource = m.CredentialSource
-	r.CredentialRef = m.CredentialRef
-	if len(m.unknownFields) > 0 {
-		r.unknownFields = make([]byte, len(m.unknownFields))
-		copy(r.unknownFields, m.unknownFields)
-	}
-	return r
-}
-
-func (m *Auth) CloneMessageVT() protobuf_go_lite.CloneMessage {
-	return m.CloneVT()
-}
-
-func (m *ProviderConfig) CloneVT() *ProviderConfig {
-	if m == nil {
-		return (*ProviderConfig)(nil)
-	}
-	r := new(ProviderConfig)
-	if m.Provider != nil {
-		r.Provider = m.Provider.(interface {
-			CloneOneofVT() isProviderConfig_Provider
-		}).CloneOneofVT()
-	}
-	if len(m.unknownFields) > 0 {
-		r.unknownFields = make([]byte, len(m.unknownFields))
-		copy(r.unknownFields, m.unknownFields)
-	}
-	return r
-}
-
-func (m *ProviderConfig) CloneMessageVT() protobuf_go_lite.CloneMessage {
-	return m.CloneVT()
-}
-
-func (m *ProviderConfig_Gcp) CloneVT() *ProviderConfig_Gcp {
-	if m == nil {
-		return (*ProviderConfig_Gcp)(nil)
-	}
-	r := new(ProviderConfig_Gcp)
-	r.Gcp = m.Gcp.CloneVT()
-	return r
-}
-
-func (m *ProviderConfig_Gcp) CloneOneofVT() isProviderConfig_Provider {
-	return m.CloneVT()
-}
-
-func (m *ProviderConfig_Aws) CloneVT() *ProviderConfig_Aws {
-	if m == nil {
-		return (*ProviderConfig_Aws)(nil)
-	}
-	r := new(ProviderConfig_Aws)
-	r.Aws = m.Aws.CloneVT()
-	return r
-}
-
-func (m *ProviderConfig_Aws) CloneOneofVT() isProviderConfig_Provider {
-	return m.CloneVT()
-}
-
-func (m *ProviderConfig_OnPrem) CloneVT() *ProviderConfig_OnPrem {
-	if m == nil {
-		return (*ProviderConfig_OnPrem)(nil)
-	}
-	r := new(ProviderConfig_OnPrem)
-	r.OnPrem = m.OnPrem.CloneVT()
-	return r
-}
-
-func (m *ProviderConfig_OnPrem) CloneOneofVT() isProviderConfig_Provider {
-	return m.CloneVT()
-}
-
-func (m *GcpConfig) CloneVT() *GcpConfig {
-	if m == nil {
-		return (*GcpConfig)(nil)
-	}
-	r := new(GcpConfig)
-	r.FolderId = m.FolderId
-	if len(m.unknownFields) > 0 {
-		r.unknownFields = make([]byte, len(m.unknownFields))
-		copy(r.unknownFields, m.unknownFields)
-	}
-	return r
-}
-
-func (m *GcpConfig) CloneMessageVT() protobuf_go_lite.CloneMessage {
-	return m.CloneVT()
-}
-
-func (m *AwsConfig) CloneVT() *AwsConfig {
-	if m == nil {
-		return (*AwsConfig)(nil)
-	}
-	r := new(AwsConfig)
-	r.AccountId = m.AccountId
-	if len(m.unknownFields) > 0 {
-		r.unknownFields = make([]byte, len(m.unknownFields))
-		copy(r.unknownFields, m.unknownFields)
-	}
-	return r
-}
-
-func (m *AwsConfig) CloneMessageVT() protobuf_go_lite.CloneMessage {
-	return m.CloneVT()
-}
-
-func (m *OnPremConfig) CloneVT() *OnPremConfig {
-	if m == nil {
-		return (*OnPremConfig)(nil)
-	}
-	r := new(OnPremConfig)
-	r.EnvironmentId = m.EnvironmentId
-	if len(m.unknownFields) > 0 {
-		r.unknownFields = make([]byte, len(m.unknownFields))
-		copy(r.unknownFields, m.unknownFields)
-	}
-	return r
-}
-
-func (m *OnPremConfig) CloneMessageVT() protobuf_go_lite.CloneMessage {
+func (m *IntegrationBinding) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
@@ -882,10 +337,6 @@ func (m *CloudIntegrationStatus) CloneVT() *CloudIntegrationStatus {
 	r := new(CloudIntegrationStatus)
 	r.ReconcilerReason = m.ReconcilerReason
 	r.ReconcilerMessage = m.ReconcilerMessage
-	r.Folder = m.Folder.CloneVT()
-	r.Projects = m.Projects.CloneVT()
-	r.ServiceAccounts = m.ServiceAccounts.CloneVT()
-	r.Iam = m.Iam.CloneVT()
 	if rhs := m.Status; rhs != nil {
 		r.Status = rhs.CloneVT()
 	}
@@ -903,28 +354,6 @@ func (m *CloudIntegrationStatus) CloneVT() *CloudIntegrationStatus {
 }
 
 func (m *CloudIntegrationStatus) CloneMessageVT() protobuf_go_lite.CloneMessage {
-	return m.CloneVT()
-}
-
-func (m *StepState) CloneVT() *StepState {
-	if m == nil {
-		return (*StepState)(nil)
-	}
-	r := new(StepState)
-	r.Ready = m.Ready
-	r.Reason = m.Reason
-	r.Message = m.Message
-	if rhs := m.ObservedAt; rhs != nil {
-		r.ObservedAt = rhs.CloneVT()
-	}
-	if len(m.unknownFields) > 0 {
-		r.unknownFields = make([]byte, len(m.unknownFields))
-		copy(r.unknownFields, m.unknownFields)
-	}
-	return r
-}
-
-func (m *StepState) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
@@ -988,16 +417,13 @@ func (this *CloudIntegrationSpec) EqualVT(that *CloudIntegrationSpec) bool {
 	if !this.Type.EqualVT(that.Type) {
 		return false
 	}
-	if !this.ResourceBinding.EqualVT(that.ResourceBinding) {
-		return false
-	}
-	if !this.CloudScope.EqualVT(that.CloudScope) {
-		return false
-	}
-	if !this.Auth.EqualVT(that.Auth) {
+	if !this.Binding.EqualVT(that.Binding) {
 		return false
 	}
 	if !this.ProviderConfig.EqualVT(that.ProviderConfig) {
+		return false
+	}
+	if !this.ProviderMirror.EqualVT(that.ProviderMirror) {
 		return false
 	}
 	if this.Enabled != that.Enabled {
@@ -1012,9 +438,6 @@ func (this *CloudIntegrationSpec) EqualVT(that *CloudIntegrationSpec) bool {
 			return false
 		}
 	}
-	if this.ProjectIdPrefix != that.ProjectIdPrefix {
-		return false
-	}
 	if len(this.Labels) != len(that.Labels) {
 		return false
 	}
@@ -1023,15 +446,6 @@ func (this *CloudIntegrationSpec) EqualVT(that *CloudIntegrationSpec) bool {
 		if !ok {
 			return false
 		}
-		if vx != vy {
-			return false
-		}
-	}
-	if len(this.MirrorProjectIds) != len(that.MirrorProjectIds) {
-		return false
-	}
-	for i, vx := range this.MirrorProjectIds {
-		vy := that.MirrorProjectIds[i]
 		if vx != vy {
 			return false
 		}
@@ -1046,7 +460,7 @@ func (this *CloudIntegrationSpec) EqualMessageVT(thatMsg any) bool {
 	}
 	return this.EqualVT(that)
 }
-func (this *ResourceBinding) EqualVT(that *ResourceBinding) bool {
+func (this *IntegrationBinding) EqualVT(that *IntegrationBinding) bool {
 	if this == that {
 		return true
 	} else if this == nil || that == nil {
@@ -1055,221 +469,14 @@ func (this *ResourceBinding) EqualVT(that *ResourceBinding) bool {
 	if this.OrganizationId != that.OrganizationId {
 		return false
 	}
-	if this.CloudName != that.CloudName {
+	if this.IntegrationName != that.IntegrationName {
 		return false
 	}
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
-func (this *ResourceBinding) EqualMessageVT(thatMsg any) bool {
-	that, ok := thatMsg.(*ResourceBinding)
-	if !ok {
-		return false
-	}
-	return this.EqualVT(that)
-}
-func (this *CloudScope) EqualVT(that *CloudScope) bool {
-	if this == that {
-		return true
-	} else if this == nil || that == nil {
-		return false
-	}
-	if this.BoundaryId != that.BoundaryId {
-		return false
-	}
-	if this.BoundaryType != that.BoundaryType {
-		return false
-	}
-	return string(this.unknownFields) == string(that.unknownFields)
-}
-
-func (this *CloudScope) EqualMessageVT(thatMsg any) bool {
-	that, ok := thatMsg.(*CloudScope)
-	if !ok {
-		return false
-	}
-	return this.EqualVT(that)
-}
-func (this *Auth) EqualVT(that *Auth) bool {
-	if this == that {
-		return true
-	} else if this == nil || that == nil {
-		return false
-	}
-	if this.AuthMode != that.AuthMode {
-		return false
-	}
-	if this.CredentialSource != that.CredentialSource {
-		return false
-	}
-	if this.CredentialRef != that.CredentialRef {
-		return false
-	}
-	return string(this.unknownFields) == string(that.unknownFields)
-}
-
-func (this *Auth) EqualMessageVT(thatMsg any) bool {
-	that, ok := thatMsg.(*Auth)
-	if !ok {
-		return false
-	}
-	return this.EqualVT(that)
-}
-func (this *ProviderConfig) EqualVT(that *ProviderConfig) bool {
-	if this == that {
-		return true
-	} else if this == nil || that == nil {
-		return false
-	}
-	if this.Provider == nil && that.Provider != nil {
-		return false
-	} else if this.Provider != nil {
-		if that.Provider == nil {
-			return false
-		}
-		if !this.Provider.(interface {
-			EqualVT(isProviderConfig_Provider) bool
-		}).EqualVT(that.Provider) {
-			return false
-		}
-	}
-	return string(this.unknownFields) == string(that.unknownFields)
-}
-
-func (this *ProviderConfig) EqualMessageVT(thatMsg any) bool {
-	that, ok := thatMsg.(*ProviderConfig)
-	if !ok {
-		return false
-	}
-	return this.EqualVT(that)
-}
-func (this *ProviderConfig_Gcp) EqualVT(thatIface isProviderConfig_Provider) bool {
-	that, ok := thatIface.(*ProviderConfig_Gcp)
-	if !ok {
-		return false
-	}
-	if this == that {
-		return true
-	}
-	if this == nil && that != nil || this != nil && that == nil {
-		return false
-	}
-	if p, q := this.Gcp, that.Gcp; p != q {
-		if p == nil {
-			p = &GcpConfig{}
-		}
-		if q == nil {
-			q = &GcpConfig{}
-		}
-		if !p.EqualVT(q) {
-			return false
-		}
-	}
-	return true
-}
-
-func (this *ProviderConfig_Aws) EqualVT(thatIface isProviderConfig_Provider) bool {
-	that, ok := thatIface.(*ProviderConfig_Aws)
-	if !ok {
-		return false
-	}
-	if this == that {
-		return true
-	}
-	if this == nil && that != nil || this != nil && that == nil {
-		return false
-	}
-	if p, q := this.Aws, that.Aws; p != q {
-		if p == nil {
-			p = &AwsConfig{}
-		}
-		if q == nil {
-			q = &AwsConfig{}
-		}
-		if !p.EqualVT(q) {
-			return false
-		}
-	}
-	return true
-}
-
-func (this *ProviderConfig_OnPrem) EqualVT(thatIface isProviderConfig_Provider) bool {
-	that, ok := thatIface.(*ProviderConfig_OnPrem)
-	if !ok {
-		return false
-	}
-	if this == that {
-		return true
-	}
-	if this == nil && that != nil || this != nil && that == nil {
-		return false
-	}
-	if p, q := this.OnPrem, that.OnPrem; p != q {
-		if p == nil {
-			p = &OnPremConfig{}
-		}
-		if q == nil {
-			q = &OnPremConfig{}
-		}
-		if !p.EqualVT(q) {
-			return false
-		}
-	}
-	return true
-}
-
-func (this *GcpConfig) EqualVT(that *GcpConfig) bool {
-	if this == that {
-		return true
-	} else if this == nil || that == nil {
-		return false
-	}
-	if this.FolderId != that.FolderId {
-		return false
-	}
-	return string(this.unknownFields) == string(that.unknownFields)
-}
-
-func (this *GcpConfig) EqualMessageVT(thatMsg any) bool {
-	that, ok := thatMsg.(*GcpConfig)
-	if !ok {
-		return false
-	}
-	return this.EqualVT(that)
-}
-func (this *AwsConfig) EqualVT(that *AwsConfig) bool {
-	if this == that {
-		return true
-	} else if this == nil || that == nil {
-		return false
-	}
-	if this.AccountId != that.AccountId {
-		return false
-	}
-	return string(this.unknownFields) == string(that.unknownFields)
-}
-
-func (this *AwsConfig) EqualMessageVT(thatMsg any) bool {
-	that, ok := thatMsg.(*AwsConfig)
-	if !ok {
-		return false
-	}
-	return this.EqualVT(that)
-}
-func (this *OnPremConfig) EqualVT(that *OnPremConfig) bool {
-	if this == that {
-		return true
-	} else if this == nil || that == nil {
-		return false
-	}
-	if this.EnvironmentId != that.EnvironmentId {
-		return false
-	}
-	return string(this.unknownFields) == string(that.unknownFields)
-}
-
-func (this *OnPremConfig) EqualMessageVT(thatMsg any) bool {
-	that, ok := thatMsg.(*OnPremConfig)
+func (this *IntegrationBinding) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*IntegrationBinding)
 	if !ok {
 		return false
 	}
@@ -1296,51 +503,11 @@ func (this *CloudIntegrationStatus) EqualVT(that *CloudIntegrationStatus) bool {
 	if !this.LastSucceededAt.EqualVT(that.LastSucceededAt) {
 		return false
 	}
-	if !this.Folder.EqualVT(that.Folder) {
-		return false
-	}
-	if !this.Projects.EqualVT(that.Projects) {
-		return false
-	}
-	if !this.ServiceAccounts.EqualVT(that.ServiceAccounts) {
-		return false
-	}
-	if !this.Iam.EqualVT(that.Iam) {
-		return false
-	}
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
 func (this *CloudIntegrationStatus) EqualMessageVT(thatMsg any) bool {
 	that, ok := thatMsg.(*CloudIntegrationStatus)
-	if !ok {
-		return false
-	}
-	return this.EqualVT(that)
-}
-func (this *StepState) EqualVT(that *StepState) bool {
-	if this == that {
-		return true
-	} else if this == nil || that == nil {
-		return false
-	}
-	if this.Ready != that.Ready {
-		return false
-	}
-	if this.Reason != that.Reason {
-		return false
-	}
-	if this.Message != that.Message {
-		return false
-	}
-	if !this.ObservedAt.EqualVT(that.ObservedAt) {
-		return false
-	}
-	return string(this.unknownFields) == string(that.unknownFields)
-}
-
-func (this *StepState) EqualMessageVT(thatMsg any) bool {
-	that, ok := thatMsg.(*StepState)
 	if !ok {
 		return false
 	}
@@ -1378,126 +545,6 @@ func (this *CloudIntegrationList) EqualMessageVT(thatMsg any) bool {
 		return false
 	}
 	return this.EqualVT(that)
-}
-
-// MarshalProtoJSON marshals the ScopeType to JSON.
-func (x ScopeType) MarshalProtoJSON(s *json.MarshalState) {
-	s.WriteEnumString(int32(x), ScopeType_name)
-}
-
-// MarshalText marshals the ScopeType to text.
-func (x ScopeType) MarshalText() ([]byte, error) {
-	return []byte(json.GetEnumString(int32(x), ScopeType_name)), nil
-}
-
-// MarshalJSON marshals the ScopeType to JSON.
-func (x ScopeType) MarshalJSON() ([]byte, error) {
-	return json.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the ScopeType from JSON.
-func (x *ScopeType) UnmarshalProtoJSON(s *json.UnmarshalState) {
-	v := s.ReadEnum(ScopeType_value)
-	if err := s.Err(); err != nil {
-		s.SetErrorf("could not read ScopeType enum: %v", err)
-		return
-	}
-	*x = ScopeType(v)
-}
-
-// UnmarshalText unmarshals the ScopeType from text.
-func (x *ScopeType) UnmarshalText(b []byte) error {
-	i, err := json.ParseEnumString(string(b), ScopeType_value)
-	if err != nil {
-		return err
-	}
-	*x = ScopeType(i)
-	return nil
-}
-
-// UnmarshalJSON unmarshals the ScopeType from JSON.
-func (x *ScopeType) UnmarshalJSON(b []byte) error {
-	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the AuthMode to JSON.
-func (x AuthMode) MarshalProtoJSON(s *json.MarshalState) {
-	s.WriteEnumString(int32(x), AuthMode_name)
-}
-
-// MarshalText marshals the AuthMode to text.
-func (x AuthMode) MarshalText() ([]byte, error) {
-	return []byte(json.GetEnumString(int32(x), AuthMode_name)), nil
-}
-
-// MarshalJSON marshals the AuthMode to JSON.
-func (x AuthMode) MarshalJSON() ([]byte, error) {
-	return json.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the AuthMode from JSON.
-func (x *AuthMode) UnmarshalProtoJSON(s *json.UnmarshalState) {
-	v := s.ReadEnum(AuthMode_value)
-	if err := s.Err(); err != nil {
-		s.SetErrorf("could not read AuthMode enum: %v", err)
-		return
-	}
-	*x = AuthMode(v)
-}
-
-// UnmarshalText unmarshals the AuthMode from text.
-func (x *AuthMode) UnmarshalText(b []byte) error {
-	i, err := json.ParseEnumString(string(b), AuthMode_value)
-	if err != nil {
-		return err
-	}
-	*x = AuthMode(i)
-	return nil
-}
-
-// UnmarshalJSON unmarshals the AuthMode from JSON.
-func (x *AuthMode) UnmarshalJSON(b []byte) error {
-	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the CredentialSource to JSON.
-func (x CredentialSource) MarshalProtoJSON(s *json.MarshalState) {
-	s.WriteEnumString(int32(x), CredentialSource_name)
-}
-
-// MarshalText marshals the CredentialSource to text.
-func (x CredentialSource) MarshalText() ([]byte, error) {
-	return []byte(json.GetEnumString(int32(x), CredentialSource_name)), nil
-}
-
-// MarshalJSON marshals the CredentialSource to JSON.
-func (x CredentialSource) MarshalJSON() ([]byte, error) {
-	return json.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the CredentialSource from JSON.
-func (x *CredentialSource) UnmarshalProtoJSON(s *json.UnmarshalState) {
-	v := s.ReadEnum(CredentialSource_value)
-	if err := s.Err(); err != nil {
-		s.SetErrorf("could not read CredentialSource enum: %v", err)
-		return
-	}
-	*x = CredentialSource(v)
-}
-
-// UnmarshalText unmarshals the CredentialSource from text.
-func (x *CredentialSource) UnmarshalText(b []byte) error {
-	i, err := json.ParseEnumString(string(b), CredentialSource_value)
-	if err != nil {
-		return err
-	}
-	*x = CredentialSource(i)
-	return nil
-}
-
-// UnmarshalJSON unmarshals the CredentialSource from JSON.
-func (x *CredentialSource) UnmarshalJSON(b []byte) error {
-	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the CloudIntegration message to JSON.
@@ -1645,25 +692,20 @@ func (x *CloudIntegrationSpec) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("type")
 		x.Type.MarshalProtoJSON(s.WithField("type"))
 	}
-	if x.ResourceBinding != nil || s.HasField("resourceBinding") {
+	if x.Binding != nil || s.HasField("binding") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("resourceBinding")
-		x.ResourceBinding.MarshalProtoJSON(s.WithField("resourceBinding"))
-	}
-	if x.CloudScope != nil || s.HasField("cloudScope") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("cloudScope")
-		x.CloudScope.MarshalProtoJSON(s.WithField("cloudScope"))
-	}
-	if x.Auth != nil || s.HasField("auth") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("auth")
-		x.Auth.MarshalProtoJSON(s.WithField("auth"))
+		s.WriteObjectField("binding")
+		x.Binding.MarshalProtoJSON(s.WithField("binding"))
 	}
 	if x.ProviderConfig != nil || s.HasField("providerConfig") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("providerConfig")
 		x.ProviderConfig.MarshalProtoJSON(s.WithField("providerConfig"))
+	}
+	if x.ProviderMirror != nil || s.HasField("providerMirror") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("providerMirror")
+		x.ProviderMirror.MarshalProtoJSON(s.WithField("providerMirror"))
 	}
 	if x.Enabled || s.HasField("enabled") {
 		s.WriteMoreIf(&wroteField)
@@ -1674,11 +716,6 @@ func (x *CloudIntegrationSpec) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("capabilities")
 		s.WriteStringArray(x.Capabilities)
-	}
-	if x.ProjectIdPrefix != "" || s.HasField("projectIdPrefix") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("projectIdPrefix")
-		s.WriteString(x.ProjectIdPrefix)
 	}
 	if x.Labels != nil || s.HasField("labels") {
 		s.WriteMoreIf(&wroteField)
@@ -1691,11 +728,6 @@ func (x *CloudIntegrationSpec) MarshalProtoJSON(s *json.MarshalState) {
 			s.WriteString(v)
 		}
 		s.WriteObjectEnd()
-	}
-	if len(x.MirrorProjectIds) > 0 || s.HasField("mirrorProjectIds") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("mirrorProjectIds")
-		s.WriteStringArray(x.MirrorProjectIds)
 	}
 	s.WriteObjectEnd()
 }
@@ -1721,34 +753,27 @@ func (x *CloudIntegrationSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 			}
 			x.Type = &v1.TypeMeta{}
 			x.Type.UnmarshalProtoJSON(s.WithField("type", true))
-		case "resource_binding", "resourceBinding":
+		case "binding":
 			if s.ReadNil() {
-				x.ResourceBinding = nil
+				x.Binding = nil
 				return
 			}
-			x.ResourceBinding = &ResourceBinding{}
-			x.ResourceBinding.UnmarshalProtoJSON(s.WithField("resource_binding", true))
-		case "cloud_scope", "cloudScope":
-			if s.ReadNil() {
-				x.CloudScope = nil
-				return
-			}
-			x.CloudScope = &CloudScope{}
-			x.CloudScope.UnmarshalProtoJSON(s.WithField("cloud_scope", true))
-		case "auth":
-			if s.ReadNil() {
-				x.Auth = nil
-				return
-			}
-			x.Auth = &Auth{}
-			x.Auth.UnmarshalProtoJSON(s.WithField("auth", true))
+			x.Binding = &IntegrationBinding{}
+			x.Binding.UnmarshalProtoJSON(s.WithField("binding", true))
 		case "provider_config", "providerConfig":
 			if s.ReadNil() {
 				x.ProviderConfig = nil
 				return
 			}
-			x.ProviderConfig = &ProviderConfig{}
+			x.ProviderConfig = &anypb.Any{}
 			x.ProviderConfig.UnmarshalProtoJSON(s.WithField("provider_config", true))
+		case "provider_mirror", "providerMirror":
+			if s.ReadNil() {
+				x.ProviderMirror = nil
+				return
+			}
+			x.ProviderMirror = &anypb.Any{}
+			x.ProviderMirror.UnmarshalProtoJSON(s.WithField("provider_mirror", true))
 		case "enabled":
 			s.AddField("enabled")
 			x.Enabled = s.ReadBool()
@@ -1759,9 +784,6 @@ func (x *CloudIntegrationSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 				return
 			}
 			x.Capabilities = s.ReadStringArray()
-		case "project_id_prefix", "projectIdPrefix":
-			s.AddField("project_id_prefix")
-			x.ProjectIdPrefix = s.ReadString()
 		case "labels":
 			s.AddField("labels")
 			if s.ReadNil() {
@@ -1772,13 +794,6 @@ func (x *CloudIntegrationSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 			s.ReadStringMap(func(key string) {
 				x.Labels[key] = s.ReadString()
 			})
-		case "mirror_project_ids", "mirrorProjectIds":
-			s.AddField("mirror_project_ids")
-			if s.ReadNil() {
-				x.MirrorProjectIds = nil
-				return
-			}
-			x.MirrorProjectIds = s.ReadStringArray()
 		}
 	})
 }
@@ -1788,8 +803,8 @@ func (x *CloudIntegrationSpec) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
-// MarshalProtoJSON marshals the ResourceBinding message to JSON.
-func (x *ResourceBinding) MarshalProtoJSON(s *json.MarshalState) {
+// MarshalProtoJSON marshals the IntegrationBinding message to JSON.
+func (x *IntegrationBinding) MarshalProtoJSON(s *json.MarshalState) {
 	if x == nil {
 		s.WriteNil()
 		return
@@ -1801,21 +816,21 @@ func (x *ResourceBinding) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("organizationId")
 		s.WriteString(x.OrganizationId)
 	}
-	if x.CloudName != "" || s.HasField("cloudName") {
+	if x.IntegrationName != "" || s.HasField("integrationName") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("cloudName")
-		s.WriteString(x.CloudName)
+		s.WriteObjectField("integrationName")
+		s.WriteString(x.IntegrationName)
 	}
 	s.WriteObjectEnd()
 }
 
-// MarshalJSON marshals the ResourceBinding to JSON.
-func (x *ResourceBinding) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals the IntegrationBinding to JSON.
+func (x *IntegrationBinding) MarshalJSON() ([]byte, error) {
 	return json.DefaultMarshalerConfig.Marshal(x)
 }
 
-// UnmarshalProtoJSON unmarshals the ResourceBinding message from JSON.
-func (x *ResourceBinding) UnmarshalProtoJSON(s *json.UnmarshalState) {
+// UnmarshalProtoJSON unmarshals the IntegrationBinding message from JSON.
+func (x *IntegrationBinding) UnmarshalProtoJSON(s *json.UnmarshalState) {
 	if s.ReadNil() {
 		return
 	}
@@ -1826,326 +841,15 @@ func (x *ResourceBinding) UnmarshalProtoJSON(s *json.UnmarshalState) {
 		case "organization_id", "organizationId":
 			s.AddField("organization_id")
 			x.OrganizationId = s.ReadString()
-		case "cloud_name", "cloudName":
-			s.AddField("cloud_name")
-			x.CloudName = s.ReadString()
+		case "integration_name", "integrationName":
+			s.AddField("integration_name")
+			x.IntegrationName = s.ReadString()
 		}
 	})
 }
 
-// UnmarshalJSON unmarshals the ResourceBinding from JSON.
-func (x *ResourceBinding) UnmarshalJSON(b []byte) error {
-	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the CloudScope message to JSON.
-func (x *CloudScope) MarshalProtoJSON(s *json.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.BoundaryId != "" || s.HasField("boundaryId") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("boundaryId")
-		s.WriteString(x.BoundaryId)
-	}
-	if x.BoundaryType != 0 || s.HasField("boundaryType") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("boundaryType")
-		x.BoundaryType.MarshalProtoJSON(s)
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the CloudScope to JSON.
-func (x *CloudScope) MarshalJSON() ([]byte, error) {
-	return json.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the CloudScope message from JSON.
-func (x *CloudScope) UnmarshalProtoJSON(s *json.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.Skip() // ignore unknown field
-		case "boundary_id", "boundaryId":
-			s.AddField("boundary_id")
-			x.BoundaryId = s.ReadString()
-		case "boundary_type", "boundaryType":
-			s.AddField("boundary_type")
-			x.BoundaryType.UnmarshalProtoJSON(s)
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the CloudScope from JSON.
-func (x *CloudScope) UnmarshalJSON(b []byte) error {
-	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the Auth message to JSON.
-func (x *Auth) MarshalProtoJSON(s *json.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.AuthMode != 0 || s.HasField("authMode") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("authMode")
-		x.AuthMode.MarshalProtoJSON(s)
-	}
-	if x.CredentialSource != 0 || s.HasField("credentialSource") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("credentialSource")
-		x.CredentialSource.MarshalProtoJSON(s)
-	}
-	if x.CredentialRef != "" || s.HasField("credentialRef") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("credentialRef")
-		s.WriteString(x.CredentialRef)
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the Auth to JSON.
-func (x *Auth) MarshalJSON() ([]byte, error) {
-	return json.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the Auth message from JSON.
-func (x *Auth) UnmarshalProtoJSON(s *json.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.Skip() // ignore unknown field
-		case "auth_mode", "authMode":
-			s.AddField("auth_mode")
-			x.AuthMode.UnmarshalProtoJSON(s)
-		case "credential_source", "credentialSource":
-			s.AddField("credential_source")
-			x.CredentialSource.UnmarshalProtoJSON(s)
-		case "credential_ref", "credentialRef":
-			s.AddField("credential_ref")
-			x.CredentialRef = s.ReadString()
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the Auth from JSON.
-func (x *Auth) UnmarshalJSON(b []byte) error {
-	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the ProviderConfig message to JSON.
-func (x *ProviderConfig) MarshalProtoJSON(s *json.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.Provider != nil {
-		switch ov := x.Provider.(type) {
-		case *ProviderConfig_Gcp:
-			s.WriteMoreIf(&wroteField)
-			s.WriteObjectField("gcp")
-			ov.Gcp.MarshalProtoJSON(s.WithField("gcp"))
-		case *ProviderConfig_Aws:
-			s.WriteMoreIf(&wroteField)
-			s.WriteObjectField("aws")
-			ov.Aws.MarshalProtoJSON(s.WithField("aws"))
-		case *ProviderConfig_OnPrem:
-			s.WriteMoreIf(&wroteField)
-			s.WriteObjectField("onPrem")
-			ov.OnPrem.MarshalProtoJSON(s.WithField("onPrem"))
-		}
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the ProviderConfig to JSON.
-func (x *ProviderConfig) MarshalJSON() ([]byte, error) {
-	return json.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the ProviderConfig message from JSON.
-func (x *ProviderConfig) UnmarshalProtoJSON(s *json.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.Skip() // ignore unknown field
-		case "gcp":
-			ov := &ProviderConfig_Gcp{}
-			x.Provider = ov
-			if s.ReadNil() {
-				ov.Gcp = nil
-				return
-			}
-			ov.Gcp = &GcpConfig{}
-			ov.Gcp.UnmarshalProtoJSON(s.WithField("gcp", true))
-		case "aws":
-			ov := &ProviderConfig_Aws{}
-			x.Provider = ov
-			if s.ReadNil() {
-				ov.Aws = nil
-				return
-			}
-			ov.Aws = &AwsConfig{}
-			ov.Aws.UnmarshalProtoJSON(s.WithField("aws", true))
-		case "on_prem", "onPrem":
-			ov := &ProviderConfig_OnPrem{}
-			x.Provider = ov
-			if s.ReadNil() {
-				ov.OnPrem = nil
-				return
-			}
-			ov.OnPrem = &OnPremConfig{}
-			ov.OnPrem.UnmarshalProtoJSON(s.WithField("on_prem", true))
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the ProviderConfig from JSON.
-func (x *ProviderConfig) UnmarshalJSON(b []byte) error {
-	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the GcpConfig message to JSON.
-func (x *GcpConfig) MarshalProtoJSON(s *json.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.FolderId != "" || s.HasField("folderId") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("folderId")
-		s.WriteString(x.FolderId)
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the GcpConfig to JSON.
-func (x *GcpConfig) MarshalJSON() ([]byte, error) {
-	return json.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the GcpConfig message from JSON.
-func (x *GcpConfig) UnmarshalProtoJSON(s *json.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.Skip() // ignore unknown field
-		case "folder_id", "folderId":
-			s.AddField("folder_id")
-			x.FolderId = s.ReadString()
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the GcpConfig from JSON.
-func (x *GcpConfig) UnmarshalJSON(b []byte) error {
-	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the AwsConfig message to JSON.
-func (x *AwsConfig) MarshalProtoJSON(s *json.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.AccountId != "" || s.HasField("accountId") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("accountId")
-		s.WriteString(x.AccountId)
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the AwsConfig to JSON.
-func (x *AwsConfig) MarshalJSON() ([]byte, error) {
-	return json.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the AwsConfig message from JSON.
-func (x *AwsConfig) UnmarshalProtoJSON(s *json.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.Skip() // ignore unknown field
-		case "account_id", "accountId":
-			s.AddField("account_id")
-			x.AccountId = s.ReadString()
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the AwsConfig from JSON.
-func (x *AwsConfig) UnmarshalJSON(b []byte) error {
-	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the OnPremConfig message to JSON.
-func (x *OnPremConfig) MarshalProtoJSON(s *json.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.EnvironmentId != "" || s.HasField("environmentId") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("environmentId")
-		s.WriteString(x.EnvironmentId)
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the OnPremConfig to JSON.
-func (x *OnPremConfig) MarshalJSON() ([]byte, error) {
-	return json.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the OnPremConfig message from JSON.
-func (x *OnPremConfig) UnmarshalProtoJSON(s *json.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.Skip() // ignore unknown field
-		case "environment_id", "environmentId":
-			s.AddField("environment_id")
-			x.EnvironmentId = s.ReadString()
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the OnPremConfig from JSON.
-func (x *OnPremConfig) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON unmarshals the IntegrationBinding from JSON.
+func (x *IntegrationBinding) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -2181,26 +885,6 @@ func (x *CloudIntegrationStatus) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("lastSucceededAt")
 		x.LastSucceededAt.MarshalProtoJSON(s.WithField("lastSucceededAt"))
-	}
-	if x.Folder != nil || s.HasField("folder") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("folder")
-		x.Folder.MarshalProtoJSON(s.WithField("folder"))
-	}
-	if x.Projects != nil || s.HasField("projects") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("projects")
-		x.Projects.MarshalProtoJSON(s.WithField("projects"))
-	}
-	if x.ServiceAccounts != nil || s.HasField("serviceAccounts") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("serviceAccounts")
-		x.ServiceAccounts.MarshalProtoJSON(s.WithField("serviceAccounts"))
-	}
-	if x.Iam != nil || s.HasField("iam") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("iam")
-		x.Iam.MarshalProtoJSON(s.WithField("iam"))
 	}
 	s.WriteObjectEnd()
 }
@@ -2246,110 +930,12 @@ func (x *CloudIntegrationStatus) UnmarshalProtoJSON(s *json.UnmarshalState) {
 			}
 			x.LastSucceededAt = &timestamppb.Timestamp{}
 			x.LastSucceededAt.UnmarshalProtoJSON(s.WithField("last_succeeded_at", true))
-		case "folder":
-			if s.ReadNil() {
-				x.Folder = nil
-				return
-			}
-			x.Folder = &StepState{}
-			x.Folder.UnmarshalProtoJSON(s.WithField("folder", true))
-		case "projects":
-			if s.ReadNil() {
-				x.Projects = nil
-				return
-			}
-			x.Projects = &StepState{}
-			x.Projects.UnmarshalProtoJSON(s.WithField("projects", true))
-		case "service_accounts", "serviceAccounts":
-			if s.ReadNil() {
-				x.ServiceAccounts = nil
-				return
-			}
-			x.ServiceAccounts = &StepState{}
-			x.ServiceAccounts.UnmarshalProtoJSON(s.WithField("service_accounts", true))
-		case "iam":
-			if s.ReadNil() {
-				x.Iam = nil
-				return
-			}
-			x.Iam = &StepState{}
-			x.Iam.UnmarshalProtoJSON(s.WithField("iam", true))
 		}
 	})
 }
 
 // UnmarshalJSON unmarshals the CloudIntegrationStatus from JSON.
 func (x *CloudIntegrationStatus) UnmarshalJSON(b []byte) error {
-	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the StepState message to JSON.
-func (x *StepState) MarshalProtoJSON(s *json.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.Ready || s.HasField("ready") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("ready")
-		s.WriteBool(x.Ready)
-	}
-	if x.Reason != "" || s.HasField("reason") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("reason")
-		s.WriteString(x.Reason)
-	}
-	if x.Message != "" || s.HasField("message") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("message")
-		s.WriteString(x.Message)
-	}
-	if x.ObservedAt != nil || s.HasField("observedAt") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("observedAt")
-		x.ObservedAt.MarshalProtoJSON(s.WithField("observedAt"))
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the StepState to JSON.
-func (x *StepState) MarshalJSON() ([]byte, error) {
-	return json.DefaultMarshalerConfig.Marshal(x)
-}
-
-// UnmarshalProtoJSON unmarshals the StepState message from JSON.
-func (x *StepState) UnmarshalProtoJSON(s *json.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.Skip() // ignore unknown field
-		case "ready":
-			s.AddField("ready")
-			x.Ready = s.ReadBool()
-		case "reason":
-			s.AddField("reason")
-			x.Reason = s.ReadString()
-		case "message":
-			s.AddField("message")
-			x.Message = s.ReadString()
-		case "observed_at", "observedAt":
-			if s.ReadNil() {
-				x.ObservedAt = nil
-				return
-			}
-			x.ObservedAt = &timestamppb.Timestamp{}
-			x.ObservedAt.UnmarshalProtoJSON(s.WithField("observed_at", true))
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the StepState from JSON.
-func (x *StepState) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -2523,17 +1109,6 @@ func (m *CloudIntegrationSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.MirrorProjectIds) > 0 {
-		for iNdEx := len(m.MirrorProjectIds) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.MirrorProjectIds[iNdEx])
-			copy(dAtA[i:], m.MirrorProjectIds[iNdEx])
-			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.MirrorProjectIds[iNdEx])))
-			i--
-			dAtA[i] = 0x3
-			i--
-			dAtA[i] = 0xf2
-		}
-	}
 	if len(m.Labels) > 0 {
 		for k := range m.Labels {
 			v := m.Labels[k]
@@ -2550,19 +1125,10 @@ func (m *CloudIntegrationSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 			dAtA[i] = 0xa
 			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(baseI-i))
 			i--
-			dAtA[i] = 0x3
+			dAtA[i] = 0x2
 			i--
-			dAtA[i] = 0xea
+			dAtA[i] = 0xd2
 		}
-	}
-	if len(m.ProjectIdPrefix) > 0 {
-		i -= len(m.ProjectIdPrefix)
-		copy(dAtA[i:], m.ProjectIdPrefix)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ProjectIdPrefix)))
-		i--
-		dAtA[i] = 0x3
-		i--
-		dAtA[i] = 0xe2
 	}
 	if len(m.Capabilities) > 0 {
 		for iNdEx := len(m.Capabilities) - 1; iNdEx >= 0; iNdEx-- {
@@ -2570,9 +1136,9 @@ func (m *CloudIntegrationSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 			copy(dAtA[i:], m.Capabilities[iNdEx])
 			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Capabilities[iNdEx])))
 			i--
-			dAtA[i] = 0x3
+			dAtA[i] = 0x2
 			i--
-			dAtA[i] = 0x9a
+			dAtA[i] = 0xca
 		}
 	}
 	if m.Enabled {
@@ -2583,36 +1149,24 @@ func (m *CloudIntegrationSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x3
+		dAtA[i] = 0x2
 		i--
-		dAtA[i] = 0x90
+		dAtA[i] = 0xc0
+	}
+	if m.ProviderMirror != nil {
+		size, err := m.ProviderMirror.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xfa
 	}
 	if m.ProviderConfig != nil {
 		size, err := m.ProviderConfig.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x2
-		i--
-		dAtA[i] = 0xca
-	}
-	if m.Auth != nil {
-		size, err := m.Auth.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x2
-		i--
-		dAtA[i] = 0xc2
-	}
-	if m.CloudScope != nil {
-		size, err := m.CloudScope.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -2623,8 +1177,8 @@ func (m *CloudIntegrationSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 		i--
 		dAtA[i] = 0xf2
 	}
-	if m.ResourceBinding != nil {
-		size, err := m.ResourceBinding.MarshalToSizedBufferVT(dAtA[:i])
+	if m.Binding != nil {
+		size, err := m.Binding.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -2648,7 +1202,7 @@ func (m *CloudIntegrationSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *ResourceBinding) MarshalVT() (dAtA []byte, err error) {
+func (m *IntegrationBinding) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -2661,12 +1215,12 @@ func (m *ResourceBinding) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ResourceBinding) MarshalToVT(dAtA []byte) (int, error) {
+func (m *IntegrationBinding) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *ResourceBinding) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *IntegrationBinding) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -2678,10 +1232,10 @@ func (m *ResourceBinding) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.CloudName) > 0 {
-		i -= len(m.CloudName)
-		copy(dAtA[i:], m.CloudName)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.CloudName)))
+	if len(m.IntegrationName) > 0 {
+		i -= len(m.IntegrationName)
+		copy(dAtA[i:], m.IntegrationName)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.IntegrationName)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -2689,332 +1243,6 @@ func (m *ResourceBinding) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.OrganizationId)
 		copy(dAtA[i:], m.OrganizationId)
 		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.OrganizationId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *CloudScope) MarshalVT() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *CloudScope) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *CloudScope) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if m.BoundaryType != 0 {
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.BoundaryType))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.BoundaryId) > 0 {
-		i -= len(m.BoundaryId)
-		copy(dAtA[i:], m.BoundaryId)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.BoundaryId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Auth) MarshalVT() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Auth) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *Auth) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if len(m.CredentialRef) > 0 {
-		i -= len(m.CredentialRef)
-		copy(dAtA[i:], m.CredentialRef)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.CredentialRef)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.CredentialSource != 0 {
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.CredentialSource))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.AuthMode != 0 {
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.AuthMode))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ProviderConfig) MarshalVT() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ProviderConfig) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *ProviderConfig) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if vtmsg, ok := m.Provider.(interface {
-		MarshalToSizedBufferVT([]byte) (int, error)
-	}); ok {
-		size, err := vtmsg.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ProviderConfig_Gcp) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *ProviderConfig_Gcp) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Gcp != nil {
-		size, err := m.Gcp.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0xa
-	} else {
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, 0)
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-func (m *ProviderConfig_Aws) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *ProviderConfig_Aws) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Aws != nil {
-		size, err := m.Aws.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x12
-	} else {
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, 0)
-		i--
-		dAtA[i] = 0x12
-	}
-	return len(dAtA) - i, nil
-}
-func (m *ProviderConfig_OnPrem) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *ProviderConfig_OnPrem) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.OnPrem != nil {
-		size, err := m.OnPrem.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x1a
-	} else {
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, 0)
-		i--
-		dAtA[i] = 0x1a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *GcpConfig) MarshalVT() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GcpConfig) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *GcpConfig) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if len(m.FolderId) > 0 {
-		i -= len(m.FolderId)
-		copy(dAtA[i:], m.FolderId)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.FolderId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *AwsConfig) MarshalVT() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AwsConfig) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *AwsConfig) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if len(m.AccountId) > 0 {
-		i -= len(m.AccountId)
-		copy(dAtA[i:], m.AccountId)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.AccountId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *OnPremConfig) MarshalVT() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *OnPremConfig) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *OnPremConfig) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if len(m.EnvironmentId) > 0 {
-		i -= len(m.EnvironmentId)
-		copy(dAtA[i:], m.EnvironmentId)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.EnvironmentId)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -3050,54 +1278,6 @@ func (m *CloudIntegrationStatus) MarshalToSizedBufferVT(dAtA []byte) (int, error
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
-	}
-	if m.Iam != nil {
-		size, err := m.Iam.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x2
-		i--
-		dAtA[i] = 0x8a
-	}
-	if m.ServiceAccounts != nil {
-		size, err := m.ServiceAccounts.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x2
-		i--
-		dAtA[i] = 0x82
-	}
-	if m.Projects != nil {
-		size, err := m.Projects.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xfa
-	}
-	if m.Folder != nil {
-		size, err := m.Folder.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xf2
 	}
 	if m.LastSucceededAt != nil {
 		size, err := m.LastSucceededAt.MarshalToSizedBufferVT(dAtA[:i])
@@ -3150,73 +1330,6 @@ func (m *CloudIntegrationStatus) MarshalToSizedBufferVT(dAtA []byte) (int, error
 		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
 		i--
 		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *StepState) MarshalVT() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *StepState) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *StepState) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if m.ObservedAt != nil {
-		size, err := m.ObservedAt.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Message)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Reason) > 0 {
-		i -= len(m.Reason)
-		copy(dAtA[i:], m.Reason)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Reason)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.Ready {
-		i--
-		if m.Ready {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -3302,20 +1415,16 @@ func (m *CloudIntegrationSpec) SizeVT() (n int) {
 		l = m.Type.SizeVT()
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
-	if m.ResourceBinding != nil {
-		l = m.ResourceBinding.SizeVT()
-		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	if m.CloudScope != nil {
-		l = m.CloudScope.SizeVT()
-		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	if m.Auth != nil {
-		l = m.Auth.SizeVT()
+	if m.Binding != nil {
+		l = m.Binding.SizeVT()
 		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
 	if m.ProviderConfig != nil {
 		l = m.ProviderConfig.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.ProviderMirror != nil {
+		l = m.ProviderMirror.SizeVT()
 		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
 	if m.Enabled {
@@ -3327,10 +1436,6 @@ func (m *CloudIntegrationSpec) SizeVT() (n int) {
 			n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 		}
 	}
-	l = len(m.ProjectIdPrefix)
-	if l > 0 {
-		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
 	if len(m.Labels) > 0 {
 		for k, v := range m.Labels {
 			_ = k
@@ -3339,17 +1444,11 @@ func (m *CloudIntegrationSpec) SizeVT() (n int) {
 			n += mapEntrySize + 2 + protobuf_go_lite.SizeOfVarint(uint64(mapEntrySize))
 		}
 	}
-	if len(m.MirrorProjectIds) > 0 {
-		for _, s := range m.MirrorProjectIds {
-			l = len(s)
-			n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-		}
-	}
 	n += len(m.unknownFields)
 	return n
 }
 
-func (m *ResourceBinding) SizeVT() (n int) {
+func (m *IntegrationBinding) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3359,141 +1458,7 @@ func (m *ResourceBinding) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
-	l = len(m.CloudName)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	n += len(m.unknownFields)
-	return n
-}
-
-func (m *CloudScope) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.BoundaryId)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	if m.BoundaryType != 0 {
-		n += 1 + protobuf_go_lite.SizeOfVarint(uint64(m.BoundaryType))
-	}
-	n += len(m.unknownFields)
-	return n
-}
-
-func (m *Auth) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.AuthMode != 0 {
-		n += 1 + protobuf_go_lite.SizeOfVarint(uint64(m.AuthMode))
-	}
-	if m.CredentialSource != 0 {
-		n += 1 + protobuf_go_lite.SizeOfVarint(uint64(m.CredentialSource))
-	}
-	l = len(m.CredentialRef)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	n += len(m.unknownFields)
-	return n
-}
-
-func (m *ProviderConfig) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if vtmsg, ok := m.Provider.(interface{ SizeVT() int }); ok {
-		n += vtmsg.SizeVT()
-	}
-	n += len(m.unknownFields)
-	return n
-}
-
-func (m *ProviderConfig_Gcp) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Gcp != nil {
-		l = m.Gcp.SizeVT()
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	} else {
-		n += 2
-	}
-	return n
-}
-func (m *ProviderConfig_Aws) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Aws != nil {
-		l = m.Aws.SizeVT()
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	} else {
-		n += 2
-	}
-	return n
-}
-func (m *ProviderConfig_OnPrem) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.OnPrem != nil {
-		l = m.OnPrem.SizeVT()
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	} else {
-		n += 2
-	}
-	return n
-}
-func (m *GcpConfig) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.FolderId)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	n += len(m.unknownFields)
-	return n
-}
-
-func (m *AwsConfig) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.AccountId)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	n += len(m.unknownFields)
-	return n
-}
-
-func (m *OnPremConfig) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.EnvironmentId)
+	l = len(m.IntegrationName)
 	if l > 0 {
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
@@ -3526,47 +1491,6 @@ func (m *CloudIntegrationStatus) SizeVT() (n int) {
 	if m.LastSucceededAt != nil {
 		l = m.LastSucceededAt.SizeVT()
 		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	if m.Folder != nil {
-		l = m.Folder.SizeVT()
-		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	if m.Projects != nil {
-		l = m.Projects.SizeVT()
-		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	if m.ServiceAccounts != nil {
-		l = m.ServiceAccounts.SizeVT()
-		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	if m.Iam != nil {
-		l = m.Iam.SizeVT()
-		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	n += len(m.unknownFields)
-	return n
-}
-
-func (m *StepState) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Ready {
-		n += 2
-	}
-	l = len(m.Reason)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	if m.ObservedAt != nil {
-		l = m.ObservedAt.SizeVT()
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -3850,7 +1774,7 @@ func (m *CloudIntegrationSpec) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 20:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ResourceBinding", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Binding", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3877,86 +1801,14 @@ func (m *CloudIntegrationSpec) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.ResourceBinding == nil {
-				m.ResourceBinding = &ResourceBinding{}
+			if m.Binding == nil {
+				m.Binding = &IntegrationBinding{}
 			}
-			if err := m.ResourceBinding.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Binding.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 30:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CloudScope", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.CloudScope == nil {
-				m.CloudScope = &CloudScope{}
-			}
-			if err := m.CloudScope.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 40:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Auth", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Auth == nil {
-				m.Auth = &Auth{}
-			}
-			if err := m.Auth.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 41:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ProviderConfig", wireType)
 			}
@@ -3986,13 +1838,49 @@ func (m *CloudIntegrationSpec) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ProviderConfig == nil {
-				m.ProviderConfig = &ProviderConfig{}
+				m.ProviderConfig = &anypb.Any{}
 			}
 			if err := m.ProviderConfig.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 50:
+		case 31:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProviderMirror", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ProviderMirror == nil {
+				m.ProviderMirror = &anypb.Any{}
+			}
+			if err := m.ProviderMirror.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 40:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Enabled", wireType)
 			}
@@ -4012,7 +1900,7 @@ func (m *CloudIntegrationSpec) UnmarshalVT(dAtA []byte) error {
 				}
 			}
 			m.Enabled = bool(v != 0)
-		case 51:
+		case 41:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Capabilities", wireType)
 			}
@@ -4044,39 +1932,7 @@ func (m *CloudIntegrationSpec) UnmarshalVT(dAtA []byte) error {
 			}
 			m.Capabilities = append(m.Capabilities, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 60:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ProjectIdPrefix", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ProjectIdPrefix = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 61:
+		case 42:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
 			}
@@ -4203,38 +2059,6 @@ func (m *CloudIntegrationSpec) UnmarshalVT(dAtA []byte) error {
 			}
 			m.Labels[mapkey] = mapvalue
 			iNdEx = postIndex
-		case 62:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MirrorProjectIds", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.MirrorProjectIds = append(m.MirrorProjectIds, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
@@ -4257,7 +2081,7 @@ func (m *CloudIntegrationSpec) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ResourceBinding) UnmarshalVT(dAtA []byte) error {
+func (m *IntegrationBinding) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4280,10 +2104,10 @@ func (m *ResourceBinding) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ResourceBinding: wiretype end group for non-group")
+			return fmt.Errorf("proto: IntegrationBinding: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ResourceBinding: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: IntegrationBinding: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -4320,7 +2144,7 @@ func (m *ResourceBinding) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CloudName", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field IntegrationName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4348,653 +2172,7 @@ func (m *ResourceBinding) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CloudName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *CloudScope) UnmarshalVT(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return protobuf_go_lite.ErrIntOverflow
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: CloudScope: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CloudScope: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BoundaryId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.BoundaryId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BoundaryType", wireType)
-			}
-			m.BoundaryType = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BoundaryType |= ScopeType(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Auth) UnmarshalVT(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return protobuf_go_lite.ErrIntOverflow
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Auth: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Auth: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AuthMode", wireType)
-			}
-			m.AuthMode = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.AuthMode |= AuthMode(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CredentialSource", wireType)
-			}
-			m.CredentialSource = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.CredentialSource |= CredentialSource(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CredentialRef", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.CredentialRef = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ProviderConfig) UnmarshalVT(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return protobuf_go_lite.ErrIntOverflow
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ProviderConfig: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ProviderConfig: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Gcp", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if oneof, ok := m.Provider.(*ProviderConfig_Gcp); ok {
-				if err := oneof.Gcp.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-					return err
-				}
-			} else {
-				v := &GcpConfig{}
-				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-					return err
-				}
-				m.Provider = &ProviderConfig_Gcp{Gcp: v}
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Aws", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if oneof, ok := m.Provider.(*ProviderConfig_Aws); ok {
-				if err := oneof.Aws.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-					return err
-				}
-			} else {
-				v := &AwsConfig{}
-				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-					return err
-				}
-				m.Provider = &ProviderConfig_Aws{Aws: v}
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OnPrem", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if oneof, ok := m.Provider.(*ProviderConfig_OnPrem); ok {
-				if err := oneof.OnPrem.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-					return err
-				}
-			} else {
-				v := &OnPremConfig{}
-				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-					return err
-				}
-				m.Provider = &ProviderConfig_OnPrem{OnPrem: v}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GcpConfig) UnmarshalVT(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return protobuf_go_lite.ErrIntOverflow
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GcpConfig: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GcpConfig: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FolderId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FolderId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AwsConfig) UnmarshalVT(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return protobuf_go_lite.ErrIntOverflow
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AwsConfig: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AwsConfig: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AccountId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AccountId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *OnPremConfig) UnmarshalVT(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return protobuf_go_lite.ErrIntOverflow
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: OnPremConfig: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: OnPremConfig: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EnvironmentId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.EnvironmentId = string(dAtA[iNdEx:postIndex])
+			m.IntegrationName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -5216,321 +2394,6 @@ func (m *CloudIntegrationStatus) UnmarshalVT(dAtA []byte) error {
 				m.LastSucceededAt = &timestamppb.Timestamp{}
 			}
 			if err := m.LastSucceededAt.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 30:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Folder", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Folder == nil {
-				m.Folder = &StepState{}
-			}
-			if err := m.Folder.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 31:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Projects", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Projects == nil {
-				m.Projects = &StepState{}
-			}
-			if err := m.Projects.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 32:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ServiceAccounts", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ServiceAccounts == nil {
-				m.ServiceAccounts = &StepState{}
-			}
-			if err := m.ServiceAccounts.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 33:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Iam", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Iam == nil {
-				m.Iam = &StepState{}
-			}
-			if err := m.Iam.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *StepState) UnmarshalVT(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return protobuf_go_lite.ErrIntOverflow
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: StepState: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: StepState: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Ready", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Ready = bool(v != 0)
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Reason", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Reason = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ObservedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protobuf_go_lite.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ObservedAt == nil {
-				m.ObservedAt = &timestamppb.Timestamp{}
-			}
-			if err := m.ObservedAt.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

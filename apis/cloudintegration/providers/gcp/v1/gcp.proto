@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package cloudintegration.providers.gcp.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/cloudintegration/providers/gcp/v1;gcp";
+
+message GcpProviderConfig {
+  string folder_id = 1;
+  GcpAuth auth = 2;
+}
+
+message GcpAuth {
+  Mode mode = 1;
+  CredentialSource credential_source = 2;
+  string credential_ref = 3;
+
+  enum Mode {
+    MODE_UNSPECIFIED = 0;
+    MODE_SERVICE_ACCOUNT_JSON = 1;
+    MODE_WORKLOAD_IDENTITY_FEDERATION = 2;
+    MODE_PLATFORM_IDENTITY = 3;
+  }
+
+  enum CredentialSource {
+    CREDENTIAL_SOURCE_UNSPECIFIED = 0;
+    CREDENTIAL_SOURCE_GOOGLE_APPLICATION_CREDENTIALS = 1;
+    CREDENTIAL_SOURCE_SECRET_REF = 2;
+    CREDENTIAL_SOURCE_INLINE = 3;
+  }
+}
+
+message GcpMirrorRequest {
+  repeated string source_project_ids = 1;
+  string naming_prefix = 2;
+}

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package cloudintegration.providers.onprem.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/cloudintegration/providers/onprem/v1;onprem";
+
+message OnPremProviderConfig {
+  string environment_id = 1;
+}
+
+message OnPremMirrorRequest {
+  repeated string source_ids = 1;
+  string naming_prefix = 2;
+}

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package cloudintegration.providers.aws.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/cloudintegration/providers/aws/v1;aws";
+
+message AwsProviderConfig {
+  string account_id = 1;
+}
+
+message AwsMirrorRequest {
+  repeated string source_ids = 1;
+  string naming_prefix = 2;
+}

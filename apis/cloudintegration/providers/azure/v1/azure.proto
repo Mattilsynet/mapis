@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package cloudintegration.providers.azure.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/cloudintegration/providers/azure/v1;azure";
+
+message AzureProviderConfig {
+  string tenant_id = 1;
+  string subscription_id = 2;
+  string management_group_id = 3;
+}
+
+message AzureMirrorRequest {
+  repeated string source_ids = 1;
+  string naming_prefix = 2;
+}
