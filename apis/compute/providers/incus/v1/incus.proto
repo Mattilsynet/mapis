@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package compute.providers.incus.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/compute/providers/incus/v1;incus";
+
+message IncusComputeConfig {
+  // Example: https://127.0.0.1:8443
+  string endpoint = 1;
+
+  // Tenant boundary for mapv2 project.
+  string incus_project = 2;
+
+  IncusAuth auth = 3;
+}
+
+message IncusAuth {
+  enum Mode {
+    MODE_UNSPECIFIED = 0;
+    MODE_MTLS_CLIENT_CERT = 1;
+  }
+
+  enum CredentialSource {
+    CREDENTIAL_SOURCE_UNSPECIFIED = 0;
+    CREDENTIAL_SOURCE_ENV = 1;
+    CREDENTIAL_SOURCE_FILE_PATH = 2;
+    CREDENTIAL_SOURCE_SECRET_REF = 3;
+  }
+
+  Mode mode = 1;
+  CredentialSource credential_source = 2;
+
+  // Future secret-manager references.
+  string client_cert_ref = 3;
+  string client_key_ref = 4;
+
+  // Optional env var names for credentials.
+  // Path mode example values:
+  //   INCUS_CLIENT_CERT_PATH
+  //   INCUS_CLIENT_KEY_PATH
+  // PEM mode example values:
+  //   INCUS_CLIENT_CERT_PEM
+  //   INCUS_CLIENT_KEY_PEM
+  string client_cert_env_ref = 5;
+  string client_key_env_ref = 6;
+}
+
+message IncusContainerEnableRequest {
+  string name = 1;
+  string image = 2;
+  map<string, string> config = 3;
+}
+
+message IncusVMEnableRequest {
+  string name = 1;
+  string image = 2;
+  map<string, string> config = 3;
+}

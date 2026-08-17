@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package compute.v1;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/compute/v1;compute";
+
+message Compute {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  ComputeSpec spec = 20;
+  ComputeStatus status = 30;
+}
+
+message ComputeSpec {
+  meta.v1.TypeMeta type = 1;
+
+  ComputeBinding binding = 20;
+
+  // Provider-specific runtime configuration payload.
+  // Example type_url:
+  // type.googleapis.com/compute.providers.gcp.v1.GcpComputeConfig
+  // type.googleapis.com/compute.providers.incus.v1.IncusComputeConfig
+  google.protobuf.Any provider_config = 30;
+
+  // Provider-specific provisioning/enable request payload.
+  // Example type_url:
+  // type.googleapis.com/compute.providers.gcp.v1.GcpCloudRunEnableRequest
+  // type.googleapis.com/compute.providers.incus.v1.IncusContainerEnableRequest
+  google.protobuf.Any provider_request = 31;
+
+  bool enabled = 40;
+  repeated string capabilities = 41;
+  map<string, string> labels = 42;
+}
+
+message ComputeBinding {
+  string organization_id = 1;
+  string project_id = 2;
+  string compute_name = 3;
+}
+
+message ComputeStatus {
+  status.v1.Status status = 1;
+
+  string reconciler_reason = 20;
+  string reconciler_message = 21;
+  google.protobuf.Timestamp last_attempted_at = 22;
+  google.protobuf.Timestamp last_succeeded_at = 23;
+}
+
+message ComputeList {
+  repeated Compute items = 1;
+}

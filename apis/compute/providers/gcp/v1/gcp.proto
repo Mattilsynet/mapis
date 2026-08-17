@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package compute.providers.gcp.v1;
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/compute/providers/gcp/v1;gcp";
+
+message GcpComputeConfig {
+  string project_id = 1;
+  string region = 2;
+  GcpAuth auth = 3;
+}
+
+message GcpAuth {
+  enum Mode {
+    MODE_UNSPECIFIED = 0;
+    MODE_SERVICE_ACCOUNT_JSON = 1;
+    MODE_WORKLOAD_IDENTITY_FEDERATION = 2;
+    MODE_PLATFORM_IDENTITY = 3;
+  }
+
+  enum CredentialSource {
+    CREDENTIAL_SOURCE_UNSPECIFIED = 0;
+    CREDENTIAL_SOURCE_ENV = 1;
+    CREDENTIAL_SOURCE_FILE_PATH = 2;
+    CREDENTIAL_SOURCE_SECRET_REF = 3;
+  }
+
+  Mode mode = 1;
+  CredentialSource credential_source = 2;
+
+  // Future secret-manager reference.
+  string credential_ref = 3;
+
+  // Optional env var name containing absolute credentials file path.
+  // Example: GOOGLE_APPLICATION_CREDENTIALS
+  string credential_env_ref = 4;
+
+  // Optional env var name containing base directory with per-project
+  // credentials files using <project-id>.json naming.
+  string credentials_dir_env_ref = 5;
+
+  // Optional env var name containing explicit CSV map:
+  // projectA=/abs/a.json,projectB=/abs/b.json
+  string credentials_map_env_ref = 6;
+}
+
+message GcpCloudRunEnableRequest {
+  string service_name = 1;
+  string image = 2;
+  uint32 container_port = 3;
+  bool allow_unauthenticated = 4;
+  map<string, string> env = 5;
+}
+
+message GcpComputeVMEnableRequest {
+  string instance_name = 1;
+  string machine_type = 2;
+  string image = 3;
+  map<string, string> labels = 4;
+}
