@@ -45,5 +45,8 @@ message QueryStatus {
 message QueryFilter {
   string name = 1;
   StatusFilter statusFilter = 10;
+  // project scopes the query to a single project (e.g. project-scoped service
+  // listing). Empty means the query is not project-scoped.
+  string project = 20;
 }
 message StatusFilter { bool status_is_ready = 1; }
