@@ -51,6 +51,17 @@ message ComputeStatus {
   string reconciler_message = 21;
   google.protobuf.Timestamp last_attempted_at = 22;
   google.protobuf.Timestamp last_succeeded_at = 23;
+
+  // Provider identifier currently serving this compute workload.
+  // Example values: "gcp", "incus".
+  string observed_provider = 24;
+
+  // High-level lifecycle state exposed by provider/domain logic.
+  // Example values: "PENDING", "PROVISIONING", "READY", "FAILED".
+  string observed_state = 25;
+
+  // Provider-specific external id/reference (instance id, service id, etc.).
+  string external_ref = 26;
 }
 
 message ComputeList {

@@ -174,6 +174,14 @@ type ComputeStatus struct {
 	ReconcilerMessage string                 `protobuf:"bytes,21,opt,name=reconciler_message,json=reconcilerMessage,proto3" json:"reconcilerMessage,omitempty"`
 	LastAttemptedAt   *timestamppb.Timestamp `protobuf:"bytes,22,opt,name=last_attempted_at,json=lastAttemptedAt,proto3" json:"lastAttemptedAt,omitempty"`
 	LastSucceededAt   *timestamppb.Timestamp `protobuf:"bytes,23,opt,name=last_succeeded_at,json=lastSucceededAt,proto3" json:"lastSucceededAt,omitempty"`
+	// Provider identifier currently serving this compute workload.
+	// Example values: "gcp", "incus".
+	ObservedProvider string `protobuf:"bytes,24,opt,name=observed_provider,json=observedProvider,proto3" json:"observedProvider,omitempty"`
+	// High-level lifecycle state exposed by provider/domain logic.
+	// Example values: "PENDING", "PROVISIONING", "READY", "FAILED".
+	ObservedState string `protobuf:"bytes,25,opt,name=observed_state,json=observedState,proto3" json:"observedState,omitempty"`
+	// Provider-specific external id/reference (instance id, service id, etc.).
+	ExternalRef string `protobuf:"bytes,26,opt,name=external_ref,json=externalRef,proto3" json:"externalRef,omitempty"`
 }
 
 func (x *ComputeStatus) Reset() {
@@ -215,6 +223,27 @@ func (x *ComputeStatus) GetLastSucceededAt() *timestamppb.Timestamp {
 		return x.LastSucceededAt
 	}
 	return nil
+}
+
+func (x *ComputeStatus) GetObservedProvider() string {
+	if x != nil {
+		return x.ObservedProvider
+	}
+	return ""
+}
+
+func (x *ComputeStatus) GetObservedState() string {
+	if x != nil {
+		return x.ObservedState
+	}
+	return ""
+}
+
+func (x *ComputeStatus) GetExternalRef() string {
+	if x != nil {
+		return x.ExternalRef
+	}
+	return ""
 }
 
 type ComputeList struct {
@@ -341,6 +370,9 @@ func (m *ComputeStatus) CloneVT() *ComputeStatus {
 	r := new(ComputeStatus)
 	r.ReconcilerReason = m.ReconcilerReason
 	r.ReconcilerMessage = m.ReconcilerMessage
+	r.ObservedProvider = m.ObservedProvider
+	r.ObservedState = m.ObservedState
+	r.ExternalRef = m.ExternalRef
 	if rhs := m.Status; rhs != nil {
 		r.Status = rhs.CloneVT()
 	}
@@ -505,6 +537,15 @@ func (this *ComputeStatus) EqualVT(that *ComputeStatus) bool {
 		return false
 	}
 	if !this.LastSucceededAt.EqualVT(that.LastSucceededAt) {
+		return false
+	}
+	if this.ObservedProvider != that.ObservedProvider {
+		return false
+	}
+	if this.ObservedState != that.ObservedState {
+		return false
+	}
+	if this.ExternalRef != that.ExternalRef {
 		return false
 	}
 	return string(this.unknownFields) == string(that.unknownFields)
@@ -898,6 +939,21 @@ func (x *ComputeStatus) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("lastSucceededAt")
 		x.LastSucceededAt.MarshalProtoJSON(s.WithField("lastSucceededAt"))
 	}
+	if x.ObservedProvider != "" || s.HasField("observedProvider") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("observedProvider")
+		s.WriteString(x.ObservedProvider)
+	}
+	if x.ObservedState != "" || s.HasField("observedState") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("observedState")
+		s.WriteString(x.ObservedState)
+	}
+	if x.ExternalRef != "" || s.HasField("externalRef") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("externalRef")
+		s.WriteString(x.ExternalRef)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -942,6 +998,15 @@ func (x *ComputeStatus) UnmarshalProtoJSON(s *json.UnmarshalState) {
 			}
 			x.LastSucceededAt = &timestamppb.Timestamp{}
 			x.LastSucceededAt.UnmarshalProtoJSON(s.WithField("last_succeeded_at", true))
+		case "observed_provider", "observedProvider":
+			s.AddField("observed_provider")
+			x.ObservedProvider = s.ReadString()
+		case "observed_state", "observedState":
+			s.AddField("observed_state")
+			x.ObservedState = s.ReadString()
+		case "external_ref", "externalRef":
+			s.AddField("external_ref")
+			x.ExternalRef = s.ReadString()
 		}
 	})
 }
@@ -1298,6 +1363,33 @@ func (m *ComputeStatus) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ExternalRef) > 0 {
+		i -= len(m.ExternalRef)
+		copy(dAtA[i:], m.ExternalRef)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ExternalRef)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xd2
+	}
+	if len(m.ObservedState) > 0 {
+		i -= len(m.ObservedState)
+		copy(dAtA[i:], m.ObservedState)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ObservedState)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xca
+	}
+	if len(m.ObservedProvider) > 0 {
+		i -= len(m.ObservedProvider)
+		copy(dAtA[i:], m.ObservedProvider)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ObservedProvider)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xc2
+	}
 	if m.LastSucceededAt != nil {
 		size, err := m.LastSucceededAt.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
@@ -1513,6 +1605,18 @@ func (m *ComputeStatus) SizeVT() (n int) {
 	}
 	if m.LastSucceededAt != nil {
 		l = m.LastSucceededAt.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ObservedProvider)
+	if l > 0 {
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ObservedState)
+	if l > 0 {
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ExternalRef)
+	if l > 0 {
 		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
@@ -2221,6 +2325,102 @@ func (m *ComputeStatus) UnmarshalVT(dAtA []byte) error {
 			if err := m.LastSucceededAt.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 24:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ObservedProvider", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ObservedProvider = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 25:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ObservedState", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ObservedState = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 26:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ExternalRef", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ExternalRef = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
