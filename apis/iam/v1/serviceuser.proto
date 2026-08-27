@@ -65,6 +65,24 @@ message ServiceUserStatus {
   
   // last_active - last time this service user was used
   google.protobuf.Timestamp last_active = 22;
+
+  // pat_credential stores the Keyhole-wrapped PAT ciphertext and the metadata
+  // required to address the Keyhole wrapping key. Plaintext PAT material and
+  // Keyhole wrapping keys are never persisted in this resource.
+  ServiceUserPATCredential pat_credential = 23;
+}
+
+message ServiceUserPATCredential {
+  string token_id = 1;
+  bytes ciphertext = 2;
+  string subsystem = 3;
+  string kind = 4;
+  string resource_id = 5;
+  string organization_id = 6;
+  string project_id = 7;
+  string zitadel_id = 8;
+  google.protobuf.Timestamp expires_at = 9;
+  google.protobuf.Timestamp minted_at = 10;
 }
 
 message ServiceUserList {

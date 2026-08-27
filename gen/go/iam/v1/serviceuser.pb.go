@@ -202,6 +202,10 @@ type ServiceUserStatus struct {
 	ZitadelId string `protobuf:"bytes,21,opt,name=zitadel_id,json=zitadelId,proto3" json:"zitadelId,omitempty"`
 	// last_active - last time this service user was used
 	LastActive *timestamppb.Timestamp `protobuf:"bytes,22,opt,name=last_active,json=lastActive,proto3" json:"lastActive,omitempty"`
+	// pat_credential stores the Keyhole-wrapped PAT ciphertext and the metadata
+	// required to address the Keyhole wrapping key. Plaintext PAT material and
+	// Keyhole wrapping keys are never persisted in this resource.
+	PatCredential *ServiceUserPATCredential `protobuf:"bytes,23,opt,name=pat_credential,json=patCredential,proto3" json:"patCredential,omitempty"`
 }
 
 func (x *ServiceUserStatus) Reset() {
@@ -227,6 +231,103 @@ func (x *ServiceUserStatus) GetZitadelId() string {
 func (x *ServiceUserStatus) GetLastActive() *timestamppb.Timestamp {
 	if x != nil {
 		return x.LastActive
+	}
+	return nil
+}
+
+func (x *ServiceUserStatus) GetPatCredential() *ServiceUserPATCredential {
+	if x != nil {
+		return x.PatCredential
+	}
+	return nil
+}
+
+type ServiceUserPATCredential struct {
+	unknownFields  []byte
+	TokenId        string                 `protobuf:"bytes,1,opt,name=token_id,json=tokenId,proto3" json:"tokenId,omitempty"`
+	Ciphertext     []byte                 `protobuf:"bytes,2,opt,name=ciphertext,proto3" json:"ciphertext,omitempty"`
+	Subsystem      string                 `protobuf:"bytes,3,opt,name=subsystem,proto3" json:"subsystem,omitempty"`
+	Kind           string                 `protobuf:"bytes,4,opt,name=kind,proto3" json:"kind,omitempty"`
+	ResourceId     string                 `protobuf:"bytes,5,opt,name=resource_id,json=resourceId,proto3" json:"resourceId,omitempty"`
+	OrganizationId string                 `protobuf:"bytes,6,opt,name=organization_id,json=organizationId,proto3" json:"organizationId,omitempty"`
+	ProjectId      string                 `protobuf:"bytes,7,opt,name=project_id,json=projectId,proto3" json:"projectId,omitempty"`
+	ZitadelId      string                 `protobuf:"bytes,8,opt,name=zitadel_id,json=zitadelId,proto3" json:"zitadelId,omitempty"`
+	ExpiresAt      *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=expires_at,json=expiresAt,proto3" json:"expiresAt,omitempty"`
+	MintedAt       *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=minted_at,json=mintedAt,proto3" json:"mintedAt,omitempty"`
+}
+
+func (x *ServiceUserPATCredential) Reset() {
+	*x = ServiceUserPATCredential{}
+}
+
+func (*ServiceUserPATCredential) ProtoMessage() {}
+
+func (x *ServiceUserPATCredential) GetTokenId() string {
+	if x != nil {
+		return x.TokenId
+	}
+	return ""
+}
+
+func (x *ServiceUserPATCredential) GetCiphertext() []byte {
+	if x != nil {
+		return x.Ciphertext
+	}
+	return nil
+}
+
+func (x *ServiceUserPATCredential) GetSubsystem() string {
+	if x != nil {
+		return x.Subsystem
+	}
+	return ""
+}
+
+func (x *ServiceUserPATCredential) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *ServiceUserPATCredential) GetResourceId() string {
+	if x != nil {
+		return x.ResourceId
+	}
+	return ""
+}
+
+func (x *ServiceUserPATCredential) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *ServiceUserPATCredential) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *ServiceUserPATCredential) GetZitadelId() string {
+	if x != nil {
+		return x.ZitadelId
+	}
+	return ""
+}
+
+func (x *ServiceUserPATCredential) GetExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return nil
+}
+
+func (x *ServiceUserPATCredential) GetMintedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.MintedAt
 	}
 	return nil
 }
@@ -316,6 +417,7 @@ func (m *ServiceUserStatus) CloneVT() *ServiceUserStatus {
 	}
 	r := new(ServiceUserStatus)
 	r.ZitadelId = m.ZitadelId
+	r.PatCredential = m.PatCredential.CloneVT()
 	if rhs := m.Status; rhs != nil {
 		r.Status = rhs.CloneVT()
 	}
@@ -329,6 +431,37 @@ func (m *ServiceUserStatus) CloneVT() *ServiceUserStatus {
 }
 
 func (m *ServiceUserStatus) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
+func (m *ServiceUserPATCredential) CloneVT() *ServiceUserPATCredential {
+	if m == nil {
+		return (*ServiceUserPATCredential)(nil)
+	}
+	r := new(ServiceUserPATCredential)
+	r.TokenId = m.TokenId
+	r.Subsystem = m.Subsystem
+	r.Kind = m.Kind
+	r.ResourceId = m.ResourceId
+	r.OrganizationId = m.OrganizationId
+	r.ProjectId = m.ProjectId
+	r.ZitadelId = m.ZitadelId
+	if rhs := m.Ciphertext; rhs != nil {
+		r.Ciphertext = slices.Clone(rhs)
+	}
+	if rhs := m.ExpiresAt; rhs != nil {
+		r.ExpiresAt = rhs.CloneVT()
+	}
+	if rhs := m.MintedAt; rhs != nil {
+		r.MintedAt = rhs.CloneVT()
+	}
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = slices.Clone(m.unknownFields)
+	}
+	return r
+}
+
+func (m *ServiceUserPATCredential) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
@@ -452,11 +585,60 @@ func (this *ServiceUserStatus) EqualVT(that *ServiceUserStatus) bool {
 	if !this.LastActive.EqualVT(that.LastActive) {
 		return false
 	}
+	if !this.PatCredential.EqualVT(that.PatCredential) {
+		return false
+	}
 	return string(this.unknownFields) == string(that.unknownFields)
 }
 
 func (this *ServiceUserStatus) EqualMessageVT(thatMsg any) bool {
 	that, ok := thatMsg.(*ServiceUserStatus)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *ServiceUserPATCredential) EqualVT(that *ServiceUserPATCredential) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if this.TokenId != that.TokenId {
+		return false
+	}
+	if string(this.Ciphertext) != string(that.Ciphertext) {
+		return false
+	}
+	if this.Subsystem != that.Subsystem {
+		return false
+	}
+	if this.Kind != that.Kind {
+		return false
+	}
+	if this.ResourceId != that.ResourceId {
+		return false
+	}
+	if this.OrganizationId != that.OrganizationId {
+		return false
+	}
+	if this.ProjectId != that.ProjectId {
+		return false
+	}
+	if this.ZitadelId != that.ZitadelId {
+		return false
+	}
+	if !this.ExpiresAt.EqualVT(that.ExpiresAt) {
+		return false
+	}
+	if !this.MintedAt.EqualVT(that.MintedAt) {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *ServiceUserPATCredential) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*ServiceUserPATCredential)
 	if !ok {
 		return false
 	}
@@ -777,6 +959,11 @@ func (x *ServiceUserStatus) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("lastActive")
 		x.LastActive.MarshalProtoJSON(s.WithField("lastActive"))
 	}
+	if x.PatCredential != nil || s.HasField("patCredential") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("patCredential")
+		x.PatCredential.MarshalProtoJSON(s.WithField("patCredential"))
+	}
 	s.WriteObjectEnd()
 }
 
@@ -811,12 +998,141 @@ func (x *ServiceUserStatus) UnmarshalProtoJSON(s *json.UnmarshalState) {
 			}
 			x.LastActive = &timestamppb.Timestamp{}
 			x.LastActive.UnmarshalProtoJSON(s.WithField("last_active", true))
+		case "pat_credential", "patCredential":
+			if s.ReadNil() {
+				x.PatCredential = nil
+				return
+			}
+			x.PatCredential = &ServiceUserPATCredential{}
+			x.PatCredential.UnmarshalProtoJSON(s.WithField("pat_credential", true))
 		}
 	})
 }
 
 // UnmarshalJSON unmarshals the ServiceUserStatus from JSON.
 func (x *ServiceUserStatus) UnmarshalJSON(b []byte) error {
+	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ServiceUserPATCredential message to JSON.
+func (x *ServiceUserPATCredential) MarshalProtoJSON(s *json.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.TokenId != "" || s.HasField("tokenId") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("tokenId")
+		s.WriteString(x.TokenId)
+	}
+	if len(x.Ciphertext) > 0 || s.HasField("ciphertext") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ciphertext")
+		s.WriteBytes(x.Ciphertext)
+	}
+	if x.Subsystem != "" || s.HasField("subsystem") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("subsystem")
+		s.WriteString(x.Subsystem)
+	}
+	if x.Kind != "" || s.HasField("kind") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("kind")
+		s.WriteString(x.Kind)
+	}
+	if x.ResourceId != "" || s.HasField("resourceId") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("resourceId")
+		s.WriteString(x.ResourceId)
+	}
+	if x.OrganizationId != "" || s.HasField("organizationId") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("organizationId")
+		s.WriteString(x.OrganizationId)
+	}
+	if x.ProjectId != "" || s.HasField("projectId") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("projectId")
+		s.WriteString(x.ProjectId)
+	}
+	if x.ZitadelId != "" || s.HasField("zitadelId") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("zitadelId")
+		s.WriteString(x.ZitadelId)
+	}
+	if x.ExpiresAt != nil || s.HasField("expiresAt") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("expiresAt")
+		x.ExpiresAt.MarshalProtoJSON(s.WithField("expiresAt"))
+	}
+	if x.MintedAt != nil || s.HasField("mintedAt") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("mintedAt")
+		x.MintedAt.MarshalProtoJSON(s.WithField("mintedAt"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ServiceUserPATCredential to JSON.
+func (x *ServiceUserPATCredential) MarshalJSON() ([]byte, error) {
+	return json.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the ServiceUserPATCredential message from JSON.
+func (x *ServiceUserPATCredential) UnmarshalProtoJSON(s *json.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.Skip() // ignore unknown field
+		case "token_id", "tokenId":
+			s.AddField("token_id")
+			x.TokenId = s.ReadString()
+		case "ciphertext":
+			s.AddField("ciphertext")
+			x.Ciphertext = s.ReadBytes()
+		case "subsystem":
+			s.AddField("subsystem")
+			x.Subsystem = s.ReadString()
+		case "kind":
+			s.AddField("kind")
+			x.Kind = s.ReadString()
+		case "resource_id", "resourceId":
+			s.AddField("resource_id")
+			x.ResourceId = s.ReadString()
+		case "organization_id", "organizationId":
+			s.AddField("organization_id")
+			x.OrganizationId = s.ReadString()
+		case "project_id", "projectId":
+			s.AddField("project_id")
+			x.ProjectId = s.ReadString()
+		case "zitadel_id", "zitadelId":
+			s.AddField("zitadel_id")
+			x.ZitadelId = s.ReadString()
+		case "expires_at", "expiresAt":
+			if s.ReadNil() {
+				x.ExpiresAt = nil
+				return
+			}
+			x.ExpiresAt = &timestamppb.Timestamp{}
+			x.ExpiresAt.UnmarshalProtoJSON(s.WithField("expires_at", true))
+		case "minted_at", "mintedAt":
+			if s.ReadNil() {
+				x.MintedAt = nil
+				return
+			}
+			x.MintedAt = &timestamppb.Timestamp{}
+			x.MintedAt.UnmarshalProtoJSON(s.WithField("minted_at", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ServiceUserPATCredential from JSON.
+func (x *ServiceUserPATCredential) UnmarshalJSON(b []byte) error {
 	return json.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
@@ -1120,6 +1436,18 @@ func (m *ServiceUserStatus) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.PatCredential != nil {
+		size, err := m.PatCredential.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xba
+	}
 	if m.LastActive != nil {
 		size, err := m.LastActive.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
@@ -1152,6 +1480,115 @@ func (m *ServiceUserStatus) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1
 		i--
 		dAtA[i] = 0xa2
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ServiceUserPATCredential) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ServiceUserPATCredential) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *ServiceUserPATCredential) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.MintedAt != nil {
+		size, err := m.MintedAt.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x52
+	}
+	if m.ExpiresAt != nil {
+		size, err := m.ExpiresAt.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if len(m.ZitadelId) > 0 {
+		i -= len(m.ZitadelId)
+		copy(dAtA[i:], m.ZitadelId)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ZitadelId)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if len(m.ProjectId) > 0 {
+		i -= len(m.ProjectId)
+		copy(dAtA[i:], m.ProjectId)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ProjectId)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.OrganizationId) > 0 {
+		i -= len(m.OrganizationId)
+		copy(dAtA[i:], m.OrganizationId)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.OrganizationId)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.ResourceId) > 0 {
+		i -= len(m.ResourceId)
+		copy(dAtA[i:], m.ResourceId)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ResourceId)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.Kind) > 0 {
+		i -= len(m.Kind)
+		copy(dAtA[i:], m.Kind)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Kind)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Subsystem) > 0 {
+		i -= len(m.Subsystem)
+		copy(dAtA[i:], m.Subsystem)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Subsystem)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Ciphertext) > 0 {
+		i -= len(m.Ciphertext)
+		copy(dAtA[i:], m.Ciphertext)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Ciphertext)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.TokenId) > 0 {
+		i -= len(m.TokenId)
+		copy(dAtA[i:], m.TokenId)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.TokenId)))
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -1294,6 +1731,60 @@ func (m *ServiceUserStatus) SizeVT() (n int) {
 	if m.LastActive != nil {
 		l = m.LastActive.SizeVT()
 		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.PatCredential != nil {
+		l = m.PatCredential.SizeVT()
+		n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *ServiceUserPATCredential) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.TokenId)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Ciphertext)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Subsystem)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Kind)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ResourceId)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.OrganizationId)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ProjectId)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ZitadelId)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.ExpiresAt != nil {
+		l = m.ExpiresAt.SizeVT()
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	if m.MintedAt != nil {
+		l = m.MintedAt.SizeVT()
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -1809,6 +2300,312 @@ func (m *ServiceUserStatus) UnmarshalVT(dAtA []byte) error {
 				m.LastActive = &timestamppb.Timestamp{}
 			}
 			if err := m.LastActive.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 23:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PatCredential", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PatCredential == nil {
+				m.PatCredential = &ServiceUserPATCredential{}
+			}
+			if err := m.PatCredential.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ServiceUserPATCredential) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	var err error
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		wire, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+		if err != nil {
+			return err
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ServiceUserPATCredential: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ServiceUserPATCredential: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenId", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TokenId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Ciphertext", wireType)
+			}
+			var byteLen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			byteLen = int(_v)
+			if err != nil {
+				return err
+			}
+			if byteLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Ciphertext = append(m.Ciphertext[:0], dAtA[iNdEx:postIndex]...)
+			if m.Ciphertext == nil {
+				m.Ciphertext = []byte{}
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Subsystem", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Subsystem = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Kind = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceId", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ResourceId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OrganizationId", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OrganizationId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProjectId", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ProjectId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ZitadelId", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ZitadelId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ExpiresAt", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ExpiresAt == nil {
+				m.ExpiresAt = &timestamppb.Timestamp{}
+			}
+			if err := m.ExpiresAt.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MintedAt", wireType)
+			}
+			var msglen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			msglen = int(_v)
+			if err != nil {
+				return err
+			}
+			if msglen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.MintedAt == nil {
+				m.MintedAt = &timestamppb.Timestamp{}
+			}
+			if err := m.MintedAt.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
