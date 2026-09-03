@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package internal.trust.v1;
+
+import "google/protobuf/timestamp.proto";
+import "meta/v1/meta.proto";
+import "status/v1/status.proto";
+
+option go_package = "github.com/Mattilsynet/mapis/gen/go/trust/v1;internaltrustv1";
+
+// InternalTrustCertificate is a platform-owned (non user-facing) resource that
+// represents the mTLS client certificate bundle used by runtime components
+// (e.g. the Incus shim) to talk to an internal service (e.g. Incus) on behalf
+// of an org/project scope.
+//
+// It is part of the internal control-plane / bootstrap surface, not a customer
+// resource. Read access is served by the "read" turtle; ensure/rotate/revoke
+// are performed by the "trust" cron turtle.
+message InternalTrustCertificate {
+  meta.v1.TypeMeta type = 1;
+  meta.v1.ObjectMeta metadata = 2;
+  InternalTrustCertificateSpec spec = 20;
+  InternalTrustCertificateStatus status = 30;
+}
+
+message InternalTrustCertificateSpec {
+  meta.v1.TypeMeta type = 1;
+
+  // Provider name, e.g. "incus".
+  string provider = 10;
+
+  // Tenant scope this certificate belongs to.
+  // For incus: organization_id and project_id combine into the incus project.
+  string organization_id = 11;
+  string project_id = 12;
+
+  // Optional runtime scope within a project (e.g. "compute", "console").
+  // When empty, the certificate applies to the whole project scope.
+  string scope = 13;
+
+  // Reference to the current active bundle version in the cert store.
+  // Format is provider-specific, e.g. "incus/<org>/<project>/versions/<v>".
+  string bundle_ref = 20;
+
+  // Optional explicit subject CN override. When empty a provider-derived
+  // common name is used.
+  string subject_cn = 21;
+
+  map<string, string> labels = 40;
+}
+
+message InternalTrustCertificateStatus {
+  status.v1.Status status = 1;
+
+  // Active bundle version currently selected for use by consumers.
+  string active_version = 10;
+
+  // Fingerprint (SHA-256) of the active client certificate.
+  string fingerprint = 11;
+
+  // Serial number of the active client certificate.
+  string serial_number = 12;
+
+  // Issuer CN of the active client certificate.
+  string issuer = 13;
+
+  // Validity window of the active client certificate.
+  google.protobuf.Timestamp not_before = 14;
+  google.protobuf.Timestamp not_after = 15;
+
+  // High-level lifecycle state: "PENDING", "PROVISIONING", "READY",
+  // "ROTATING", "FAILED".
+  string phase = 20;
+  string message = 21;
+  google.protobuf.Timestamp last_attempted_at = 22;
+  google.protobuf.Timestamp last_succeeded_at = 23;
+}
+
+message InternalTrustCertificateList {
+  repeated InternalTrustCertificate items = 1;
+}
