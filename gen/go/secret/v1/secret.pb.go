@@ -61,12 +61,10 @@ func (x *Secret) GetStatus() *SecretStatus {
 }
 
 type SecretSpec struct {
-	unknownFields  []byte
-	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organizationId,omitempty"`
-	ProjectId      string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"projectId,omitempty"`
-	SecretId       string `protobuf:"bytes,3,opt,name=secret_id,json=secretId,proto3" json:"secretId,omitempty"`
-	DisplayName    string `protobuf:"bytes,4,opt,name=display_name,json=displayName,proto3" json:"displayName,omitempty"`
-	Description    string `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields []byte
+	// description is the only desired-state field on a Secret. Identity is carried
+	// exclusively by metadata.name and metadata.fqrn.
+	Description string `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
 }
 
 func (x *SecretSpec) Reset() {
@@ -74,34 +72,6 @@ func (x *SecretSpec) Reset() {
 }
 
 func (*SecretSpec) ProtoMessage() {}
-
-func (x *SecretSpec) GetOrganizationId() string {
-	if x != nil {
-		return x.OrganizationId
-	}
-	return ""
-}
-
-func (x *SecretSpec) GetProjectId() string {
-	if x != nil {
-		return x.ProjectId
-	}
-	return ""
-}
-
-func (x *SecretSpec) GetSecretId() string {
-	if x != nil {
-		return x.SecretId
-	}
-	return ""
-}
-
-func (x *SecretSpec) GetDisplayName() string {
-	if x != nil {
-		return x.DisplayName
-	}
-	return ""
-}
 
 func (x *SecretSpec) GetDescription() string {
 	if x != nil {
@@ -232,9 +202,9 @@ func (x *SecretIndexItem) GetLabels() map[string]string {
 	return nil
 }
 
-// SecretValue is an immutable encrypted version record linked to a Secret by
-// secret_id + version. spec.plaintext carries the value provided by the caller
-// on write and the decrypted value on GET; it is never persisted in plaintext.
+// SecretValue is an immutable encrypted child resource of a Secret. CREATE
+// supplies spec.parent_fqrn; the domain allocates metadata.name and the
+// hierarchical metadata.fqrn for the new child.
 type SecretValue struct {
 	unknownFields []byte
 	Type          *v1.TypeMeta       `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
@@ -278,20 +248,12 @@ func (x *SecretValue) GetStatus() *SecretValueStatus {
 }
 
 type SecretValueSpec struct {
-	unknownFields  []byte
-	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organizationId,omitempty"`
-	ProjectId      string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"projectId,omitempty"`
-	SecretId       string `protobuf:"bytes,3,opt,name=secret_id,json=secretId,proto3" json:"secretId,omitempty"`
-	// version is the immutable version number of this SecretValue within the Secret.
-	Version int64 `protobuf:"varint,4,opt,name=version,proto3" json:"version,omitempty"`
+	unknownFields []byte
 	// algorithm names the crypto scheme used to persist this value. age-hybrid is
 	// the only allowed value for new writes.
 	Algorithm string `protobuf:"bytes,5,opt,name=algorithm,proto3" json:"algorithm,omitempty"`
 	// key_refs are project-scoped key references used to encrypt this value via keyhole.
 	KeyRefs []string `protobuf:"bytes,6,rep,name=key_refs,json=keyRefs,proto3" json:"keyRefs,omitempty"`
-	// plaintext carries secret material on write (CREATE) and on read (GET). It is
-	// never stored; only ciphertext is persisted.
-	Plaintext []byte `protobuf:"bytes,7,opt,name=plaintext,proto3" json:"plaintext,omitempty"`
 	// ciphertext is the locally encrypted payload blob for this version record
 	// (nonce || ciphertext) produced by the secret domain's data-encryption-key
 	// (DEK) envelope flow. It is created on write and persisted; it is never
@@ -301,6 +263,10 @@ type SecretValueSpec struct {
 	// ciphertext. It is persisted alongside ciphertext but never returned to
 	// callers in read/list responses.
 	WrappedDek []byte `protobuf:"bytes,9,opt,name=wrapped_dek,json=wrappedDek,proto3" json:"wrappedDek,omitempty"`
+	// parent_fqrn identifies the parent Secret, e.g.
+	// secret/{org}/{project}/secret/{name}. The relationship is persisted and
+	// returned on reads; only cryptographic fields are redacted.
+	ParentFqrn string `protobuf:"bytes,10,opt,name=parent_fqrn,json=parentFqrn,proto3" json:"parentFqrn,omitempty"`
 }
 
 func (x *SecretValueSpec) Reset() {
@@ -308,34 +274,6 @@ func (x *SecretValueSpec) Reset() {
 }
 
 func (*SecretValueSpec) ProtoMessage() {}
-
-func (x *SecretValueSpec) GetOrganizationId() string {
-	if x != nil {
-		return x.OrganizationId
-	}
-	return ""
-}
-
-func (x *SecretValueSpec) GetProjectId() string {
-	if x != nil {
-		return x.ProjectId
-	}
-	return ""
-}
-
-func (x *SecretValueSpec) GetSecretId() string {
-	if x != nil {
-		return x.SecretId
-	}
-	return ""
-}
-
-func (x *SecretValueSpec) GetVersion() int64 {
-	if x != nil {
-		return x.Version
-	}
-	return 0
-}
 
 func (x *SecretValueSpec) GetAlgorithm() string {
 	if x != nil {
@@ -347,13 +285,6 @@ func (x *SecretValueSpec) GetAlgorithm() string {
 func (x *SecretValueSpec) GetKeyRefs() []string {
 	if x != nil {
 		return x.KeyRefs
-	}
-	return nil
-}
-
-func (x *SecretValueSpec) GetPlaintext() []byte {
-	if x != nil {
-		return x.Plaintext
 	}
 	return nil
 }
@@ -370,6 +301,13 @@ func (x *SecretValueSpec) GetWrappedDek() []byte {
 		return x.WrappedDek
 	}
 	return nil
+}
+
+func (x *SecretValueSpec) GetParentFqrn() string {
+	if x != nil {
+		return x.ParentFqrn
+	}
+	return ""
 }
 
 type SecretValueStatus struct {
@@ -557,10 +495,6 @@ func (m *SecretSpec) CloneVT() *SecretSpec {
 		return (*SecretSpec)(nil)
 	}
 	r := new(SecretSpec)
-	r.OrganizationId = m.OrganizationId
-	r.ProjectId = m.ProjectId
-	r.SecretId = m.SecretId
-	r.DisplayName = m.DisplayName
 	r.Description = m.Description
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = slices.Clone(m.unknownFields)
@@ -665,16 +599,10 @@ func (m *SecretValueSpec) CloneVT() *SecretValueSpec {
 		return (*SecretValueSpec)(nil)
 	}
 	r := new(SecretValueSpec)
-	r.OrganizationId = m.OrganizationId
-	r.ProjectId = m.ProjectId
-	r.SecretId = m.SecretId
-	r.Version = m.Version
 	r.Algorithm = m.Algorithm
+	r.ParentFqrn = m.ParentFqrn
 	if rhs := m.KeyRefs; rhs != nil {
 		r.KeyRefs = slices.Clone(rhs)
-	}
-	if rhs := m.Plaintext; rhs != nil {
-		r.Plaintext = slices.Clone(rhs)
 	}
 	if rhs := m.Ciphertext; rhs != nil {
 		r.Ciphertext = slices.Clone(rhs)
@@ -787,18 +715,6 @@ func (this *SecretSpec) EqualVT(that *SecretSpec) bool {
 	if this == that {
 		return true
 	} else if this == nil || that == nil {
-		return false
-	}
-	if this.OrganizationId != that.OrganizationId {
-		return false
-	}
-	if this.ProjectId != that.ProjectId {
-		return false
-	}
-	if this.SecretId != that.SecretId {
-		return false
-	}
-	if this.DisplayName != that.DisplayName {
 		return false
 	}
 	if this.Description != that.Description {
@@ -952,18 +868,6 @@ func (this *SecretValueSpec) EqualVT(that *SecretValueSpec) bool {
 	} else if this == nil || that == nil {
 		return false
 	}
-	if this.OrganizationId != that.OrganizationId {
-		return false
-	}
-	if this.ProjectId != that.ProjectId {
-		return false
-	}
-	if this.SecretId != that.SecretId {
-		return false
-	}
-	if this.Version != that.Version {
-		return false
-	}
 	if this.Algorithm != that.Algorithm {
 		return false
 	}
@@ -976,13 +880,13 @@ func (this *SecretValueSpec) EqualVT(that *SecretValueSpec) bool {
 			return false
 		}
 	}
-	if string(this.Plaintext) != string(that.Plaintext) {
-		return false
-	}
 	if string(this.Ciphertext) != string(that.Ciphertext) {
 		return false
 	}
 	if string(this.WrappedDek) != string(that.WrappedDek) {
+		return false
+	}
+	if this.ParentFqrn != that.ParentFqrn {
 		return false
 	}
 	return string(this.unknownFields) == string(that.unknownFields)
@@ -1184,26 +1088,6 @@ func (x *SecretSpec) MarshalProtoJSON(s *json.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if x.OrganizationId != "" || s.HasField("organizationId") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("organizationId")
-		s.WriteString(x.OrganizationId)
-	}
-	if x.ProjectId != "" || s.HasField("projectId") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("projectId")
-		s.WriteString(x.ProjectId)
-	}
-	if x.SecretId != "" || s.HasField("secretId") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("secretId")
-		s.WriteString(x.SecretId)
-	}
-	if x.DisplayName != "" || s.HasField("displayName") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("displayName")
-		s.WriteString(x.DisplayName)
-	}
 	if x.Description != "" || s.HasField("description") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("description")
@@ -1226,18 +1110,6 @@ func (x *SecretSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 		switch key {
 		default:
 			s.Skip() // ignore unknown field
-		case "organization_id", "organizationId":
-			s.AddField("organization_id")
-			x.OrganizationId = s.ReadString()
-		case "project_id", "projectId":
-			s.AddField("project_id")
-			x.ProjectId = s.ReadString()
-		case "secret_id", "secretId":
-			s.AddField("secret_id")
-			x.SecretId = s.ReadString()
-		case "display_name", "displayName":
-			s.AddField("display_name")
-			x.DisplayName = s.ReadString()
 		case "description":
 			s.AddField("description")
 			x.Description = s.ReadString()
@@ -1619,26 +1491,6 @@ func (x *SecretValueSpec) MarshalProtoJSON(s *json.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if x.OrganizationId != "" || s.HasField("organizationId") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("organizationId")
-		s.WriteString(x.OrganizationId)
-	}
-	if x.ProjectId != "" || s.HasField("projectId") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("projectId")
-		s.WriteString(x.ProjectId)
-	}
-	if x.SecretId != "" || s.HasField("secretId") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("secretId")
-		s.WriteString(x.SecretId)
-	}
-	if x.Version != 0 || s.HasField("version") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("version")
-		s.WriteInt64(x.Version)
-	}
 	if x.Algorithm != "" || s.HasField("algorithm") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("algorithm")
@@ -1649,11 +1501,6 @@ func (x *SecretValueSpec) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("keyRefs")
 		s.WriteStringArray(x.KeyRefs)
 	}
-	if len(x.Plaintext) > 0 || s.HasField("plaintext") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("plaintext")
-		s.WriteBytes(x.Plaintext)
-	}
 	if len(x.Ciphertext) > 0 || s.HasField("ciphertext") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ciphertext")
@@ -1663,6 +1510,11 @@ func (x *SecretValueSpec) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("wrappedDek")
 		s.WriteBytes(x.WrappedDek)
+	}
+	if x.ParentFqrn != "" || s.HasField("parentFqrn") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("parentFqrn")
+		s.WriteString(x.ParentFqrn)
 	}
 	s.WriteObjectEnd()
 }
@@ -1681,18 +1533,6 @@ func (x *SecretValueSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 		switch key {
 		default:
 			s.Skip() // ignore unknown field
-		case "organization_id", "organizationId":
-			s.AddField("organization_id")
-			x.OrganizationId = s.ReadString()
-		case "project_id", "projectId":
-			s.AddField("project_id")
-			x.ProjectId = s.ReadString()
-		case "secret_id", "secretId":
-			s.AddField("secret_id")
-			x.SecretId = s.ReadString()
-		case "version":
-			s.AddField("version")
-			x.Version = s.ReadInt64()
 		case "algorithm":
 			s.AddField("algorithm")
 			x.Algorithm = s.ReadString()
@@ -1703,15 +1543,15 @@ func (x *SecretValueSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 				return
 			}
 			x.KeyRefs = s.ReadStringArray()
-		case "plaintext":
-			s.AddField("plaintext")
-			x.Plaintext = s.ReadBytes()
 		case "ciphertext":
 			s.AddField("ciphertext")
 			x.Ciphertext = s.ReadBytes()
 		case "wrapped_dek", "wrappedDek":
 			s.AddField("wrapped_dek")
 			x.WrappedDek = s.ReadBytes()
+		case "parent_fqrn", "parentFqrn":
+			s.AddField("parent_fqrn")
+			x.ParentFqrn = s.ReadString()
 		}
 	})
 }
@@ -2098,34 +1938,6 @@ func (m *SecretSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x2a
 	}
-	if len(m.DisplayName) > 0 {
-		i -= len(m.DisplayName)
-		copy(dAtA[i:], m.DisplayName)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.DisplayName)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.SecretId) > 0 {
-		i -= len(m.SecretId)
-		copy(dAtA[i:], m.SecretId)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.SecretId)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.ProjectId) > 0 {
-		i -= len(m.ProjectId)
-		copy(dAtA[i:], m.ProjectId)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ProjectId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.OrganizationId) > 0 {
-		i -= len(m.OrganizationId)
-		copy(dAtA[i:], m.OrganizationId)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.OrganizationId)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -2428,6 +2240,13 @@ func (m *SecretValueSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ParentFqrn) > 0 {
+		i -= len(m.ParentFqrn)
+		copy(dAtA[i:], m.ParentFqrn)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ParentFqrn)))
+		i--
+		dAtA[i] = 0x52
+	}
 	if len(m.WrappedDek) > 0 {
 		i -= len(m.WrappedDek)
 		copy(dAtA[i:], m.WrappedDek)
@@ -2441,13 +2260,6 @@ func (m *SecretValueSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Ciphertext)))
 		i--
 		dAtA[i] = 0x42
-	}
-	if len(m.Plaintext) > 0 {
-		i -= len(m.Plaintext)
-		copy(dAtA[i:], m.Plaintext)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Plaintext)))
-		i--
-		dAtA[i] = 0x3a
 	}
 	if len(m.KeyRefs) > 0 {
 		for iNdEx := len(m.KeyRefs) - 1; iNdEx >= 0; iNdEx-- {
@@ -2464,32 +2276,6 @@ func (m *SecretValueSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.Algorithm)))
 		i--
 		dAtA[i] = 0x2a
-	}
-	if m.Version != 0 {
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.Version))
-		i--
-		dAtA[i] = 0x20
-	}
-	if len(m.SecretId) > 0 {
-		i -= len(m.SecretId)
-		copy(dAtA[i:], m.SecretId)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.SecretId)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.ProjectId) > 0 {
-		i -= len(m.ProjectId)
-		copy(dAtA[i:], m.ProjectId)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ProjectId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.OrganizationId) > 0 {
-		i -= len(m.OrganizationId)
-		copy(dAtA[i:], m.OrganizationId)
-		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.OrganizationId)))
-		i--
-		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -2706,22 +2492,6 @@ func (m *SecretSpec) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.OrganizationId)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	l = len(m.ProjectId)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	l = len(m.SecretId)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	l = len(m.DisplayName)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
 	l = len(m.Description)
 	if l > 0 {
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
@@ -2840,21 +2610,6 @@ func (m *SecretValueSpec) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.OrganizationId)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	l = len(m.ProjectId)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	l = len(m.SecretId)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
-	if m.Version != 0 {
-		n += 1 + protobuf_go_lite.SizeOfVarint(uint64(m.Version))
-	}
 	l = len(m.Algorithm)
 	if l > 0 {
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
@@ -2865,15 +2620,15 @@ func (m *SecretValueSpec) SizeVT() (n int) {
 			n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 		}
 	}
-	l = len(m.Plaintext)
-	if l > 0 {
-		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
-	}
 	l = len(m.Ciphertext)
 	if l > 0 {
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
 	l = len(m.WrappedDek)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ParentFqrn)
 	if l > 0 {
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
@@ -3126,94 +2881,6 @@ func (m *SecretSpec) UnmarshalVT(dAtA []byte) error {
 			return fmt.Errorf("proto: SecretSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OrganizationId", wireType)
-			}
-			var stringLen uint64
-			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
-			if err != nil {
-				return err
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.OrganizationId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ProjectId", wireType)
-			}
-			var stringLen uint64
-			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
-			if err != nil {
-				return err
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ProjectId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SecretId", wireType)
-			}
-			var stringLen uint64
-			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
-			if err != nil {
-				return err
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SecretId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DisplayName", wireType)
-			}
-			var stringLen uint64
-			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
-			if err != nil {
-				return err
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DisplayName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
@@ -3851,81 +3518,6 @@ func (m *SecretValueSpec) UnmarshalVT(dAtA []byte) error {
 			return fmt.Errorf("proto: SecretValueSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OrganizationId", wireType)
-			}
-			var stringLen uint64
-			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
-			if err != nil {
-				return err
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.OrganizationId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ProjectId", wireType)
-			}
-			var stringLen uint64
-			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
-			if err != nil {
-				return err
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ProjectId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SecretId", wireType)
-			}
-			var stringLen uint64
-			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
-			if err != nil {
-				return err
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SecretId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Version", wireType)
-			}
-			m.Version = 0
-			m.Version, iNdEx, err = protobuf_go_lite.DecodeVarintInt64(dAtA, iNdEx)
-			if err != nil {
-				return err
-			}
 		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Algorithm", wireType)
@@ -3969,32 +3561,6 @@ func (m *SecretValueSpec) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.KeyRefs = append(m.KeyRefs, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Plaintext", wireType)
-			}
-			var byteLen int
-			var _v uint64
-			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
-			byteLen = int(_v)
-			if err != nil {
-				return err
-			}
-			if byteLen < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return protobuf_go_lite.ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Plaintext = append(m.Plaintext[:0], dAtA[iNdEx:postIndex]...)
-			if m.Plaintext == nil {
-				m.Plaintext = []byte{}
-			}
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
@@ -4047,6 +3613,28 @@ func (m *SecretValueSpec) UnmarshalVT(dAtA []byte) error {
 			if m.WrappedDek == nil {
 				m.WrappedDek = []byte{}
 			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ParentFqrn", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ParentFqrn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
