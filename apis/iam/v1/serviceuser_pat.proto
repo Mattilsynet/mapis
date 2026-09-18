@@ -85,3 +85,36 @@ message CQRSPrincipalSessionCacheEntry {
   bool negative = 7;
   string reason = 8;
 }
+
+// ActivationCredentialRequest is an internal runtime request for the PAT of
+// the activation-managed ServiceUser for an exact org/project/service tuple.
+message ActivationCredentialRequest {
+  string organization_id = 1;
+  string project_id = 2;
+  string service_name = 3;
+}
+
+message ActivationCredentialResponse {
+  bool success = 1;
+  string principal = 2;
+  bytes token = 3;
+  string token_id = 4;
+  int64 expires_at = 5;
+  string error = 6;
+}
+
+// ActivationPrincipalCheckRequest lets internal authorization layers verify
+// that an introspected PAT belongs to the active activation runtime for the
+// exact target project and service.
+message ActivationPrincipalCheckRequest {
+  string organization_id = 1;
+  string project_id = 2;
+  string service_name = 3;
+  string zitadel_user_id = 4;
+}
+
+message ActivationPrincipalCheckResponse {
+  bool allowed = 1;
+  string principal = 2;
+  string reason = 3;
+}

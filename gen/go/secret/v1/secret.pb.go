@@ -65,6 +65,10 @@ type SecretSpec struct {
 	// description is the only desired-state field on a Secret. Identity is carried
 	// exclusively by metadata.name and metadata.fqrn.
 	Description string `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	// initial_value is accepted only on Secret CREATE and is immediately moved
+	// into the first immutable SecretValue version. It is never persisted on the
+	// parent Secret or returned by GET/LIST/events.
+	InitialValue []byte `protobuf:"bytes,6,opt,name=initial_value,json=initialValue,proto3" json:"initialValue,omitempty"`
 }
 
 func (x *SecretSpec) Reset() {
@@ -78,6 +82,13 @@ func (x *SecretSpec) GetDescription() string {
 		return x.Description
 	}
 	return ""
+}
+
+func (x *SecretSpec) GetInitialValue() []byte {
+	if x != nil {
+		return x.InitialValue
+	}
+	return nil
 }
 
 type SecretStatus struct {
@@ -267,6 +278,14 @@ type SecretValueSpec struct {
 	// secret/{org}/{project}/secret/{name}. The relationship is persisted and
 	// returned on reads; only cryptographic fields are redacted.
 	ParentFqrn string `protobuf:"bytes,10,opt,name=parent_fqrn,json=parentFqrn,proto3" json:"parentFqrn,omitempty"`
+	// write_value is accepted only on SecretValue CREATE. The Secret domain
+	// wraps it before persistence and clears it from stored resources, GET/LIST
+	// responses, and events. It must never be used for an UPDATE because value
+	// versions are immutable.
+	WriteValue []byte `protobuf:"bytes,11,opt,name=write_value,json=writeValue,proto3" json:"writeValue,omitempty"`
+	// wrapped_value is the Keyhole ciphertext for this immutable version. It is
+	// persisted by the Secret domain and never returned by GET/LIST/events.
+	WrappedValue []byte `protobuf:"bytes,12,opt,name=wrapped_value,json=wrappedValue,proto3" json:"wrappedValue,omitempty"`
 }
 
 func (x *SecretValueSpec) Reset() {
@@ -308,6 +327,20 @@ func (x *SecretValueSpec) GetParentFqrn() string {
 		return x.ParentFqrn
 	}
 	return ""
+}
+
+func (x *SecretValueSpec) GetWriteValue() []byte {
+	if x != nil {
+		return x.WriteValue
+	}
+	return nil
+}
+
+func (x *SecretValueSpec) GetWrappedValue() []byte {
+	if x != nil {
+		return x.WrappedValue
+	}
+	return nil
 }
 
 type SecretValueStatus struct {
@@ -496,6 +529,9 @@ func (m *SecretSpec) CloneVT() *SecretSpec {
 	}
 	r := new(SecretSpec)
 	r.Description = m.Description
+	if rhs := m.InitialValue; rhs != nil {
+		r.InitialValue = slices.Clone(rhs)
+	}
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = slices.Clone(m.unknownFields)
 	}
@@ -610,6 +646,12 @@ func (m *SecretValueSpec) CloneVT() *SecretValueSpec {
 	if rhs := m.WrappedDek; rhs != nil {
 		r.WrappedDek = slices.Clone(rhs)
 	}
+	if rhs := m.WriteValue; rhs != nil {
+		r.WriteValue = slices.Clone(rhs)
+	}
+	if rhs := m.WrappedValue; rhs != nil {
+		r.WrappedValue = slices.Clone(rhs)
+	}
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = slices.Clone(m.unknownFields)
 	}
@@ -718,6 +760,9 @@ func (this *SecretSpec) EqualVT(that *SecretSpec) bool {
 		return false
 	}
 	if this.Description != that.Description {
+		return false
+	}
+	if string(this.InitialValue) != string(that.InitialValue) {
 		return false
 	}
 	return string(this.unknownFields) == string(that.unknownFields)
@@ -887,6 +932,12 @@ func (this *SecretValueSpec) EqualVT(that *SecretValueSpec) bool {
 		return false
 	}
 	if this.ParentFqrn != that.ParentFqrn {
+		return false
+	}
+	if string(this.WriteValue) != string(that.WriteValue) {
+		return false
+	}
+	if string(this.WrappedValue) != string(that.WrappedValue) {
 		return false
 	}
 	return string(this.unknownFields) == string(that.unknownFields)
@@ -1093,6 +1144,11 @@ func (x *SecretSpec) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("description")
 		s.WriteString(x.Description)
 	}
+	if len(x.InitialValue) > 0 || s.HasField("initialValue") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("initialValue")
+		s.WriteBytes(x.InitialValue)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1113,6 +1169,9 @@ func (x *SecretSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 		case "description":
 			s.AddField("description")
 			x.Description = s.ReadString()
+		case "initial_value", "initialValue":
+			s.AddField("initial_value")
+			x.InitialValue = s.ReadBytes()
 		}
 	})
 }
@@ -1516,6 +1575,16 @@ func (x *SecretValueSpec) MarshalProtoJSON(s *json.MarshalState) {
 		s.WriteObjectField("parentFqrn")
 		s.WriteString(x.ParentFqrn)
 	}
+	if len(x.WriteValue) > 0 || s.HasField("writeValue") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("writeValue")
+		s.WriteBytes(x.WriteValue)
+	}
+	if len(x.WrappedValue) > 0 || s.HasField("wrappedValue") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("wrappedValue")
+		s.WriteBytes(x.WrappedValue)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1552,6 +1621,12 @@ func (x *SecretValueSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 		case "parent_fqrn", "parentFqrn":
 			s.AddField("parent_fqrn")
 			x.ParentFqrn = s.ReadString()
+		case "write_value", "writeValue":
+			s.AddField("write_value")
+			x.WriteValue = s.ReadBytes()
+		case "wrapped_value", "wrappedValue":
+			s.AddField("wrapped_value")
+			x.WrappedValue = s.ReadBytes()
 		}
 	})
 }
@@ -1931,6 +2006,13 @@ func (m *SecretSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.InitialValue) > 0 {
+		i -= len(m.InitialValue)
+		copy(dAtA[i:], m.InitialValue)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.InitialValue)))
+		i--
+		dAtA[i] = 0x32
+	}
 	if len(m.Description) > 0 {
 		i -= len(m.Description)
 		copy(dAtA[i:], m.Description)
@@ -2240,6 +2322,20 @@ func (m *SecretValueSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.WrappedValue) > 0 {
+		i -= len(m.WrappedValue)
+		copy(dAtA[i:], m.WrappedValue)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.WrappedValue)))
+		i--
+		dAtA[i] = 0x62
+	}
+	if len(m.WriteValue) > 0 {
+		i -= len(m.WriteValue)
+		copy(dAtA[i:], m.WriteValue)
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.WriteValue)))
+		i--
+		dAtA[i] = 0x5a
+	}
 	if len(m.ParentFqrn) > 0 {
 		i -= len(m.ParentFqrn)
 		copy(dAtA[i:], m.ParentFqrn)
@@ -2496,6 +2592,10 @@ func (m *SecretSpec) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
+	l = len(m.InitialValue)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -2629,6 +2729,14 @@ func (m *SecretValueSpec) SizeVT() (n int) {
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
 	l = len(m.ParentFqrn)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.WriteValue)
+	if l > 0 {
+		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	l = len(m.WrappedValue)
 	if l > 0 {
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 	}
@@ -2902,6 +3010,32 @@ func (m *SecretSpec) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InitialValue", wireType)
+			}
+			var byteLen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			byteLen = int(_v)
+			if err != nil {
+				return err
+			}
+			if byteLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.InitialValue = append(m.InitialValue[:0], dAtA[iNdEx:postIndex]...)
+			if m.InitialValue == nil {
+				m.InitialValue = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3635,6 +3769,58 @@ func (m *SecretValueSpec) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.ParentFqrn = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WriteValue", wireType)
+			}
+			var byteLen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			byteLen = int(_v)
+			if err != nil {
+				return err
+			}
+			if byteLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WriteValue = append(m.WriteValue[:0], dAtA[iNdEx:postIndex]...)
+			if m.WriteValue == nil {
+				m.WriteValue = []byte{}
+			}
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WrappedValue", wireType)
+			}
+			var byteLen int
+			var _v uint64
+			_v, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			byteLen = int(_v)
+			if err != nil {
+				return err
+			}
+			if byteLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WrappedValue = append(m.WrappedValue[:0], dAtA[iNdEx:postIndex]...)
+			if m.WrappedValue == nil {
+				m.WrappedValue = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

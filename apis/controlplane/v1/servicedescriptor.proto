@@ -75,6 +75,13 @@ message ServiceDescriptorSpec {
   // defaults projected by reconciler.
   repeated BuiltInRoleBinding built_in_role_bindings = 33;
 
+  // activation_runtime_role_names declares the internal-only roles granted to
+  // the deterministic runtime ServiceUser created for each project activation
+  // of this service. The activation reconciler expands these names into
+  // immutable, project-scoped RoleBindings. This is runtime dependency access,
+  // not a grant of this service's tenant-facing roles.
+  repeated string activation_runtime_role_names = 34;
+
   // v1 supports only APPLY semantics.
   // APPLY is authoritative desired-state reconciliation for descriptor-owned
   // built-in permissions and roles:

@@ -288,6 +288,12 @@ type ServiceDescriptorSpec struct {
 	// built_in_role_bindings declares built-in rolebinding intent for managed
 	// defaults projected by reconciler.
 	BuiltInRoleBindings []*BuiltInRoleBinding `protobuf:"bytes,33,rep,name=built_in_role_bindings,json=builtInRoleBindings,proto3" json:"builtInRoleBindings,omitempty"`
+	// activation_runtime_role_names declares the internal-only roles granted to
+	// the deterministic runtime ServiceUser created for each project activation
+	// of this service. The activation reconciler expands these names into
+	// immutable, project-scoped RoleBindings. This is runtime dependency access,
+	// not a grant of this service's tenant-facing roles.
+	ActivationRuntimeRoleNames []string `protobuf:"bytes,34,rep,name=activation_runtime_role_names,json=activationRuntimeRoleNames,proto3" json:"activationRuntimeRoleNames,omitempty"`
 	// v1 supports only APPLY semantics.
 	// APPLY is authoritative desired-state reconciliation for descriptor-owned
 	// built-in permissions and roles:
@@ -378,6 +384,13 @@ func (x *ServiceDescriptorSpec) GetBuiltInPermissionFilters() []*BuiltInPermissi
 func (x *ServiceDescriptorSpec) GetBuiltInRoleBindings() []*BuiltInRoleBinding {
 	if x != nil {
 		return x.BuiltInRoleBindings
+	}
+	return nil
+}
+
+func (x *ServiceDescriptorSpec) GetActivationRuntimeRoleNames() []string {
+	if x != nil {
+		return x.ActivationRuntimeRoleNames
 	}
 	return nil
 }
@@ -789,6 +802,9 @@ func (m *ServiceDescriptorSpec) CloneVT() *ServiceDescriptorSpec {
 			r.BuiltInRoleBindings[k] = v.CloneVT()
 		}
 	}
+	if rhs := m.ActivationRuntimeRoleNames; rhs != nil {
+		r.ActivationRuntimeRoleNames = slices.Clone(rhs)
+	}
 	if len(m.unknownFields) > 0 {
 		r.unknownFields = slices.Clone(m.unknownFields)
 	}
@@ -1111,6 +1127,15 @@ func (this *ServiceDescriptorSpec) EqualVT(that *ServiceDescriptorSpec) bool {
 			if !p.EqualVT(q) {
 				return false
 			}
+		}
+	}
+	if len(this.ActivationRuntimeRoleNames) != len(that.ActivationRuntimeRoleNames) {
+		return false
+	}
+	for i, vx := range this.ActivationRuntimeRoleNames {
+		vy := that.ActivationRuntimeRoleNames[i]
+		if vx != vy {
+			return false
 		}
 	}
 	if this.Mode != that.Mode {
@@ -1789,6 +1814,11 @@ func (x *ServiceDescriptorSpec) MarshalProtoJSON(s *json.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
+	if len(x.ActivationRuntimeRoleNames) > 0 || s.HasField("activationRuntimeRoleNames") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("activationRuntimeRoleNames")
+		s.WriteStringArray(x.ActivationRuntimeRoleNames)
+	}
 	if x.Mode != 0 || s.HasField("mode") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("mode")
@@ -1939,6 +1969,13 @@ func (x *ServiceDescriptorSpec) UnmarshalProtoJSON(s *json.UnmarshalState) {
 				}
 				x.BuiltInRoleBindings = append(x.BuiltInRoleBindings, v)
 			})
+		case "activation_runtime_role_names", "activationRuntimeRoleNames":
+			s.AddField("activation_runtime_role_names")
+			if s.ReadNil() {
+				x.ActivationRuntimeRoleNames = nil
+				return
+			}
+			x.ActivationRuntimeRoleNames = s.ReadStringArray()
 		case "mode":
 			s.AddField("mode")
 			x.Mode.UnmarshalProtoJSON(s)
@@ -2640,6 +2677,17 @@ func (m *ServiceDescriptorSpec) MarshalToSizedBufferVT(dAtA []byte) (int, error)
 		i--
 		dAtA[i] = 0xc0
 	}
+	if len(m.ActivationRuntimeRoleNames) > 0 {
+		for iNdEx := len(m.ActivationRuntimeRoleNames) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ActivationRuntimeRoleNames[iNdEx])
+			copy(dAtA[i:], m.ActivationRuntimeRoleNames[iNdEx])
+			i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(len(m.ActivationRuntimeRoleNames[iNdEx])))
+			i--
+			dAtA[i] = 0x2
+			i--
+			dAtA[i] = 0x92
+		}
+	}
 	if len(m.BuiltInRoleBindings) > 0 {
 		for iNdEx := len(m.BuiltInRoleBindings) - 1; iNdEx >= 0; iNdEx-- {
 			size, err := m.BuiltInRoleBindings[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
@@ -3315,6 +3363,12 @@ func (m *ServiceDescriptorSpec) SizeVT() (n int) {
 			n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
 		}
 	}
+	if len(m.ActivationRuntimeRoleNames) > 0 {
+		for _, s := range m.ActivationRuntimeRoleNames {
+			l = len(s)
+			n += 2 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+		}
+	}
 	if m.Mode != 0 {
 		n += 2 + protobuf_go_lite.SizeOfVarint(uint64(m.Mode))
 	}
@@ -3946,6 +4000,28 @@ func (m *ServiceDescriptorSpec) UnmarshalVT(dAtA []byte) error {
 			if err := m.BuiltInRoleBindings[len(m.BuiltInRoleBindings)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 34:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ActivationRuntimeRoleNames", wireType)
+			}
+			var stringLen uint64
+			stringLen, iNdEx, err = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
+			if err != nil {
+				return err
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ActivationRuntimeRoleNames = append(m.ActivationRuntimeRoleNames, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 40:
 			if wireType != 0 {
