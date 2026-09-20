@@ -55,7 +55,6 @@ type ZoneView int32
 
 const (
 	ZoneView_ZONE_VIEW_UNSPECIFIED ZoneView = 0
-	ZoneView_ZONE_VIEW_ANY         ZoneView = 1
 	ZoneView_ZONE_VIEW_INTERNAL    ZoneView = 2
 	ZoneView_ZONE_VIEW_EXTERNAL    ZoneView = 3
 )
@@ -64,13 +63,11 @@ const (
 var (
 	ZoneView_name = map[int32]string{
 		0: "ZONE_VIEW_UNSPECIFIED",
-		1: "ZONE_VIEW_ANY",
 		2: "ZONE_VIEW_INTERNAL",
 		3: "ZONE_VIEW_EXTERNAL",
 	}
 	ZoneView_value = map[string]int32{
 		"ZONE_VIEW_UNSPECIFIED": 0,
-		"ZONE_VIEW_ANY":         1,
 		"ZONE_VIEW_INTERNAL":    2,
 		"ZONE_VIEW_EXTERNAL":    3,
 	}

@@ -27,7 +27,10 @@ message ZoneSpec {
   }];
   Soa soa = 5;
   repeated string nameservers = 6;
-  ZoneView view = 7 [(buf.validate.field).enum.defined_only = true];
+  ZoneView view = 7 [(buf.validate.field).enum = {
+    defined_only: true,
+    in: [2, 3]
+  }];
   map<string, string> labels = 8;
   string etag = 9;
   google.protobuf.Timestamp created_at = 10;
@@ -55,7 +58,8 @@ enum ZoneKind {
 
 enum ZoneView {
   ZONE_VIEW_UNSPECIFIED = 0;
-  ZONE_VIEW_ANY = 1;
+  reserved 1;
+  reserved "ZONE_VIEW_ANY";
   ZONE_VIEW_INTERNAL = 2;
   ZONE_VIEW_EXTERNAL = 3;
 }
