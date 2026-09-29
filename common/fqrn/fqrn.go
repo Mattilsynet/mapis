@@ -56,7 +56,7 @@ func Parse(value string) (Resource, error) {
 	if r.Service == "organization" && (r.Org != "global" || r.Project != "all" || r.Region != "" || r.Type != "organization") {
 		return Resource{}, fmt.Errorf("invalid organization anchor")
 	}
-	if r.Service == "project" && (r.Org == "global" || r.Project != "all" || r.Region != "" || r.Type != "project" || r.ID == "all") {
+	if r.Service == "project" && r.Type == "project" && (r.Org == "global" || r.Project != "all" || r.Region != "" || r.ID == "all") {
 		return Resource{}, fmt.Errorf("invalid project anchor")
 	}
 	if r.Canonical() != value {

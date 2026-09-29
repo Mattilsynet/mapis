@@ -39,3 +39,17 @@ func TestParseRejectsAliasesAndMalformedResources(t *testing.T) {
 		}
 	}
 }
+
+func TestParseAcceptsProjectServiceActivationResource(t *testing.T) {
+	value := "project/acme/frontend/projectserviceactivation/dns"
+	resource, err := Parse(value)
+	if err != nil {
+		t.Fatalf("Parse(%q): %v", value, err)
+	}
+	if resource.Service != "project" || resource.Org != "acme" || resource.Project != "frontend" || resource.Type != "projectserviceactivation" || resource.ID != "dns" {
+		t.Fatalf("resource = %+v", resource)
+	}
+	if resource.Canonical() != value {
+		t.Fatalf("Canonical() = %q, want %q", resource.Canonical(), value)
+	}
+}
